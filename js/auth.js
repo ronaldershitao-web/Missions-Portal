@@ -2,64 +2,68 @@
    Google Identity Authentication
 ========================================== */
 
-function handleCredentialResponse(response) {
-
-    if (CONFIG.DEBUG) {
-
-        console.log("JWT Received");
-
-        console.log(response);
-
-    }
+async function handleCredentialResponse(response) {
 
     showLoading();
 
-    const token = response.credential;
+    try {
 
-    if (!token) {
+        const res = await fetch(CONFIG.API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":"application/json"
+            },
+
+            body: JSON.stringify({
+
+                action:"login",
+
+                token:response.credential
+
+            })
+
+        });
+
+        const result = await res.json();
 
         hideLoading();
 
+        if(result.success){
+
+            showMessage(
+                "Welcome " + result.user.name,
+                "success"
+            );
+
+            console.log(result);
+
+            // Next:
+            // window.location = "dashboard.html";
+
+        }else{
+
+            showMessage(
+                result.message,
+                "danger"
+            );
+
+        }
+
+    }
+    catch(err){
+
+        hideLoading();
+
+        console.error(err);
+
         showMessage(
-            "Authentication failed.",
+            "Unable to connect to server.",
             "danger"
         );
 
-        return;
-
     }
-
-    // Decode JWT for display only
-    const payload = parseJwt(token);
-
-    console.log(payload);
-
-    showMessage(
-
-        "Welcome " + payload.name,
-
-        "success"
-
-    );
-
-    /*
-       Phase 2
-
-       fetch(CONFIG.API_URL,{
-            method:"POST",
-            body:JSON.stringify({
-                action:"login",
-                token:token
-            })
-       })
-
-    */
-
-    setTimeout(function(){
-
-        hideLoading();
-
-    },1000);
 
 }
 
