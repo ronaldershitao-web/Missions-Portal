@@ -1,0 +1,297 @@
+/* =====================================================
+   Missions Portal
+   Version 1.0
+===================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    height:100%;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+
+    background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 100%);
+    overflow:hidden;
+
+}
+
+/* ==========================
+   Background
+========================== */
+
+.background-overlay{
+
+    position:fixed;
+    inset:0;
+
+    background:
+    radial-gradient(circle at top left,
+    rgba(255,255,255,.12),
+    transparent 35%),
+
+    radial-gradient(circle at bottom right,
+    rgba(255,255,255,.08),
+    transparent 30%);
+
+    z-index:-1;
+
+}
+
+/* ==========================
+   Hero Section
+========================== */
+
+.hero{
+
+    color:white;
+    max-width:600px;
+
+}
+
+.logo-circle{
+
+    width:120px;
+    height:120px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.15);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:60px;
+
+    margin-bottom:30px;
+
+    backdrop-filter:blur(10px);
+
+}
+
+.portal-title{
+
+    font-size:56px;
+    font-weight:700;
+    margin-bottom:15px;
+
+}
+
+.portal-subtitle{
+
+    font-size:22px;
+    opacity:.9;
+    margin-bottom:40px;
+    line-height:1.5;
+
+}
+
+.hero-features{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+
+}
+
+.hero-features div{
+
+    background:rgba(255,255,255,.08);
+
+    padding:18px;
+
+    border-radius:14px;
+
+    backdrop-filter:blur(10px);
+
+    transition:.25s;
+
+}
+
+.hero-features div:hover{
+
+    transform:translateY(-3px);
+
+    background:rgba(255,255,255,.16);
+
+}
+
+.hero-features i{
+
+    margin-right:10px;
+
+}
+
+/* ==========================
+   Login Card
+========================== */
+
+.login-card{
+
+    width:420px;
+    max-width:95%;
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:45px;
+
+    box-shadow:
+    0 25px 60px rgba(0,0,0,.25);
+
+    animation:fadeIn .6s ease;
+
+}
+
+.login-card h2{
+
+    font-weight:700;
+    color:#0f172a;
+
+}
+
+.login-card p{
+
+    color:#64748b;
+
+}
+
+.mobile-logo{
+
+    font-size:60px;
+    margin-bottom:20px;
+
+}
+
+/* ==========================
+   Google Button
+========================== */
+
+.g_id_signin{
+
+    display:flex;
+    justify-content:center;
+
+}
+
+/* ==========================
+   Loading
+========================== */
+
+.loading-area{
+
+    text-align:center;
+
+}
+
+.spinner-border{
+
+    width:3rem;
+    height:3rem;
+
+}
+
+/* ==========================
+   Footer
+========================== */
+
+.footer{
+
+    text-align:center;
+    color:#94a3b8;
+    font-size:13px;
+    line-height:1.7;
+
+}
+
+/* ==========================
+   Alerts
+========================== */
+
+.alert{
+
+    border-radius:12px;
+
+}
+
+/* ==========================
+   Animations
+========================== */
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media (max-width:992px){
+
+    body{
+
+        overflow:auto;
+
+    }
+
+    .login-card{
+
+        margin:25px;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .login-card{
+
+        padding:35px 25px;
+
+    }
+
+    .portal-title{
+
+        font-size:42px;
+
+    }
+
+    .portal-subtitle{
+
+        font-size:18px;
+
+    }
+
+}
+
+@media (max-width:576px){
+
+    .login-card{
+
+        width:100%;
+        border-radius:18px;
+
+    }
+
+}
