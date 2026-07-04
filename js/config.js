@@ -1,13 +1,10 @@
 const CONFIG = {
 
     APP_NAME: "Missions Portal",
-
     VERSION: "1.0.0",
 
     CLIENT_ID: "263902111764-jdil2ttim5q05gim8tsheopgoprr6jmh.apps.googleusercontent.com",
 
-    DEPLOYMENT_ID: "AKfycbwloXXuUM8zEg4woOdaet0WoFOkTlbEr5gRQv2-yBZ6gcEZ44n2Y1EOON0CBnUoec60",
-
-    DEBUG: true
+    SCRIPT_ID: "1P5yyJNmQ6L8zndgkcDmj6h7xoExK_7EDV_jnRIQZjovJK-hGgojlwhd9"
 
 };
