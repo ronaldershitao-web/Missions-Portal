@@ -1,49 +1,53 @@
 /* ==========================================
-   Google Login + Execution API
+   AUTH FLOW (GIS + Execution API)
 ========================================== */
 
 let accessToken = null;
 
 /* ==========================================
-   GIS Callback (ID TOKEN ONLY)
+   GIS LOGIN CALLBACK (ID TOKEN)
 ========================================== */
 
 async function handleCredentialResponse(response) {
 
     showLoading();
 
+    const idToken = response.credential;
+
     try {
 
-        const idToken = response.credential;
+        // STEP 1: Load Google API client
+        await new Promise((resolve) => {
+            gapi.load("client", resolve);
+        });
 
-        // 1. Load OAuth token client
+        // STEP 2: Request OAuth Access Token
         const tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CONFIG.CLIENT_ID,
-            scope: "https://www.googleapis.com/auth/script.projects",
+
+            scope: "https://www.googleapis.com/auth/script.scriptapp",
+
             callback: async (tokenResponse) => {
 
                 accessToken = tokenResponse.access_token;
 
-                // 2. Call Apps Script Execution API
+                // STEP 3: Call Apps Script
                 await callLogin(idToken, accessToken);
-
             }
         });
 
-        // 3. Request access token
         tokenClient.requestAccessToken();
 
     } catch (err) {
 
         hideLoading();
         console.error(err);
-        showMessage("Login failed", "danger");
-
+        showMessage("Login init failed", "danger");
     }
 }
 
 /* ==========================================
-   CALL APPS SCRIPT (Execution API)
+   EXECUTION API CALL
 ========================================== */
 
 async function callLogin(idToken, token) {
@@ -70,7 +74,13 @@ async function callLogin(idToken, token) {
 
         hideLoading();
 
-        // Execution API response format
+        if (data.error) {
+
+            console.error(data.error);
+            showMessage("Execution API error", "danger");
+            return;
+        }
+
         const result = data.response.result;
 
         if (result.success) {
@@ -80,34 +90,32 @@ async function callLogin(idToken, token) {
                 "success"
             );
 
-            console.log("LOGIN SUCCESS:", result);
+            console.log("LOGIN OK:", result);
 
-            // TODO: redirect
+            // NEXT STEP
             // window.location = "dashboard.html";
 
         } else {
 
             showMessage(result.message, "danger");
-
         }
 
     } catch (err) {
 
         hideLoading();
         console.error(err);
-        showMessage("Execution API failed", "danger");
-
+        showMessage("Server call failed", "danger");
     }
 }
 
 /* ==========================================
-   JWT Decoder (optional debug)
+   DEBUG JWT (optional)
 ========================================== */
 
 function parseJwt(token) {
 
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
 
+    return JSON.parse(atob(base64));
 }
