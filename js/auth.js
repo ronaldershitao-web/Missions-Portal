@@ -1,23 +1,30 @@
-let idTokenGlobal = null;
-let accessTokenGlobal = null;
-
 /* ==========================================
-   GIS LOGIN (ID TOKEN ONLY)
+   Missions Portal - AUTH (STABLE VERSION)
 ========================================== */
 
-function handleCredentialResponse(response) {
+let idTokenGlobal = null;
+
+/* ==========================================
+   GOOGLE LOGIN CALLBACK (GIS)
+========================================== */
+
+async function handleCredentialResponse(response) {
 
     showLoading();
     clearMessage();
 
     try {
 
-        console.log("GIS LOGIN OK");
+        console.log("GIS LOGIN SUCCESS");
 
+        // 1. Store ID token from Google Identity Services
         idTokenGlobal = response.credential;
 
-        // STEP 1: Start SAFE OAuth (redirect flow, NOT popup)
-        startOAuthFlow();
+        // OPTIONAL DEBUG
+        // console.log(parseJwt(idTokenGlobal));
+
+        // 2. Directly call Apps Script Execution API
+        await callAppsScriptLogin(idTokenGlobal);
 
     } catch (err) {
 
@@ -28,122 +35,53 @@ function handleCredentialResponse(response) {
 }
 
 /* ==========================================
-   SAFE OAUTH FLOW (NO POPUP)
+   APPS SCRIPT EXECUTION API CALL
 ========================================== */
 
-function startOAuthFlow() {
-
-    const client = google.accounts.oauth2.initCodeClient({
-
-        client_id: CONFIG.CLIENT_ID,
-
-        scope: "https://www.googleapis.com/auth/script.scriptapp",
-
-        ux_mode: "popup", // fallback safe mode
-
-        callback: async (response) => {
-
-            try {
-
-                if (!response.code) {
-                    throw new Error("No auth code returned");
-                }
-
-                console.log("AUTH CODE RECEIVED");
-
-                // STEP 2: Exchange code for access token (via Google endpoint)
-                const token = await exchangeCodeForToken(response.code);
-
-                accessTokenGlobal = token;
-
-                // STEP 3: Call Apps Script
-                await callAppsScriptLogin(idTokenGlobal, accessTokenGlobal);
-
-            } catch (err) {
-
-                console.error(err);
-                hideLoading();
-                showMessage("OAuth failed", "danger");
-            }
-        }
-    });
-
-    client.requestCode();
-}
-
-/* ==========================================
-   EXCHANGE CODE FOR ACCESS TOKEN
-========================================== */
-
-async function exchangeCodeForToken(code) {
-
-    const res = await fetch("https://oauth2.googleapis.com/token", {
-
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-
-        body: new URLSearchParams({
-
-            code: code,
-            client_id: CONFIG.CLIENT_ID,
-            grant_type: "authorization_code",
-            redirect_uri: "postmessage"
-        })
-
-    });
-
-    const data = await res.json();
-
-    if (!data.access_token) {
-        throw new Error("No access token returned");
-    }
-
-    return data.access_token;
-}
-
-/* ==========================================
-   APPS SCRIPT EXECUTION API
-========================================== */
-
-async function callAppsScriptLogin(idToken, accessToken) {
-
-    const url = `https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`;
+async function callAppsScriptLogin(idToken) {
 
     try {
 
-        const res = await fetch(url, {
+        const url = `https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`;
 
+        const payload = {
+            function: "login",
+            parameters: [idToken],
+            devMode: false
+        };
+
+        const res = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + accessToken
+                "Authorization": "Bearer " + await getAccessToken()
             },
-
-            body: JSON.stringify({
-                function: "login",
-                parameters: [idToken],
-                devMode: false
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await res.json();
 
-        console.log("EXEC RESPONSE:", data);
+        console.log("EXECUTION API RESPONSE:", data);
 
         hideLoading();
 
+        // API error check
         if (data.error) {
 
-            showMessage("Execution API error", "danger");
             console.error(data.error);
+            showMessage("Execution API error", "danger");
             return;
         }
 
         const result = data.response?.result;
 
-        if (result?.success) {
+        if (!result) {
+            showMessage("Invalid server response", "danger");
+            return;
+        }
+
+        // SUCCESS
+        if (result.success) {
 
             showMessage(
                 "Welcome " + result.user.name,
@@ -152,25 +90,62 @@ async function callAppsScriptLogin(idToken, accessToken) {
 
             console.log("LOGIN SUCCESS:", result);
 
-            // NEXT STEP
-            // localStorage.setItem("user", JSON.stringify(result.user));
+            // OPTIONAL: store session
+            localStorage.setItem("mp_user", JSON.stringify(result.user));
+
+            // OPTIONAL redirect
             // window.location.href = "dashboard.html";
 
         } else {
 
-            showMessage(result?.message || "Access denied", "danger");
+            showMessage(result.message || "Access denied", "danger");
         }
 
     } catch (err) {
 
         console.error(err);
         hideLoading();
-        showMessage("Server error", "danger");
+        showMessage("Server connection failed", "danger");
     }
 }
 
 /* ==========================================
-   DEBUG JWT
+   GET OAUTH ACCESS TOKEN (SINGLE FLOW)
+========================================== */
+
+function getAccessToken() {
+
+    return new Promise((resolve, reject) => {
+
+        try {
+
+            const tokenClient = google.accounts.oauth2.initTokenClient({
+
+                client_id: CONFIG.CLIENT_ID,
+
+                scope: "https://www.googleapis.com/auth/script.scriptapp",
+
+                callback: (tokenResponse) => {
+
+                    if (!tokenResponse || !tokenResponse.access_token) {
+                        reject("No access token received");
+                        return;
+                    }
+
+                    resolve(tokenResponse.access_token);
+                }
+            });
+
+            tokenClient.requestAccessToken();
+
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+/* ==========================================
+   OPTIONAL DEBUG: JWT PARSER
 ========================================== */
 
 function parseJwt(token) {
@@ -180,6 +155,7 @@ function parseJwt(token) {
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         return JSON.parse(atob(base64));
     } catch (e) {
+        console.error("JWT parse error", e);
         return null;
     }
 }
