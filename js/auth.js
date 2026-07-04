@@ -1,5 +1,11 @@
 /* ==========================================
-   Google Identity Authentication
+   Google Login + Execution API
+========================================== */
+
+let accessToken = null;
+
+/* ==========================================
+   GIS Callback (ID TOKEN ONLY)
 ========================================== */
 
 async function handleCredentialResponse(response) {
@@ -8,75 +14,100 @@ async function handleCredentialResponse(response) {
 
     try {
 
-        const res = await fetch(CONFIG.API_URL, {
+        const idToken = response.credential;
 
-            method: "POST",
+        // 1. Load OAuth token client
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CONFIG.CLIENT_ID,
+            scope: "https://www.googleapis.com/auth/script.projects",
+            callback: async (tokenResponse) => {
 
-            headers: {
-                "Content-Type":"application/json"
-            },
+                accessToken = tokenResponse.access_token;
 
-            body: JSON.stringify({
+                // 2. Call Apps Script Execution API
+                await callLogin(idToken, accessToken);
 
-                action:"login",
-
-                token:response.credential
-
-            })
-
+            }
         });
 
-        const result = await res.json();
+        // 3. Request access token
+        tokenClient.requestAccessToken();
+
+    } catch (err) {
+
+        hideLoading();
+        console.error(err);
+        showMessage("Login failed", "danger");
+
+    }
+}
+
+/* ==========================================
+   CALL APPS SCRIPT (Execution API)
+========================================== */
+
+async function callLogin(idToken, token) {
+
+    try {
+
+        const res = await fetch(
+            `https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    function: "login",
+                    parameters: [idToken],
+                    devMode: false
+                })
+            }
+        );
+
+        const data = await res.json();
 
         hideLoading();
 
-        if(result.success){
+        // Execution API response format
+        const result = data.response.result;
+
+        if (result.success) {
 
             showMessage(
                 "Welcome " + result.user.name,
                 "success"
             );
 
-            console.log(result);
+            console.log("LOGIN SUCCESS:", result);
 
-            // Next:
+            // TODO: redirect
             // window.location = "dashboard.html";
 
-        }else{
+        } else {
 
-            showMessage(
-                result.message,
-                "danger"
-            );
+            showMessage(result.message, "danger");
 
         }
 
-    }
-    catch(err){
+    } catch (err) {
 
         hideLoading();
-
         console.error(err);
-
-        showMessage(
-            "Unable to connect to server.",
-            "danger"
-        );
+        showMessage("Execution API failed", "danger");
 
     }
-
 }
 
 /* ==========================================
-   Decode JWT
+   JWT Decoder (optional debug)
 ========================================== */
 
-function parseJwt(token){
+function parseJwt(token) {
 
     const base64Url = token.split('.')[1];
-
-    const base64 = base64Url.replace(/-/g,'+').replace(/_/g,'/');
-
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(atob(base64));
 
 }
