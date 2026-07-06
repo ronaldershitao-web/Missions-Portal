@@ -8,18 +8,16 @@
 
 <title>Communication Centre</title>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="./js/config.js"></script>
 <script src="./js/auth.js"></script>
+
 
 <style>
 
 body{
-
     margin:0;
     font-family:Arial;
     background:#f4f6f8;
-
 }
 
 
@@ -53,31 +51,11 @@ body{
 }
 
 
-
-.filters{
-
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-
-}
-
-
-select,
 button{
 
-    padding:10px;
-
+    padding:10px 15px;
+    border:none;
     border-radius:6px;
-
-    border:1px solid #ccc;
-
-}
-
-
-
-button{
-
     background:#1e3a8a;
     color:white;
     cursor:pointer;
@@ -92,14 +70,34 @@ button:hover{
 }
 
 
+
+select{
+
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+
+}
+
+
+
+.eventCard{
+
+    padding:15px;
+    background:#eef2ff;
+    border-radius:8px;
+    margin-top:10px;
+
+}
+
+
+
 .person{
 
     border:1px solid #ddd;
-
     padding:15px;
-
     margin-top:10px;
-
     border-radius:8px;
 
 }
@@ -108,12 +106,10 @@ button:hover{
 
 .badge{
 
-    background:#eef2ff;
-
+    background:#dbeafe;
     color:#1e3a8a;
 
     padding:5px 10px;
-
     border-radius:15px;
 
 }
@@ -127,15 +123,20 @@ button:hover{
 }
 
 
+
 </style>
 
+
 </head>
+
 
 
 <body>
 
 
+
 <div class="header">
+
 
 <h2>
 📢 Communication Centre
@@ -151,109 +152,89 @@ Back
 
 
 
+
+
 <div class="container">
 
 
-<div class="card">
-
-
-<h3>
-Reminder Filters
-</h3>
-
-
-<div class="filters">
-
-
-<select id="eventFilter"
-onchange="loadReminders()">
-
-<option value="">
-All Events
-</option>
-
-</select>
-
-
-
-<select id="reminderFilter"
-onchange="loadReminders()">
-
-<option value="">
-All Reminders
-</option>
-
-<option value="T-7">
-T-7 Days
-</option>
-
-<option value="T-3">
-T-3 Days
-</option>
-
-<option value="T-1">
-T-1 Day
-</option>
-
-
-</select>
-
-
-
-<select id="statusFilter"
-onchange="loadReminders()">
-
-<option value="PENDING">
-Pending
-</option>
-
-<option value="SENT">
-Sent
-</option>
-
-<option value="">
-All
-</option>
-
-
-</select>
-
-
-</div>
-
-
-</div>
-
-
-
-
 
 <div class="card">
 
 
 <h3>
-
-People Requiring Communication
-
+Today's Reminder Events
 </h3>
 
 
-<div id="count">
+<div id="eventList">
 
 Loading...
 
 </div>
 
 
-<div id="list">
+</div>
+
+
+
+
+
+
+<div class="card">
+
+
+<h3>
+Select Event
+</h3>
+
+
+<select id="eventFilter"
+onchange="loadParticipants()">
+
+
+<option value="">
+Select Event
+</option>
+
+
+</select>
+
 
 </div>
 
 
+
+
+
+
+<div class="card">
+
+
+<h3>
+Participants Requiring Reminder
+</h3>
+
+
+<div id="count">
+
+0 people
+
 </div>
 
 
+
+<div id="participantList">
+
 </div>
+
+
+
+</div>
+
+
+
+</div>
+
 
 
 
@@ -262,27 +243,16 @@ Loading...
 <script>
 
 
-let reminderData=[];
+let reminderEvents=[];
 
-
-
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-
-const selectedEvent =
-params.get("event");
-
-
-
-const selectedReminder =
-params.get("reminder");
+let participants=[];
 
 
 
 
+// ===============================
+// API CALL
+// ===============================
 
 async function apiCall(action,data={}){
 
@@ -325,48 +295,33 @@ return await response.json();
 
 
 
-async function loadReminders(){
+
+// ===============================
+// LOAD ACTIVE REMINDER EVENTS
+// ===============================
 
 
-const filters={
-
-
-event:
-document.getElementById(
-"eventFilter"
-).value,
-
-
-type:
-document.getElementById(
-"reminderFilter"
-).value,
-
-
-status:
-document.getElementById(
-"statusFilter"
-).value
-
-
-};
-
+async function loadReminderEvents(){
 
 
 const result =
 await apiCall(
-
-"getReminderQueue",
-
-filters
-
+"getActiveEventsForReminder",
+{}
 );
 
 
 
-if(!result.success){
+console.log(result);
 
-alert(result.message);
+
+
+if(!result){
+
+document.getElementById(
+"eventList"
+).innerHTML =
+"No reminders today";
 
 return;
 
@@ -374,12 +329,15 @@ return;
 
 
 
-reminderData =
-result.data;
+reminderEvents=result;
 
 
 
-renderList();
+renderEvents();
+
+
+
+populateEventDropdown();
 
 
 }
@@ -388,13 +346,230 @@ renderList();
 
 
 
-function renderList(){
+
+// ===============================
+// DISPLAY EVENTS
+// ===============================
+
+
+function renderEvents(){
 
 
 const div =
 document.getElementById(
-"list"
+"eventList"
 );
+
+
+
+div.innerHTML="";
+
+
+
+if(reminderEvents.length===0){
+
+
+div.innerHTML =
+"No events requiring reminders";
+
+
+return;
+
+
+}
+
+
+
+
+reminderEvents.forEach(e=>{
+
+
+div.innerHTML +=
+
+`
+
+<div class="eventCard">
+
+
+<b>
+${e.eventName}
+</b>
+
+
+<br>
+
+
+Date:
+${e.eventDate}
+
+
+<br>
+
+
+Reminder:
+
+<span class="badge">
+${e.reminderType}
+</span>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// EVENT DROPDOWN
+// ===============================
+
+
+function populateEventDropdown(){
+
+
+const select =
+document.getElementById(
+"eventFilter"
+);
+
+
+
+select.innerHTML =
+
+`
+
+<option value="">
+Select Event
+</option>
+
+`;
+
+
+
+reminderEvents.forEach(e=>{
+
+
+select.innerHTML +=
+
+`
+
+<option value="${e.spreadsheetId}">
+
+${e.eventName}
+-
+${e.reminderType}
+
+</option>
+
+`;
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// LOAD PARTICIPANTS
+// ===============================
+
+
+async function loadParticipants(){
+
+
+const eventId =
+document.getElementById(
+"eventFilter"
+).value;
+
+
+
+if(!eventId)
+return;
+
+
+
+const event =
+reminderEvents.find(
+e=>
+e.spreadsheetId===eventId
+);
+
+
+
+
+const result =
+await apiCall(
+
+"getReminderParticipants",
+
+{
+
+spreadsheetId:eventId,
+
+reminderType:
+event.reminderType
+
+}
+
+);
+
+
+
+console.log(result);
+
+
+
+participants=result;
+
+
+
+renderParticipants();
+
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// DISPLAY PARTICIPANTS
+// ===============================
+
+
+function renderParticipants(){
+
+
+const div =
+document.getElementById(
+"participantList"
+);
+
 
 
 div.innerHTML="";
@@ -405,7 +580,8 @@ document.getElementById(
 "count"
 )
 .innerHTML =
-reminderData.length
+
+participants.length
 +
 " people";
 
@@ -413,7 +589,7 @@ reminderData.length
 
 
 
-reminderData.forEach(p=>{
+participants.forEach(p=>{
 
 
 const message =
@@ -431,6 +607,7 @@ We look forward to seeing you!
 
 
 
+
 div.innerHTML +=
 
 
@@ -444,30 +621,35 @@ ${p.name}
 </h4>
 
 
-<p>
-${p.eventName}
-</p>
-
 
 <p>
 📱 ${p.mobile}
 </p>
 
 
+<p>
+
 <span class="badge">
+
 ${p.reminderType}
+
 </span>
 
+</p>
 
-<br><br>
 
 
-<button class="whatsapp"
+
+<button
+
+class="whatsapp"
+
 onclick='openWhatsApp("${p.mobile}",${JSON.stringify(message)})'>
 
 WhatsApp
 
 </button>
+
 
 
 </div>
@@ -480,11 +662,18 @@ WhatsApp
 });
 
 
+
 }
 
 
 
 
+
+
+
+// ===============================
+// WHATSAPP MANUAL SEND
+// ===============================
 
 
 function openWhatsApp(
@@ -516,6 +705,8 @@ url,
 
 
 
+
+
 function goBack(){
 
 
@@ -528,39 +719,26 @@ window.location.href =
 
 
 
-window.onload=function(){
 
 
-
-if(selectedEvent){
-
-document.getElementById(
-"eventFilter"
-).value =
-selectedEvent;
-
-}
+// ===============================
+// START
+// ===============================
 
 
-
-if(selectedReminder){
-
-document.getElementById(
-"reminderFilter"
-).value =
-selectedReminder;
-
-}
+window.onload =
+async function(){
 
 
-
-loadReminders();
+await loadReminderEvents();
 
 
 };
 
 
+
 </script>
+
 
 
 </body>
