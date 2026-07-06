@@ -901,6 +901,11 @@ function renderParticipants() {
             p => p.attendance == "YES"
         ).length;
 
+    document.getElementById("walkinCount").innerText =
+participants.filter(
+p => p.referral=="Walk In"
+).length;
+
     participants.forEach((p, index) => {
 
         const tr = document.createElement("tr");
@@ -922,13 +927,41 @@ ${p.attendance=="YES" ? "checked" : ""}>
 
         <td>${p.mobile}</td>
 
-        <td>${p.church}</td>
+       <td>${p.church}</td>
+
+<td>${p.referral}</td>
 
         `;
 
         tbody.appendChild(tr);
 
     });
+
+}
+    document
+.getElementById("participantSearch")
+.addEventListener("keyup",filterParticipants);
+
+function filterParticipants(){
+
+const keyword=document
+.getElementById("participantSearch")
+.value
+.toLowerCase();
+
+const rows=document
+.querySelectorAll("#participantTable tr");
+
+rows.forEach(row=>{
+
+const text=row.innerText.toLowerCase();
+
+row.style.display=
+text.includes(keyword)
+?""
+:"none";
+
+});
 
 }
 
@@ -1039,6 +1072,13 @@ async function fetchEvents(){
         alert("Unable to save attendance.");
 
     }
+
+}
+
+    function openWalkInForm(){
+
+window.location.href=
+`walkin.html?event=${currentEvent}`;
 
 }
 
