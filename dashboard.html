@@ -178,7 +178,31 @@
         <p>Notify participants using templates.</p>
         <button onclick="openReminderTool()">Send</button>
       </div>
+<div class="task-card">
 
+  <h4>📥 Import External Google Sheet</h4>
+
+  <p>Paste Google Sheet link and categorize for system analysis.</p>
+
+  <input id="sheetUrl"
+    placeholder="Paste Google Sheet URL"
+    style="width: 100%; padding: 6px;" />
+
+  <select id="importEventType" style="width: 100%; margin-top: 8px;">
+    <option value="FIRESIDE">Fireside Chat</option>
+    <option value="WORKSHOP">Workshop</option>
+    <option value="PRAYER">Prayer Meeting</option>
+  </select>
+
+  <input id="importEventName"
+    placeholder="Event Name"
+    style="width: 100%; padding: 6px; margin-top: 8px;" />
+
+  <button onclick="importSheet()" style="margin-top:10px;">
+    Import Data
+  </button>
+
+</div>
     </div>
   </div>
 
@@ -284,6 +308,39 @@
   function openReminderTool() {
     alert("Reminder Tool coming soon");
   }
+
+  function importSheet() {
+
+  const url = document.getElementById("sheetUrl").value;
+  const eventType = document.getElementById("importEventType").value;
+  const eventName = document.getElementById("importEventName").value;
+
+  const user = JSON.parse(localStorage.getItem("mp_user"));
+
+  if (!url || !eventName) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(res => {
+
+      if (res.success) {
+        alert("Import successful");
+        console.log(res);
+      } else {
+        alert(res.message || "Import failed");
+      }
+
+    })
+    .importExternalSheet({
+      url: url,
+      eventType: eventType,
+      eventName: eventName,
+      importedBy: user.email
+    });
+
+}
 
   // =========================
   // LOGOUT
