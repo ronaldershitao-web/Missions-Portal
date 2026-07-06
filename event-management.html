@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Event Management</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="./js/config.js"></script>
+<script src="./js/auth.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6f8;
+}
+
+.header{
+
+    background:#1e3a8a;
+    color:white;
+    padding:18px 30px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+.header h2{
+
+    margin:0;
+
+}
+
+.backBtn{
+
+    background:white;
+    color:#1e3a8a;
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+    cursor:pointer;
+
+}
+
+.container{
+
+    padding:25px;
+
+}
+
+.controls{
+
+    display:flex;
+    gap:15px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+
+}
+
+.controls input,
+.controls select{
+
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+
+}
+
+.controls input{
+
+    width:280px;
+
+}
+
+.summary{
+
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+
+}
+
+.summaryCard{
+
+    background:white;
+    border-radius:10px;
+    padding:20px;
+
+    box-shadow:0 2px 5px rgba(0,0,0,.08);
+
+}
+
+.summaryCard h3{
+
+    margin:0;
+    font-size:14px;
+    color:#666;
+
+}
+
+.summaryCard h1{
+
+    margin:10px 0 0;
+    color:#1e3a8a;
+
+}
+
+.tableCard{
+
+    background:white;
+    border-radius:10px;
+    padding:20px;
+
+    box-shadow:0 2px 5px rgba(0,0,0,.08);
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+th{
+
+    background:#1e3a8a;
+    color:white;
+    padding:12px;
+
+}
+
+td{
+
+    padding:10px;
+    border-bottom:1px solid #eee;
+
+}
+
+tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.actionBtn{
+
+    border:none;
+    padding:7px 10px;
+    border-radius:5px;
+    cursor:pointer;
+    color:white;
+    margin-right:5px;
+
+}
+
+.manageBtn{
+
+    background:#2563eb;
+
+}
+
+.syncBtn{
+
+    background:#16a34a;
+
+}
+
+.closeBtn{
+
+    background:#dc2626;
+
+}
+
+.openBtn{
+
+    background:#ca8a04;
+
+}
+
+.badge{
+
+    padding:5px 10px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+
+}
+
+.active{
+
+    background:#16a34a;
+
+}
+
+.closed{
+
+    background:#dc2626;
+
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+
+display:none;
+
+position:fixed;
+
+left:0;
+top:0;
+
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,.45);
+
+justify-content:center;
+align-items:center;
+
+}
+
+.modalContent{
+
+background:white;
+
+width:90%;
+max-width:1000px;
+
+border-radius:10px;
+
+padding:20px;
+
+max-height:90vh;
+
+overflow:auto;
+
+}
+
+.modalHeader{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+margin-bottom:20px;
+
+}
+
+.close{
+
+font-size:26px;
+cursor:pointer;
+
+}
+
+.participantTable{
+
+margin-top:15px;
+
+}
+
+.saveBtn{
+
+margin-top:20px;
+
+background:#1e3a8a;
+
+color:white;
+
+padding:10px 20px;
+
+border:none;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+/* Loading */
+
+.loading{
+
+display:none;
+
+position:fixed;
+
+left:0;
+top:0;
+
+width:100%;
+height:100%;
+
+background:rgba(255,255,255,.7);
+
+justify-content:center;
+align-items:center;
+
+font-size:28px;
+font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<h2>📅 Event Management</h2>
+
+<button class="backBtn"
+onclick="window.location='dashboard.html'">
+
+← Dashboard
+
+</button>
+
+</div>
+
+<div class="container">
+
+<div class="summary">
+
+<div class="summaryCard">
+
+<h3>Total Events</h3>
+
+<h1 id="totalEvents">0</h1>
+
+</div>
+
+<div class="summaryCard">
+
+<h3>Open Events</h3>
+
+<h1 id="activeEvents">0</h1>
+
+</div>
+
+<div class="summaryCard">
+
+<h3>Total Registrations</h3>
+
+<h1 id="totalRegs">0</h1>
+
+</div>
+
+<div class="summaryCard">
+
+<h3>Total Attendance</h3>
+
+<h1 id="totalAttendance">0</h1>
+
+</div>
+
+</div>
+
+<div class="controls">
+
+<input
+
+id="searchBox"
+
+placeholder="Search Event Name...">
+
+<select id="statusFilter">
+
+<option value="ALL">
+
+All Status
+
+</option>
+
+<option value="ACTIVE">
+
+Active
+
+</option>
+
+<option value="CLOSED">
+
+Closed
+
+</option>
+
+</select>
+
+</div>
+
+<div class="tableCard">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Event</th>
+
+<th>Type</th>
+
+<th>Status</th>
+
+<th>Registered</th>
+
+<th>Attended</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="eventTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- Participants -->
+
+<div class="modal"
+
+id="participantModal">
+
+<div class="modalContent">
+
+<div class="modalHeader">
+
+<h2 id="eventTitle">
+
+Participants
+
+</h2>
+
+<span
+
+class="close"
+
+onclick="closeModal()">
+
+&times;
+
+</span>
+
+</div>
+
+<div>
+
+<strong>
+
+Registered :
+
+</strong>
+
+<span id="regCount">
+
+0
+
+</span>
+
+&nbsp;&nbsp;&nbsp;
+
+<strong>
+
+Attended :
+
+</strong>
+
+<span id="attCount">
+
+0
+
+</span>
+
+</div>
+
+<table
+class="participantTable">
+
+<thead>
+
+<tr>
+
+<th></th>
+
+<th>Name</th>
+
+<th>Email</th>
+
+<th>Mobile</th>
+
+<th>Church</th>
+
+</tr>
+
+</thead>
+
+<tbody id="participantTable">
+
+</tbody>
+
+</table>
+
+<button
+
+class="saveBtn"
+
+onclick="saveAttendance()">
+
+Save Attendance
+
+</button>
+
+</div>
+
+</div>
+
+<div
+
+class="loading"
+
+id="loading">
+
+Loading...
+
+</div>
+
+<script>
+
+const user =
+JSON.parse(
+localStorage.getItem("mp_user")
+);
+
+if(!user){
+
+location="index.html";
+
+}
+
+if(
+!["Admin","Intern"].includes(user.role)
+){
+
+alert("Access denied.");
+
+location="dashboard.html";
+
+}
+
+/* Data */
+
+let events=[];
+
+let participants=[];
+
+let currentEvent=null;
+
+</script>
+
+</body>
+
+</html>
