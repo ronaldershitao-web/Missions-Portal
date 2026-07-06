@@ -14,7 +14,7 @@
       height: 100vh;
     }
 
-    /* Sidebar */
+    /* SIDEBAR */
     .sidebar {
       width: 220px;
       background: #1e3a8a;
@@ -41,7 +41,7 @@
       background: rgba(255,255,255,0.2);
     }
 
-    /* Main content */
+    /* MAIN */
     .main {
       flex: 1;
       padding: 20px;
@@ -73,6 +73,36 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
+    /* INTERN GRID */
+    .intern-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .task-card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 5px solid #1e3a8a;
+    }
+
+    .task-card button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      background: #1e3a8a;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .task-card button:hover {
+      background: #163172;
+    }
+
   </style>
 </head>
 
@@ -97,6 +127,10 @@
     Pastoral Care
   </div>
 
+  <div class="nav-item intern-only" onclick="showSection('intern')">
+    Intern Workspace
+  </div>
+
 </div>
 
 <!-- MAIN -->
@@ -111,6 +145,41 @@
   <div id="home" class="card">
     <h3>Dashboard Home</h3>
     <p>Overview of ministry activity will go here.</p>
+  </div>
+
+  <!-- INTERN -->
+  <div id="intern" class="card hidden intern-only">
+
+    <h3>Intern Workspace</h3>
+    <p>Welcome Intern. Execute your assigned tasks below.</p>
+
+    <div class="intern-grid">
+
+      <div class="task-card">
+        <h4>📄 Create Google Form</h4>
+        <p>Build event or ministry forms.</p>
+        <button onclick="openFormBuilder()">Start</button>
+      </div>
+
+      <div class="task-card">
+        <h4>📊 Analyze Form Results</h4>
+        <p>Review and interpret response data.</p>
+        <button onclick="openDataView()">View</button>
+      </div>
+
+      <div class="task-card">
+        <h4>📦 Prepare Event Materials</h4>
+        <p>Generate lists, summaries, PDFs.</p>
+        <button onclick="openMaterialPrep()">Prepare</button>
+      </div>
+
+      <div class="task-card">
+        <h4>📢 Send Reminders</h4>
+        <p>Notify participants using templates.</p>
+        <button onclick="openReminderTool()">Send</button>
+      </div>
+
+    </div>
   </div>
 
   <!-- ADMIN -->
@@ -148,21 +217,36 @@
     `Welcome, ${user.name} (${user.role})`;
 
   // =========================
-  // ROLE CONTROL
+  // ROLE ACCESS CONTROL (SCALABLE)
   // =========================
   function applyRoleAccess() {
 
-    if (user.role !== "Admin") {
-      document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
+    const role = user.role;
+
+    const hide = (selector) => {
+      document.querySelectorAll(selector).forEach(el => el.style.display = "none");
+    };
+
+    // Admin only
+    if (role !== "Admin") {
+      hide(".admin-only");
     }
 
-    if (user.role !== "Cell Leader" && user.role !== "Admin") {
-      document.querySelectorAll(".cell-only").forEach(el => el.style.display = "none");
+    // Cell + Admin
+    if (!["Admin", "Cell Leader"].includes(role)) {
+      hide(".cell-only");
     }
 
-    if (!["Admin", "Pastor"].includes(user.role)) {
-      document.querySelectorAll(".pastoral-only").forEach(el => el.style.display = "none");
+    // Pastor + Admin
+    if (!["Admin", "Pastor"].includes(role)) {
+      hide(".pastoral-only");
     }
+
+    // Intern only logic
+    if (role !== "Intern") {
+      hide(".intern-only");
+    }
+
   }
 
   applyRoleAccess();
@@ -180,6 +264,25 @@
     if (section) {
       section.classList.remove("hidden");
     }
+  }
+
+  // =========================
+  // INTERN ACTIONS (STUBS)
+  // =========================
+  function openFormBuilder() {
+    alert("Form Builder module coming soon");
+  }
+
+  function openDataView() {
+    alert("Data Analysis module coming soon");
+  }
+
+  function openMaterialPrep() {
+    alert("Material Preparation module coming soon");
+  }
+
+  function openReminderTool() {
+    alert("Reminder Tool coming soon");
   }
 
   // =========================
