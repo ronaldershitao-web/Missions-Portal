@@ -865,6 +865,50 @@ function closeModal() {
 
 }
 
+    async function loadEvents(){
+
+    const res = await runScript("getEventList");
+
+    renderEvents(res);
+
+}
+
+async function syncEvent(id){
+
+    await runScript("syncEvent",[id]);
+
+    loadEvents();
+
+}
+
+async function closeEvent(id){
+
+    await runScript("setEventStatus",[id,"CLOSED"]);
+
+    loadEvents();
+
+}
+
+async function openEvent(id){
+
+    await runScript("setEventStatus",[id,"ACTIVE"]);
+
+    loadEvents();
+
+}
+
+function viewParticipants(id){
+
+    location.href="participants.html?id="+id;
+
+}
+
+function attendance(id){
+
+    location.href="attendance.html?id="+id;
+
+}
+
 
 
 </script>
