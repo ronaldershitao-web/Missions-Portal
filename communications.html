@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Communication Centre</title>
+
+<script src="./js/config.js"></script>
+
+<style>
+
+body{
+
+    margin:0;
+    font-family:Arial;
+    background:#f4f6f8;
+
+}
+
+
+.header{
+
+    background:#1e3a8a;
+    color:white;
+    padding:20px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+
+.container{
+
+    padding:25px;
+
+}
+
+
+.card{
+
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+
+}
+
+
+
+.filters{
+
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+
+}
+
+
+select,
+button{
+
+    padding:10px;
+
+    border-radius:6px;
+
+    border:1px solid #ccc;
+
+}
+
+
+
+button{
+
+    background:#1e3a8a;
+    color:white;
+    cursor:pointer;
+
+}
+
+
+button:hover{
+
+    background:#163172;
+
+}
+
+
+.person{
+
+    border:1px solid #ddd;
+
+    padding:15px;
+
+    margin-top:10px;
+
+    border-radius:8px;
+
+}
+
+
+
+.badge{
+
+    background:#eef2ff;
+
+    color:#1e3a8a;
+
+    padding:5px 10px;
+
+    border-radius:15px;
+
+}
+
+
+
+.whatsapp{
+
+    background:#16a34a;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h2>
+📢 Communication Centre
+</h2>
+
+
+<button onclick="goBack()">
+Back
+</button>
+
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h3>
+Reminder Filters
+</h3>
+
+
+<div class="filters">
+
+
+<select id="eventFilter"
+onchange="loadReminders()">
+
+<option value="">
+All Events
+</option>
+
+</select>
+
+
+
+<select id="reminderFilter"
+onchange="loadReminders()">
+
+<option value="">
+All Reminders
+</option>
+
+<option value="T-7">
+T-7 Days
+</option>
+
+<option value="T-3">
+T-3 Days
+</option>
+
+<option value="T-1">
+T-1 Day
+</option>
+
+
+</select>
+
+
+
+<select id="statusFilter"
+onchange="loadReminders()">
+
+<option value="PENDING">
+Pending
+</option>
+
+<option value="SENT">
+Sent
+</option>
+
+<option value="">
+All
+</option>
+
+
+</select>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h3>
+
+People Requiring Communication
+
+</h3>
+
+
+<div id="count">
+
+Loading...
+
+</div>
+
+
+<div id="list">
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+let reminderData=[];
+
+
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+
+const selectedEvent =
+params.get("event");
+
+
+
+const selectedReminder =
+params.get("reminder");
+
+
+
+
+
+async function apiCall(action,data={}){
+
+
+const response =
+await fetch(
+
+CONFIG.API_URL,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"text/plain"
+
+},
+
+body:JSON.stringify({
+
+action:action,
+
+data:data
+
+})
+
+}
+
+);
+
+
+
+return await response.json();
+
+
+}
+
+
+
+
+
+async function loadReminders(){
+
+
+const filters={
+
+
+event:
+document.getElementById(
+"eventFilter"
+).value,
+
+
+type:
+document.getElementById(
+"reminderFilter"
+).value,
+
+
+status:
+document.getElementById(
+"statusFilter"
+).value
+
+
+};
+
+
+
+const result =
+await apiCall(
+
+"getReminderQueue",
+
+filters
+
+);
+
+
+
+if(!result.success){
+
+alert(result.message);
+
+return;
+
+}
+
+
+
+reminderData =
+result.data;
+
+
+
+renderList();
+
+
+}
+
+
+
+
+
+function renderList(){
+
+
+const div =
+document.getElementById(
+"list"
+);
+
+
+div.innerHTML="";
+
+
+
+document.getElementById(
+"count"
+)
+.innerHTML =
+reminderData.length
++
+" people";
+
+
+
+
+
+reminderData.forEach(p=>{
+
+
+const message =
+
+`Hi ${p.name},
+
+This is a reminder for ${p.eventName}.
+
+Date:
+${p.eventDate}
+
+We look forward to seeing you!
+
+`;
+
+
+
+div.innerHTML +=
+
+
+`
+
+<div class="person">
+
+
+<h4>
+${p.name}
+</h4>
+
+
+<p>
+${p.eventName}
+</p>
+
+
+<p>
+📱 ${p.mobile}
+</p>
+
+
+<span class="badge">
+${p.reminderType}
+</span>
+
+
+<br><br>
+
+
+<button class="whatsapp"
+onclick='openWhatsApp("${p.mobile}",${JSON.stringify(message)})'>
+
+WhatsApp
+
+</button>
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+function openWhatsApp(
+mobile,
+message
+){
+
+
+const url =
+
+"https://wa.me/"
++
+mobile
++
+"?text="
++
+encodeURIComponent(message);
+
+
+
+window.open(
+url,
+"_blank"
+);
+
+
+}
+
+
+
+
+function goBack(){
+
+
+window.location.href =
+"event-management.html";
+
+
+}
+
+
+
+
+window.onload=function(){
+
+
+
+if(selectedEvent){
+
+document.getElementById(
+"eventFilter"
+).value =
+selectedEvent;
+
+}
+
+
+
+if(selectedReminder){
+
+document.getElementById(
+"reminderFilter"
+).value =
+selectedReminder;
+
+}
+
+
+
+loadReminders();
+
+
+};
+
+
+</script>
+
+
+</body>
+
+</html>
