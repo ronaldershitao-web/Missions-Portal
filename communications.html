@@ -70,7 +70,6 @@ button:hover{
 }
 
 
-
 select{
 
     width:100%;
@@ -122,10 +121,7 @@ select{
 
 }
 
-
-
 </style>
-
 
 </head>
 
@@ -136,7 +132,6 @@ select{
 
 
 <div class="header">
-
 
 <h2>
 📢 Communication Centre
@@ -157,9 +152,7 @@ Back
 <div class="container">
 
 
-
 <div class="card">
-
 
 <h3>
 Today's Reminder Events
@@ -167,21 +160,17 @@ Today's Reminder Events
 
 
 <div id="eventList">
-
 Loading...
-
 </div>
 
 
 </div>
-
 
 
 
 
 
 <div class="card">
-
 
 <h3>
 Select Event
@@ -216,11 +205,8 @@ Participants Requiring Reminder
 
 
 <div id="count">
-
 0 people
-
 </div>
-
 
 
 <div id="participantList">
@@ -228,12 +214,12 @@ Participants Requiring Reminder
 </div>
 
 
+</div>
+
 
 </div>
 
 
-
-</div>
 
 
 
@@ -249,18 +235,30 @@ let participants=[];
 
 
 
-
-// ===============================
-// API CALL
-// ===============================
-
-async function apiCall(action,data={}){
+const params =
+new URLSearchParams(
+window.location.search
+);
 
 
-const response =
-await fetch(
+const presetEvent =
+params.get("event");
 
-CONFIG.API_URL,
+
+
+
+
+// =====================================
+// APPS SCRIPT EXECUTION API
+// =====================================
+
+
+async function apiCall(functionName, parameters=[]){
+
+
+const response = await fetch(
+
+`https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`,
 
 {
 
@@ -268,17 +266,24 @@ method:"POST",
 
 headers:{
 
-"Content-Type":"text/plain"
+"Content-Type":"application/json",
+
+"Authorization":
+"Bearer " + await getAccessToken()
 
 },
 
+
 body:JSON.stringify({
 
-action:action,
+function:functionName,
 
-data:data
+parameters:parameters,
+
+devMode:false
 
 })
+
 
 }
 
@@ -286,7 +291,33 @@ data:data
 
 
 
-return await response.json();
+const result =
+await response.json();
+
+
+
+console.log(
+functionName,
+result
+);
+
+
+
+if(result.error){
+
+throw new Error(
+
+result.error.details?.[0]?.errorMessage
+||
+result.error.message
+
+);
+
+}
+
+
+
+return result.response.result;
 
 
 }
@@ -296,18 +327,22 @@ return await response.json();
 
 
 
-// ===============================
+
+// =====================================
 // LOAD ACTIVE REMINDER EVENTS
-// ===============================
+// =====================================
 
 
 async function loadReminderEvents(){
 
 
+try{
+
+
 const result =
 await apiCall(
 "getActiveEventsForReminder",
-{}
+[]
 );
 
 
@@ -316,29 +351,31 @@ console.log(result);
 
 
 
-if(!result){
-
-document.getElementById(
-"eventList"
-).innerHTML =
-"No reminders today";
-
-return;
-
-}
-
-
-
-reminderEvents=result;
+reminderEvents =
+result || [];
 
 
 
 renderEvents();
 
-
-
 populateEventDropdown();
 
+
+
+}
+catch(err){
+
+
+console.error(err);
+
+
+document.getElementById(
+"eventList"
+).innerHTML =
+"Unable to load reminders";
+
+
+}
 
 }
 
@@ -347,9 +384,10 @@ populateEventDropdown();
 
 
 
-// ===============================
+
+// =====================================
 // DISPLAY EVENTS
-// ===============================
+// =====================================
 
 
 function renderEvents(){
@@ -374,7 +412,6 @@ div.innerHTML =
 
 
 return;
-
 
 }
 
@@ -413,9 +450,7 @@ ${e.reminderType}
 </span>
 
 
-
 </div>
-
 
 `;
 
@@ -433,9 +468,9 @@ ${e.reminderType}
 
 
 
-// ===============================
-// EVENT DROPDOWN
-// ===============================
+// =====================================
+// DROPDOWN
+// =====================================
 
 
 function populateEventDropdown(){
@@ -451,11 +486,9 @@ document.getElementById(
 select.innerHTML =
 
 `
-
 <option value="">
 Select Event
 </option>
-
 `;
 
 
@@ -482,6 +515,16 @@ ${e.reminderType}
 
 
 
+if(presetEvent){
+
+select.value =
+presetEvent;
+
+loadParticipants();
+
+}
+
+
 }
 
 
@@ -490,9 +533,10 @@ ${e.reminderType}
 
 
 
-// ===============================
+
+// =====================================
 // LOAD PARTICIPANTS
-// ===============================
+// =====================================
 
 
 async function loadParticipants(){
@@ -513,16 +557,22 @@ return;
 const event =
 reminderEvents.find(
 e=>
-e.spreadsheetId===eventId
+String(e.spreadsheetId)
+===
+String(eventId)
 );
 
 
+
+try{
 
 
 const result =
 await apiCall(
 
 "getReminderParticipants",
+
+[
 
 {
 
@@ -533,20 +583,34 @@ event.reminderType
 
 }
 
+]
+
 );
 
 
 
-console.log(result);
-
-
-
-participants=result;
+participants =
+result || [];
 
 
 
 renderParticipants();
 
+
+
+}
+catch(err){
+
+
+console.error(err);
+
+
+alert(
+"Unable to load participants"
+);
+
+
+}
 
 
 }
@@ -557,9 +621,9 @@ renderParticipants();
 
 
 
-// ===============================
+// =====================================
 // DISPLAY PARTICIPANTS
-// ===============================
+// =====================================
 
 
 function renderParticipants(){
@@ -607,7 +671,6 @@ We look forward to seeing you!
 
 
 
-
 div.innerHTML +=
 
 
@@ -621,13 +684,10 @@ ${p.name}
 </h4>
 
 
-
 <p>
 📱 ${p.mobile}
 </p>
 
-
-<p>
 
 <span class="badge">
 
@@ -635,9 +695,8 @@ ${p.reminderType}
 
 </span>
 
-</p>
 
-
+<br><br>
 
 
 <button
@@ -651,9 +710,7 @@ WhatsApp
 </button>
 
 
-
 </div>
-
 
 `;
 
@@ -671,9 +728,9 @@ WhatsApp
 
 
 
-// ===============================
-// WHATSAPP MANUAL SEND
-// ===============================
+// =====================================
+// WHATSAPP
+// =====================================
 
 
 function openWhatsApp(
@@ -707,23 +764,17 @@ url,
 
 
 
-function goBack(){
 
+function goBack(){
 
 window.location.href =
 "event-management.html";
-
 
 }
 
 
 
 
-
-
-// ===============================
-// START
-// ===============================
 
 
 window.onload =
@@ -736,9 +787,7 @@ await loadReminderEvents();
 };
 
 
-
 </script>
-
 
 
 </body>
