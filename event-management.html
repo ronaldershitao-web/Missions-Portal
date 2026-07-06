@@ -949,6 +949,53 @@ async function fetchEvents(){
 
 }
 
+    async function saveAttendance() {
+
+    const checked = document.querySelectorAll(".attendance-check");
+
+    const attendance = [];
+
+    checked.forEach(box => {
+
+        attendance.push({
+
+            email: box.dataset.email,
+            attended: box.checked
+
+        });
+
+    });
+
+    try {
+
+        showLoading();
+
+        await runScript(
+            "saveAttendance",
+            [
+                currentSpreadsheetId,
+                attendance
+            ]
+        );
+
+        hideLoading();
+
+        alert("Attendance saved successfully.");
+
+        await loadEvents();
+
+    } catch(err) {
+
+        hideLoading();
+
+        console.error(err);
+
+        alert("Unable to save attendance.");
+
+    }
+
+}
+
 
 </script>
 
