@@ -6,7 +6,7 @@ const CONFIG = {
     CLIENT_ID: "263902111764-jdil2ttim5q05gim8tsheopgoprr6jmh.apps.googleusercontent.com",
 
     // THIS MUST BE SCRIPT PROJECT ID (NOT AKfycb)
-    SCRIPT_ID: "1P5yyJNmQ6L8zndgkcDmj6h7xoExK_7EDV_jnRIQZjovJK-hGgojlwhd9",
+    SCRIPT_ID: "AKfycbz0UlPom-YTQMDA3nS5wciKH-6bHMhYafRS6GkGKlKJHGuMtgBJ8z2mibB7Lgv1SB6J",
 
     DEBUG: true
 };
