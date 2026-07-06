@@ -860,14 +860,10 @@ function renderParticipants() {
         <td>
 
             <input
-
-                type="checkbox"
-
-                ${p.attendance == "YES" ? "checked" : ""}
-
-                onchange="participants[${index}].attendance =
-                this.checked ? 'YES' : 'NO'">
-
+type="checkbox"
+class="attendance-check"
+data-email="${p.email}"
+${p.attendance=="YES" ? "checked" : ""}>
         </td>
 
         <td>${p.name}</td>
@@ -971,12 +967,12 @@ async function fetchEvents(){
         showLoading();
 
         await runScript(
-            "saveAttendance",
-            [
-                currentSpreadsheetId,
-                attendance
-            ]
-        );
+    "saveAttendance",
+    [
+        currentEvent,
+        attendance
+    ]
+);
 
         hideLoading();
 
