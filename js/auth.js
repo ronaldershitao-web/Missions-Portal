@@ -83,10 +83,11 @@ async function callAppsScriptLogin(idToken) {
         // SUCCESS
         if (result.success) {
 
-            showMessage(
-                "Welcome " + result.user.name,
-                "success"
-            );
+    localStorage.setItem("mp_user", JSON.stringify(result.user));
+
+    window.location.href = "dashboard.html";
+
+}
 
             console.log("LOGIN SUCCESS:", result);
 
