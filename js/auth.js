@@ -123,7 +123,11 @@ function getAccessToken() {
 
                 client_id: CONFIG.CLIENT_ID,
 
-                scope: "https://www.googleapis.com/auth/script.scriptapp",
+                scope: [
+  "https://www.googleapis.com/auth/script.scriptapp",
+  "https://www.googleapis.com/auth/spreadsheets",
+  "https://www.googleapis.com/auth/drive.readonly"
+].join(" "),
 
                 callback: (tokenResponse) => {
 
