@@ -540,35 +540,6 @@ onclick="saveAttendance()">
 
 </thead>
 
-<tbody id="participantTable">
-
-</tbody>
-
-</table>
-
-<thead>
-
-<tr>
-
-<th></th>
-
-<th>Name</th>
-
-<th>Email</th>
-
-<th>Mobile</th>
-
-<th>Church</th>
-
-</tr>
-
-</thead>
-
-<tbody id="participantTable">
-
-</tbody>
-
-</table>
 
 <button
 
@@ -887,6 +858,8 @@ function renderParticipants() {
     document
         .getElementById("participantModal")
         .style.display = "flex";
+    document.getElementById("participantSearch").value = "";
+document.getElementById("participantSearch").onkeyup = filterParticipants;
 
     const tbody =
         document.getElementById("participantTable");
@@ -942,26 +915,26 @@ ${p.attendance=="YES" ? "checked" : ""}>
 .getElementById("participantSearch")
 .addEventListener("keyup",filterParticipants);
 
-function filterParticipants(){
+function filterParticipants() {
 
-const keyword=document
-.getElementById("participantSearch")
-.value
-.toLowerCase();
+    const keyword = document
+        .getElementById("participantSearch")
+        .value
+        .trim()
+        .toLowerCase();
 
-const rows=document
-.querySelectorAll("#participantTable tr");
+    const rows = document
+        .getElementById("participantTable")
+        .getElementsByTagName("tr");
 
-rows.forEach(row=>{
+    for (const row of rows) {
 
-const text=row.innerText.toLowerCase();
+        row.style.display =
+            row.innerText.toLowerCase().includes(keyword)
+            ? ""
+            : "none";
 
-row.style.display=
-text.includes(keyword)
-?""
-:"none";
-
-});
+    }
 
 }
 
