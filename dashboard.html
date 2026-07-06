@@ -309,7 +309,7 @@
     alert("Reminder Tool coming soon");
   }
 
-  function importSheet() {
+ async function importSheet() {
 
   const url = document.getElementById("sheetUrl").value;
   const eventType = document.getElementById("importEventType").value;
@@ -322,26 +322,42 @@
     return;
   }
 
-  google.script.run
-    .withSuccessHandler(res => {
+  try {
 
-      if (res.success) {
-        alert("Import successful");
-        console.log(res);
-      } else {
-        alert(res.message || "Import failed");
-      }
-
-    })
-    .importExternalSheet({
-      url: url,
-      eventType: eventType,
-      eventName: eventName,
-      importedBy: user.email
+    const res = await fetch(`https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + await getAccessToken()
+      },
+      body: JSON.stringify({
+        function: "importExternalSheet",
+        parameters: [{
+          url,
+          eventType,
+          eventName,
+          importedBy: user.email
+        }],
+        devMode: false
+      })
     });
 
-}
+    const data = await res.json();
 
+    console.log(data);
+
+    if (data.response?.result?.success) {
+      alert("Import successful");
+    } else {
+      alert(data.response?.result?.message || "Import failed");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+
+}
   // =========================
   // LOGOUT
   // =========================
