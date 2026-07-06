@@ -898,23 +898,42 @@ function closeModal() {
 
 }
 
-    async function loadEvents(){
+   
+async function fetchEvents(){
 
-    const res = await runScript("getEventList");
-
-    renderEvents(res);
-
-}
-
-async function syncEvent(id){
-
-    await runScript("syncEvent",[id]);
-
-    loadEvents();
+    return await runScript("getEventList");
 
 }
 
-async function closeEvent(id){
+    async function fetchParticipants(id){
+
+    return await runScript("getParticipants",[id]);
+
+}
+
+    async function syncEvent(id){
+
+    showLoading();
+
+    try{
+
+        await runScript("syncEvent",[id]);
+
+        await loadEvents();
+
+    }
+
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+    async function closeEvent(id){
+
+    if(!confirm("Close this event?")) return;
 
     await runScript("setEventStatus",[id,"CLOSED"]);
 
@@ -922,26 +941,13 @@ async function closeEvent(id){
 
 }
 
-async function openEvent(id){
+    async function reopenEvent(id){
 
     await runScript("setEventStatus",[id,"ACTIVE"]);
 
     loadEvents();
 
 }
-
-function viewParticipants(id){
-
-    location.href="participants.html?id="+id;
-
-}
-
-function attendance(id){
-
-    location.href="attendance.html?id="+id;
-
-}
-
 
 
 </script>
