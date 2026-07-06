@@ -67,7 +67,6 @@ async function callAppsScriptLogin(idToken) {
 
         // API error check
         if (data.error) {
-
             console.error(data.error);
             showMessage("Execution API error", "danger");
             return;
@@ -80,24 +79,22 @@ async function callAppsScriptLogin(idToken) {
             return;
         }
 
+        // =========================
         // SUCCESS
+        // =========================
         if (result.success) {
-
-    localStorage.setItem("mp_user", JSON.stringify(result.user));
-
-    window.location.href = "dashboard.html";
-
-}
 
             console.log("LOGIN SUCCESS:", result);
 
-            // OPTIONAL: store session
             localStorage.setItem("mp_user", JSON.stringify(result.user));
 
-            // OPTIONAL redirect
-            // window.location.href = "dashboard.html";
+            window.location.href = "dashboard.html";
 
-        } else {
+        } 
+        // =========================
+        // FAIL
+        // =========================
+        else {
 
             showMessage(result.message || "Access denied", "danger");
         }
