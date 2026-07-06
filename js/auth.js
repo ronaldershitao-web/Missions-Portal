@@ -110,10 +110,22 @@ async function callAppsScriptLogin(idToken) {
 /* ==========================================
    GET OAUTH ACCESS TOKEN (SINGLE FLOW)
 ========================================== */
+let accessTokenCache = null;
+let tokenExpiryTime = 0;
 
 function getAccessToken() {
 
     return new Promise((resolve, reject) => {
+
+        const now = Date.now();
+
+        // =========================
+        // 1. USE CACHE IF VALID
+        // =========================
+        if (accessTokenCache && now < tokenExpiryTime) {
+            resolve(accessTokenCache);
+            return;
+        }
 
         try {
 
@@ -122,10 +134,10 @@ function getAccessToken() {
                 client_id: CONFIG.CLIENT_ID,
 
                 scope: [
-  "https://www.googleapis.com/auth/script.scriptapp",
-  "https://www.googleapis.com/auth/spreadsheets",
-  "https://www.googleapis.com/auth/drive.readonly"
-].join(" "),
+                    "https://www.googleapis.com/auth/script.scriptapp",
+                    "https://www.googleapis.com/auth/spreadsheets",
+                    "https://www.googleapis.com/auth/drive.readonly"
+                ].join(" "),
 
                 callback: (tokenResponse) => {
 
@@ -134,7 +146,15 @@ function getAccessToken() {
                         return;
                     }
 
-                    resolve(tokenResponse.access_token);
+                    // =========================
+                    // 2. CACHE TOKEN
+                    // =========================
+                    accessTokenCache = tokenResponse.access_token;
+
+                    // expire in ~50 minutes (safe buffer)
+                    tokenExpiryTime = Date.now() + 50 * 60 * 1000;
+
+                    resolve(accessTokenCache);
                 }
             });
 
@@ -145,7 +165,6 @@ function getAccessToken() {
         }
     });
 }
-
 /* ==========================================
    OPTIONAL DEBUG: JWT PARSER
 ========================================== */
