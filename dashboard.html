@@ -256,9 +256,10 @@
     }
 
     // Intern only logic
-    if (role !== "Intern") {
-      hide(".intern-only");
-    }
+    // Intern + Admin
+if (!["Admin", "Intern"].includes(role)) {
+    hide(".intern-only");
+}
 
   }
 
