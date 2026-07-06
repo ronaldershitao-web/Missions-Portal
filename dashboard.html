@@ -192,6 +192,13 @@
     placeholder="Paste Google Sheet URL"
     style="width: 100%; padding: 6px;" />
 
+<input
+    type="date"
+    id="importEventDate"
+    style="width:100%;padding:6px;margin-top:8px;">
+
+
+  
   <select id="importEventType" style="width: 100%; margin-top: 8px;">
     <option value="FIRESIDE">Fireside Chat</option>
     <option value="WORKSHOP">Workshop</option>
@@ -316,15 +323,20 @@
  async function importSheet() {
 
   const url = document.getElementById("sheetUrl").value;
+   const eventDate =
+    document.getElementById("importEventDate").value;
   const eventType = document.getElementById("importEventType").value;
   const eventName = document.getElementById("importEventName").value;
 
   const user = JSON.parse(localStorage.getItem("mp_user"));
 
-  if (!url || !eventName) {
-    alert("Please fill in all fields");
+  if (!url || !eventName || !eventDate) {
+
+    alert("Please complete all fields.");
+
     return;
-  }
+
+}
 
   try {
 
