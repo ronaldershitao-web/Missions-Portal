@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Walk-In Registration</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="./js/config.js"></script>
+<script src="./js/auth.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f4f6f8;
+}
+
+
+.header{
+
+    background:#1e3a8a;
+    color:white;
+    padding:20px;
+
+    display:flex;
+    justify-content:space-between;
+
+}
+
+
+.container{
+
+    padding:30px;
+
+}
+
+
+.card{
+
+    background:white;
+    padding:25px;
+    max-width:500px;
+    margin:auto;
+
+    border-radius:12px;
+
+}
+
+
+label{
+
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+
+}
+
+
+input{
+
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+
+    border:1px solid #ccc;
+    border-radius:6px;
+
+}
+
+
+.eventBox{
+
+    background:#eef2ff;
+    padding:15px;
+    border-radius:8px;
+
+}
+
+
+button{
+
+    margin-top:25px;
+
+    width:100%;
+
+    padding:12px;
+
+    background:#1e3a8a;
+    color:white;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+
+button:hover{
+
+    background:#163172;
+
+}
+
+
+.back{
+
+    background:white;
+    color:#1e3a8a;
+    width:auto;
+    padding:8px 15px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h2>
+➕ Walk-In Registration
+</h2>
+
+
+<button class="back"
+onclick="goBack()">
+
+Back
+
+</button>
+
+
+</div>
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h3>Event</h3>
+
+
+<div class="eventBox">
+
+<div>
+<b>Name:</b>
+<span id="eventName">Loading...</span>
+</div>
+
+
+<div>
+<b>Date:</b>
+<span id="eventDate"></span>
+</div>
+
+
+<div>
+<b>Type:</b>
+<span id="eventType"></span>
+</div>
+
+
+</div>
+
+
+
+<label>
+Name *
+</label>
+
+<input id="name">
+
+
+
+<label>
+Mobile *
+</label>
+
+<input id="mobile">
+
+
+
+<label>
+Email
+</label>
+
+<input id="email">
+
+
+
+<label>
+Church
+</label>
+
+<input id="church">
+
+
+
+<label>
+DOB
+</label>
+
+<input 
+type="date"
+id="dob">
+
+
+
+<button onclick="submitWalkIn()">
+
+Register Walk-In
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<script>
+
+
+const user =
+JSON.parse(localStorage.getItem("mp_user"));
+
+
+if(!user){
+
+location="index.html";
+
+}
+
+
+
+const params =
+new URLSearchParams(window.location.search);
+
+
+const spreadsheetId =
+params.get("event");
+
+
+
+let eventInfo = {};
+
+
+
+// ================================
+// Generic Apps Script Runner
+// ================================
+
+
+async function runScript(functionName, parameters=[]){
+
+
+const response =
+await fetch(
+
+`https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json",
+
+"Authorization":
+"Bearer " + await getAccessToken()
+
+},
+
+
+body:JSON.stringify({
+
+function:functionName,
+
+parameters:parameters,
+
+devMode:false
+
+})
+
+
+});
+
+
+const result =
+await response.json();
+
+
+console.log(result);
+
+
+if(result.error){
+
+throw new Error(
+result.error.message
+);
+
+}
+
+
+return result.response.result;
+
+
+}
+
+
+
+
+// ================================
+// Load Event
+// ================================
+
+
+window.onload = async function(){
+
+
+if(!spreadsheetId){
+
+alert("Missing Event");
+
+return;
+
+}
+
+
+eventInfo =
+await runScript(
+"getEventInfo",
+[
+spreadsheetId
+]
+);
+
+
+
+document.getElementById("eventName")
+.innerText =
+eventInfo.eventName;
+
+
+
+document.getElementById("eventDate")
+.innerText =
+eventInfo.eventDate;
+
+
+
+document.getElementById("eventType")
+.innerText =
+eventInfo.eventType;
+
+
+
+};
+
+
+
+
+
+// ================================
+// Submit Walk In
+// ================================
+
+
+async function submitWalkIn(){
+
+
+const data={
+
+
+spreadsheetId:
+
+
+spreadsheetId,
+
+
+name:
+
+document.getElementById("name").value,
+
+
+mobile:
+
+document.getElementById("mobile").value,
+
+
+email:
+
+document.getElementById("email").value,
+
+
+church:
+
+document.getElementById("church").value,
+
+
+dob:
+
+document.getElementById("dob").value,
+
+
+createdBy:
+
+user.email
+
+
+};
+
+
+
+
+if(!data.name || !data.mobile){
+
+
+alert(
+"Name and Mobile are required"
+);
+
+
+return;
+
+
+}
+
+
+
+
+try{
+
+
+await runScript(
+
+"addWalkIn",
+
+[data]
+
+);
+
+
+
+alert(
+"Walk-in registered successfully"
+);
+
+
+
+window.location.href =
+"event-management.html";
+
+
+
+}
+
+catch(err){
+
+
+console.error(err);
+
+
+alert(
+"Unable to register walk-in"
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+function goBack(){
+
+
+window.location.href =
+"event-management.html";
+
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
