@@ -1,5 +1,196 @@
-const user = JSON.parse(localStorage.getItem("mp_user"));
+<!DOCTYPE html>
+<html lang="en">
 
-if (!user) {
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Missions Portal - Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: #1e3a8a;
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .nav-item {
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 20px;
+      background: #f4f6f8;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .logout-btn {
+      background: red;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+  <h2>Missions Portal</h2>
+
+  <div class="nav-item" onclick="showSection('home')">Home</div>
+
+  <div class="nav-item admin-only" onclick="showSection('admin')">
+    Admin Panel
+  </div>
+
+  <div class="nav-item cell-only" onclick="showSection('cell')">
+    Cell Groups
+  </div>
+
+  <div class="nav-item pastoral-only" onclick="showSection('pastoral')">
+    Pastoral Care
+  </div>
+
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h2 id="welcomeText">Welcome</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- HOME -->
+  <div id="home" class="card">
+    <h3>Dashboard Home</h3>
+    <p>Overview of ministry activity will go here.</p>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="admin" class="card hidden admin-only">
+    <h3>Admin Panel</h3>
+    <p>Manage users, roles, system settings.</p>
+  </div>
+
+  <!-- CELL -->
+  <div id="cell" class="card hidden cell-only">
+    <h3>Cell Groups</h3>
+    <p>Cell group management area.</p>
+  </div>
+
+  <!-- PASTORAL -->
+  <div id="pastoral" class="card hidden pastoral-only">
+    <h3>Pastoral Care</h3>
+    <p>Care tracking and follow-ups.</p>
+  </div>
+
+</div>
+
+<script>
+
+  // =========================
+  // LOAD USER
+  // =========================
+  const user = JSON.parse(localStorage.getItem("mp_user"));
+
+  if (!user) {
     window.location.href = "index.html";
-}
+  }
+
+  document.getElementById("welcomeText").innerText =
+    `Welcome, ${user.name} (${user.role})`;
+
+  // =========================
+  // ROLE CONTROL
+  // =========================
+  function applyRoleAccess() {
+
+    if (user.role !== "Admin") {
+      document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
+    }
+
+    if (user.role !== "Cell Leader" && user.role !== "Admin") {
+      document.querySelectorAll(".cell-only").forEach(el => el.style.display = "none");
+    }
+
+    if (!["Admin", "Pastor"].includes(user.role)) {
+      document.querySelectorAll(".pastoral-only").forEach(el => el.style.display = "none");
+    }
+  }
+
+  applyRoleAccess();
+
+  // =========================
+  // NAVIGATION
+  // =========================
+  function showSection(id) {
+
+    document.querySelectorAll(".card").forEach(card => {
+      card.classList.add("hidden");
+    });
+
+    const section = document.getElementById(id);
+    if (section) {
+      section.classList.remove("hidden");
+    }
+  }
+
+  // =========================
+  // LOGOUT
+  // =========================
+  function logout() {
+    localStorage.removeItem("mp_user");
+    window.location.href = "index.html";
+  }
+
+</script>
+
+</body>
+</html>
