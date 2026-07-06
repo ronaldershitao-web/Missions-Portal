@@ -159,40 +159,94 @@
 
     <div class="intern-grid">
 
-      
-<div class="task-card">
-  <h3> Data Migration</h3>
-  <h4>📥 Import External Google Sheet</h4>
+    <!-- DATA MIGRATION -->
+    <div class="task-card">
 
-  <p>Paste Google Sheet link and categorize for system analysis.</p>
+        <h3>📥 Data Migration</h3>
 
-  <input id="sheetUrl"
-    placeholder="Paste Google Sheet URL"
-    style="width: 100%; padding: 6px;" />
+        <p>Import a Google Form response sheet into the Missions Portal.</p>
 
-<input
-    type="date"
-    id="importEventDate"
-    style="width:100%;padding:6px;margin-top:8px;">
+        <input
+            id="sheetUrl"
+            placeholder="Paste Google Sheet URL"
+            style="width:100%;padding:8px;">
 
+        <input
+            type="date"
+            id="importEventDate"
+            style="width:100%;padding:8px;margin-top:8px;">
 
-  
-  <select id="importEventType" style="width: 100%; margin-top: 8px;">
-    <option value="FIRESIDE">Fireside Chat</option>
-    <option value="WORKSHOP">Workshop</option>
-    <option value="PRAYER">Prayer Meeting</option>
-  </select>
+        <select
+            id="importEventType"
+            style="width:100%;padding:8px;margin-top:8px;">
 
-  <input id="importEventName"
-    placeholder="Event Name"
-    style="width: 100%; padding: 6px; margin-top: 8px;" />
+            <option value="FIRESIDE">Fireside Chat</option>
+            <option value="WORKSHOP">Workshop</option>
+            <option value="PRAYER">Prayer Meeting</option>
 
-  <button onclick="importSheet()" style="margin-top:10px;">
-    Import Data
-  </button>
+        </select>
+
+        <input
+            id="importEventName"
+            placeholder="Event Name"
+            style="width:100%;padding:8px;margin-top:8px;">
+
+        <button onclick="importSheet()">
+            Import Event
+        </button>
+
+    </div>
+
+    <!-- EVENT MANAGEMENT -->
+
+    <div class="task-card">
+
+        <h3>📅 Event Management</h3>
+
+        <p>Manage imported events.</p>
+
+        <ul style="padding-left:18px;">
+            <li>View events</li>
+            <li>Sync registrations</li>
+            <li>Close events</li>
+            <li>View participant count</li>
+        </ul>
+
+        <button onclick="openEventManager()">
+            Open Event Manager
+        </button>
+
+    </div>
+
+    <!-- COMMUNICATION -->
+
+    <div class="task-card">
+
+        <h3>💬 Communications</h3>
+
+        <p>Send personalised reminders and follow-up messages.</p>
+
+        <button onclick="openReminderCentre()">
+            Reminder Centre
+        </button>
+
+    </div>
+
+    <!-- REPORTS -->
+
+    <div class="task-card">
+
+        <h3>📊 Reports</h3>
+
+        <p>Attendance, registration and ministry analytics.</p>
+
+        <button onclick="openReports()">
+            View Reports
+        </button>
+
+    </div>
 
 </div>
-    </div>
   </div>
 
   <!-- ADMIN -->
@@ -351,6 +405,24 @@
     console.error(err);
     alert("Server error");
   }
+
+}
+
+  function openEventManager() {
+
+    window.location.href = "event-management.html";
+
+}
+
+function openReminderCentre() {
+
+    window.location.href = "communications.html";
+
+}
+
+function openReports() {
+
+    window.location.href = "reports.html";
 
 }
   // =========================
