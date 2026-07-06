@@ -463,38 +463,88 @@ onclick="closeModal()">
 
 </div>
 
+<!-- Event Summary -->
+
+<div style="display:flex;gap:30px;margin-bottom:20px;">
+
 <div>
+<b>Registered</b><br>
+<span id="regCount">0</span>
+</div>
 
-<strong>
+<div>
+<b>Attended</b><br>
+<span id="attCount">0</span>
+</div>
 
-Registered :
-
-</strong>
-
-<span id="regCount">
-
-0
-
-</span>
-
-&nbsp;&nbsp;&nbsp;
-
-<strong>
-
-Attended :
-
-</strong>
-
-<span id="attCount">
-
-0
-
-</span>
+<div>
+<b>Walk-ins</b><br>
+<span id="walkinCount">0</span>
+</div>
 
 </div>
 
-<table
-class="participantTable">
+<!-- Search -->
+
+<input
+id="participantSearch"
+placeholder="Search Name / Email / Mobile / Church..."
+style="
+width:100%;
+padding:10px;
+margin-bottom:15px;
+border-radius:6px;
+border:1px solid #ccc;">
+
+<!-- Buttons -->
+
+<div style="margin-bottom:15px;">
+
+<button class="saveBtn"
+onclick="openWalkInForm()">
+
+➕ Walk-in Registration
+
+</button>
+
+<button class="saveBtn"
+onclick="saveAttendance()">
+
+💾 Save Attendance
+
+</button>
+
+</div>
+
+<!-- Participant Table -->
+
+<table class="participantTable">
+
+<thead>
+
+<tr>
+
+<th></th>
+
+<th>Name</th>
+
+<th>Email</th>
+
+<th>Mobile</th>
+
+<th>Church</th>
+
+<th>Referral</th>
+
+</tr>
+
+</thead>
+
+<tbody id="participantTable">
+
+</tbody>
+
+</table>
 
 <thead>
 
