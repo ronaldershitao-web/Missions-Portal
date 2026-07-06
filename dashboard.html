@@ -255,11 +255,10 @@
       hide(".pastoral-only");
     }
 
-    // Intern only logic
-    // Intern + Admin
-if (!["Admin", "Intern"].includes(role)) {
+    if (!["Admin", "Intern"].includes(role)) {
     hide(".intern-only");
 }
+
 
   }
 
