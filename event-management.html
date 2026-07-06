@@ -575,8 +575,349 @@ let participants=[];
 
 let currentEvent=null;
 
+    // ==========================================
+// EVENT MANAGEMENT UI
+// ==========================================
+
+let events = [];
+let participants = [];
+let currentEvent = null;
+
+// Load page
+window.onload = function () {
+    loadEvents();
+
+    document
+        .getElementById("searchBox")
+        .addEventListener("keyup", filterEvents);
+
+    document
+        .getElementById("statusFilter")
+        .addEventListener("change", filterEvents);
+};
+
+// ==========================================
+// Loading
+// ==========================================
+
+function showLoading() {
+    document.getElementById("loading").style.display = "flex";
+}
+
+function hideLoading() {
+    document.getElementById("loading").style.display = "none";
+}
+
+// ==========================================
+// Load Events
+// ==========================================
+
+async function loadEvents() {
+
+    showLoading();
+
+    try {
+
+        events = await fetchEvents();
+
+        renderSummary();
+
+        renderTable(events);
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        alert("Unable to load events.");
+
+    }
+
+    hideLoading();
+
+}
+
+// ==========================================
+// Summary
+// ==========================================
+
+function renderSummary() {
+
+    document.getElementById("totalEvents").innerText =
+        events.length;
+
+    document.getElementById("activeEvents").innerText =
+        events.filter(e => e.status == "ACTIVE").length;
+
+    document.getElementById("totalRegs").innerText =
+        events.reduce((a, b) => a + Number(b.registrations), 0);
+
+    document.getElementById("totalAttendance").innerText =
+        events.reduce((a, b) => a + Number(b.attended), 0);
+
+}
+
+// ==========================================
+// Event Table
+// ==========================================
+
+function renderTable(data) {
+
+    const tbody = document.getElementById("eventTable");
+
+    tbody.innerHTML = "";
+
+    data.forEach(event => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+
+        <td>${event.eventDate}</td>
+
+        <td>${event.eventName}</td>
+
+        <td>${event.eventType}</td>
+
+        <td>
+
+            <span class="badge ${event.status.toLowerCase()}">
+
+                ${event.status}
+
+            </span>
+
+        </td>
+
+        <td>${event.registrations}</td>
+
+        <td>${event.attended}</td>
+
+        <td>
+
+            <button
+                class="actionBtn manageBtn"
+                onclick="viewParticipants('${event.spreadsheetId}')">
+
+                Manage
+
+            </button>
+
+            <button
+                class="actionBtn syncBtn"
+                onclick="syncEvent('${event.spreadsheetId}')">
+
+                Sync
+
+            </button>
+
+            ${
+                event.status == "ACTIVE"
+
+                ?
+
+                `<button
+                    class="actionBtn closeBtn"
+                    onclick="closeEvent('${event.spreadsheetId}')">
+
+                    Close
+
+                </button>`
+
+                :
+
+                `<button
+                    class="actionBtn openBtn"
+                    onclick="reopenEvent('${event.spreadsheetId}')">
+
+                    Open
+
+                </button>`
+
+            }
+
+        </td>
+
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+// ==========================================
+// Search & Filter
+// ==========================================
+
+function filterEvents() {
+
+    const keyword =
+        document
+            .getElementById("searchBox")
+            .value
+            .toLowerCase();
+
+    const status =
+        document
+            .getElementById("statusFilter")
+            .value;
+
+    const filtered = events.filter(e => {
+
+        const matchName =
+            e.eventName
+                .toLowerCase()
+                .includes(keyword);
+
+        const matchStatus =
+            status == "ALL" ||
+            e.status == status;
+
+        return matchName && matchStatus;
+
+    });
+
+    renderTable(filtered);
+
+}
+
+// ==========================================
+// View Participants
+// ==========================================
+
+async function viewParticipants(spreadsheetId) {
+
+    showLoading();
+
+    currentEvent = spreadsheetId;
+
+    participants =
+        await fetchParticipants(spreadsheetId);
+
+    hideLoading();
+
+    renderParticipants();
+
+}
+
+// ==========================================
+// Participant Table
+// ==========================================
+
+function renderParticipants() {
+
+    document
+        .getElementById("participantModal")
+        .style.display = "flex";
+
+    const tbody =
+        document.getElementById("participantTable");
+
+    tbody.innerHTML = "";
+
+    document.getElementById("regCount").innerText =
+        participants.length;
+
+    document.getElementById("attCount").innerText =
+        participants.filter(
+            p => p.attendance == "YES"
+        ).length;
+
+    participants.forEach((p, index) => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+
+        <td>
+
+            <input
+
+                type="checkbox"
+
+                ${p.attendance == "YES" ? "checked" : ""}
+
+                onchange="participants[${index}].attendance =
+                this.checked ? 'YES' : 'NO'">
+
+        </td>
+
+        <td>${p.name}</td>
+
+        <td>${p.email}</td>
+
+        <td>${p.mobile}</td>
+
+        <td>${p.church}</td>
+
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+// ==========================================
+// Close Modal
+// ==========================================
+
+function closeModal() {
+
+    document
+        .getElementById("participantModal")
+        .style.display = "none";
+
+}
+
+// ==========================================
+// Placeholder Functions
+// (Connected in Part 3)
+// ==========================================
+
+async function fetchEvents() {
+
+    return [];
+
+}
+
+async function fetchParticipants(id) {
+
+    return [];
+
+}
+
+async function saveAttendance() {
+
+    alert("Apps Script connection coming in Part 3.");
+
+}
+
+async function syncEvent(id) {
+
+    alert("Apps Script connection coming in Part 3.");
+
+}
+
+async function closeEvent(id) {
+
+    alert("Apps Script connection coming in Part 3.");
+
+}
+
+async function reopenEvent(id) {
+
+    alert("Apps Script connection coming in Part 3.");
+
+}
+
 </script>
 
+
+
+    
 </body>
 
 </html>
