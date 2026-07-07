@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Missions Analytics Dashboard</title>
 
@@ -21,88 +21,79 @@
 
 <body>
 
-<!-- ===================================================== -->
-<!-- HEADER -->
-<!-- ===================================================== -->
+<!-- ==========================================
+HEADER
+========================================== -->
 
 <div class="header">
 
-<div>
+    <div>
+        <h1>📊 Missions Analytics Dashboard</h1>
+        <div class="subtitle">
+            Executive Reporting & Ministry Insights
+        </div>
+    </div>
 
-<h1>📊 Missions Analytics Dashboard</h1>
+    <div>
 
-<div class="subtitle">
-Executive Reporting & Ministry Insights
+        <button onclick="exportExcel()">
+            Export Excel
+        </button>
+
+        <button onclick="exportCSV()">
+            Export CSV
+        </button>
+
+        <button onclick="refreshDashboard()">
+            Refresh
+        </button>
+
+        <button onclick="goBack()">
+            Back
+        </button>
+
+    </div>
+
 </div>
-
-</div>
-
-<div>
-
-<button onclick="exportExcel()">Export Excel</button>
-
-<button onclick="exportCSV()">Export CSV</button>
-
-<button onclick="goBack()">Back</button>
-
-</div>
-
-</div>
-
-
 
 <div class="container">
 
-<!-- ===================================================== -->
-<!-- KPI -->
-<!-- ===================================================== -->
+<!-- ==========================================
+KPI SUMMARY
+========================================== -->
 
 <div class="kpiGrid">
 
-<div class="kpiCard">
-<div class="kpiTitle">Registrations</div>
-<div class="kpiValue" id="kpiRegistrations">-</div>
-</div>
+    <div class="kpiCard">
+        <div class="kpiTitle">Registrations</div>
+        <div class="kpiValue" id="kpiRegistrations">-</div>
+    </div>
 
-<div class="kpiCard">
-<div class="kpiTitle">Participants</div>
-<div class="kpiValue" id="kpiParticipants">-</div>
-</div>
+    <div class="kpiCard">
+        <div class="kpiTitle">Participants</div>
+        <div class="kpiValue" id="kpiParticipants">-</div>
+    </div>
 
-<div class="kpiCard">
-<div class="kpiTitle">Events</div>
-<div class="kpiValue" id="kpiEvents">-</div>
-</div>
+    <div class="kpiCard">
+        <div class="kpiTitle">Events</div>
+        <div class="kpiValue" id="kpiEvents">-</div>
+    </div>
 
-<div class="kpiCard">
-<div class="kpiTitle">Churches</div>
-<div class="kpiValue" id="kpiChurches">-</div>
-</div>
+    <div class="kpiCard">
+        <div class="kpiTitle">Churches</div>
+        <div class="kpiValue" id="kpiChurches">-</div>
+    </div>
 
-<div class="kpiCard">
-<div class="kpiTitle">Attendance</div>
-<div class="kpiValue" id="kpiAttendanceRate">-</div>
-</div>
-
-</div>
-
-
-
-<!-- ===================================================== -->
-<!-- EXECUTIVE SUMMARY -->
-<!-- ===================================================== -->
-
-<div class="card">
-
-<div id="executiveSummary"></div>
+    <div class="kpiCard">
+        <div class="kpiTitle">Attendance Rate</div>
+        <div class="kpiValue" id="kpiAttendanceRate">-</div>
+    </div>
 
 </div>
 
-
-
-<!-- ===================================================== -->
-<!-- FILTERS -->
-<!-- ===================================================== -->
+<!-- ==========================================
+FILTERS
+========================================== -->
 
 <div class="card">
 
@@ -115,7 +106,9 @@ Executive Reporting & Ministry Insights
 <label>Year</label>
 
 <select id="yearFilter" onchange="refreshDashboard()">
+
 <option value="">All Years</option>
+
 </select>
 
 </div>
@@ -125,7 +118,9 @@ Executive Reporting & Ministry Insights
 <label>Event Type</label>
 
 <select id="eventTypeFilter" onchange="refreshDashboard()">
+
 <option value="">All Event Types</option>
+
 </select>
 
 </div>
@@ -135,14 +130,16 @@ Executive Reporting & Ministry Insights
 <label>Church</label>
 
 <select id="churchFilter" onchange="refreshDashboard()">
+
 <option value="">All Churches</option>
+
 </select>
 
 </div>
 
 <div>
 
-<label>Participant</label>
+<label>Search Participant</label>
 
 <input
 id="searchBox"
@@ -156,17 +153,15 @@ onkeyup="refreshDashboard()">
 
 </div>
 
-
-
-<!-- ===================================================== -->
-<!-- CHARTS -->
-<!-- ===================================================== -->
+<!-- ==========================================
+CHARTS
+========================================== -->
 
 <div class="chartGrid">
 
 <div class="chartCard">
 
-<h3>Participants Over Time</h3>
+<h2>Participants Across Time</h2>
 
 <canvas id="timelineChart"></canvas>
 
@@ -174,7 +169,7 @@ onkeyup="refreshDashboard()">
 
 <div class="chartCard">
 
-<h3>Participants by Event Type</h3>
+<h2>Participants by Event Type</h2>
 
 <canvas id="eventTypeChart"></canvas>
 
@@ -182,7 +177,7 @@ onkeyup="refreshDashboard()">
 
 <div class="chartCard">
 
-<h3>Church Demographics</h3>
+<h2>Church Demographics</h2>
 
 <canvas id="churchChart"></canvas>
 
@@ -190,7 +185,7 @@ onkeyup="refreshDashboard()">
 
 <div class="chartCard">
 
-<h3>Repeat Attendance</h3>
+<h2>Repeat Attendance</h2>
 
 <canvas id="repeatChart"></canvas>
 
@@ -198,13 +193,11 @@ onkeyup="refreshDashboard()">
 
 </div>
 
+<!-- ==========================================
+EVENT SUMMARY
+========================================== -->
 
-
-<!-- ===================================================== -->
-<!-- EVENT SUMMARY -->
-<!-- ===================================================== -->
-
-<div class="card tableCard">
+<div class="card">
 
 <h2>Event Summary</h2>
 
@@ -246,27 +239,47 @@ onkeyup="refreshDashboard()">
 
 </div>
 
+<!-- ==========================================
+LOADING
+========================================== -->
 
+<div id="loadingOverlay">
 
-<!-- ===================================================== -->
-<!-- LOADING -->
-<!-- ===================================================== -->
+<div class="loadingCard">
 
-<div id="loading" class="loading">
+<div class="loader"></div>
 
-Loading Dashboard...
+<div class="loadingText">
+
+Loading Missions Analytics...
 
 </div>
 
+</div>
 
+</div>
+
+<!-- ==========================================
+FOOTER
+========================================== -->
 
 <footer>
 
 <div class="footer">
 
-COOS Missions Portal |
-Executive Analytics Dashboard |
-<span id="lastRefresh"></span>
+COOS Missions Portal
+
+&nbsp;|&nbsp;
+
+Executive Analytics Dashboard
+
+&nbsp;|&nbsp;
+
+<span id="lastRefresh">
+
+Loading...
+
+</span>
 
 </div>
 
