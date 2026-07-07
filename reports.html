@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Missions Analytics Dashboard</title>
+
+<link rel="stylesheet" href="reports.css">
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script src="./js/config.js"></script>
+<script src="./js/auth.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <div>
+
+        <h1>📊 Missions Analytics Dashboard</h1>
+
+        <div class="subtitle">
+            Executive Reporting & Ministry Insights
+        </div>
+
+    </div>
+
+    <div>
+
+        <button onclick="exportExcel()">
+            Export Excel
+        </button>
+
+        <button onclick="exportCSV()">
+            Export CSV
+        </button>
+
+        <button onclick="goBack()">
+            Back
+        </button>
+
+    </div>
+
+</div>
+
+
+<div class="container">
+
+<!-- ====================================================== -->
+<!-- KPI CARDS -->
+<!-- ====================================================== -->
+
+<div class="kpiGrid">
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Total Registrations
+        </div>
+
+        <div class="kpiValue" id="totalParticipants">
+            -
+        </div>
+
+    </div>
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Unique Participants
+        </div>
+
+        <div class="kpiValue" id="uniqueParticipants">
+            -
+        </div>
+
+    </div>
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Active Events
+        </div>
+
+        <div class="kpiValue" id="activeEvents">
+            -
+        </div>
+
+    </div>
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Event Types
+        </div>
+
+        <div class="kpiValue" id="eventTypes">
+            -
+        </div>
+
+    </div>
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Churches Represented
+        </div>
+
+        <div class="kpiValue" id="churchCount">
+            -
+        </div>
+
+    </div>
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Repeat Participants
+        </div>
+
+        <div class="kpiValue" id="repeatParticipants">
+            -
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- FILTERS -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>Filters</h2>
+
+<div class="filterGrid">
+
+<div>
+
+<label>Year</label>
+
+<select id="yearFilter" onchange="refreshDashboard()">
+
+<option value="">
+All Years
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Event Type</label>
+
+<select id="eventTypeFilter" onchange="refreshDashboard()">
+
+<option value="">
+All Event Types
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Church</label>
+
+<select id="churchFilter" onchange="refreshDashboard()">
+
+<option value="">
+All Churches
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Search Participant</label>
+
+<input
+type="text"
+id="searchBox"
+placeholder="Search..."
+onkeyup="refreshDashboard()">
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- PARTICIPANTS OVER TIME -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Participants Across Time
+</h2>
+
+<canvas id="participantsTimeline"></canvas>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- PARTICIPANTS BY EVENT TYPE -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Participants by Event Type
+</h2>
+
+<canvas id="participantsByEventType"></canvas>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CHURCH + AGE -->
+<!-- ====================================================== -->
+
+<div class="twoColumn">
+
+<div class="card">
+
+<h2>
+Church Demographics
+</h2>
+
+<canvas id="churchChart"></canvas>
+
+</div>
+
+<div class="card">
+
+<h2>
+Age Distribution by Event Type
+</h2>
+
+<canvas id="ageChart"></canvas>
+
+</div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- REPEAT PARTICIPATION -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Repeat Attendance Distribution
+</h2>
+
+<canvas id="repeatAttendanceChart"></canvas>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- ENGAGEMENT FUNNEL -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Engagement Funnel
+</h2>
+
+<canvas id="engagementChart"></canvas>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- EVENT POPULARITY -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Event Popularity
+</h2>
+
+<canvas id="eventPopularityChart"></canvas>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- ATTENDANCE HEATMAP -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Attendance Heatmap
+</h2>
+
+<div id="heatmapContainer">
+
+<table id="heatmapTable">
+
+<thead>
+
+<tr id="heatmapHeader">
+
+</tr>
+
+</thead>
+
+<tbody id="heatmapBody">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- TOP EVENTS -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Top Events
+</h2>
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Event</th>
+
+<th>Type</th>
+
+<th>Date</th>
+
+<th>Registered</th>
+
+<th>Attended</th>
+
+<th>Attendance %</th>
+
+</tr>
+
+</thead>
+
+<tbody id="topEventsTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- UNIQUE PARTICIPANTS -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Unique Participants
+</h2>
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+
+<th>Church</th>
+
+<th>Total Events</th>
+
+<th>First Event</th>
+
+<th>Latest Event</th>
+
+</tr>
+
+</thead>
+
+<tbody id="uniqueParticipantsTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- PARTICIPANT JOURNEY MATRIX -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Participant Journey Matrix
+</h2>
+
+<p class="sectionDescription">
+Shows every participant and the missions activities they have attended.
+Multiple attendance (e.g. Fireside sessions) will be counted separately.
+</p>
+
+<div class="tableWrapper">
+
+<table class="reportTable" id="journeyTable">
+
+<thead id="journeyHeader">
+
+<tr>
+
+<th>Name</th>
+
+<th>Church</th>
+
+<!-- Event columns inserted by reports.js -->
+
+</tr>
+
+</thead>
+
+<tbody id="journeyBody">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- EVENT SUMMARY -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Event Summary
+</h2>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Event</th>
+
+<th>Type</th>
+
+<th>Registered</th>
+
+<th>Attended</th>
+
+<th>Attendance %</th>
+
+<th>Unique Participants</th>
+
+</tr>
+
+</thead>
+
+<tbody id="eventSummaryTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CHURCH BREAKDOWN -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Church Breakdown
+</h2>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Church</th>
+
+<th>Participants</th>
+
+<th>%</th>
+
+</tr>
+
+</thead>
+
+<tbody id="churchTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- EVENT TYPE BREAKDOWN -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Event Type Breakdown
+</h2>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Event Type</th>
+
+<th>Total Events</th>
+
+<th>Total Participants</th>
+
+<th>Average Attendance</th>
+
+</tr>
+
+</thead>
+
+<tbody id="eventTypeTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- MOST ACTIVE PARTICIPANTS -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>
+Most Active Participants
+</h2>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Rank</th>
+
+<th>Name</th>
+
+<th>Church</th>
+
+<th>Total Activities</th>
+
+<th>Last Activity</th>
+
+</tr>
+
+</thead>
+
+<tbody id="topParticipantsTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- LOADING -->
+<!-- ====================================================== -->
+
+<div id="loadingOverlay">
+
+<div class="loadingCard">
+
+<div class="loader"></div>
+
+<div class="loadingText">
+
+Loading Missions Analytics...
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- PARTICIPANT MODAL -->
+<!-- ====================================================== -->
+
+<div
+id="participantModal"
+class="modal">
+
+<div class="modalContent">
+
+<div class="modalHeader">
+
+<h2 id="modalTitle">
+
+Participant Details
+
+</h2>
+
+<span
+class="close"
+onclick="closeParticipantModal()">
+
+&times;
+
+</span>
+
+</div>
+
+<div
+class="modalBody"
+id="modalBody">
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- EVENT MODAL -->
+<!-- ====================================================== -->
+
+<div
+id="eventModal"
+class="modal">
+
+<div class="modalContent">
+
+<div class="modalHeader">
+
+<h2>
+
+Event Details
+
+</h2>
+
+<span
+class="close"
+onclick="closeEventModal()">
+
+&times;
+
+</span>
+
+</div>
+
+<div
+class="modalBody"
+id="eventModalBody">
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- FOOTER -->
+<!-- ====================================================== -->
+
+<footer>
+
+<div class="footer">
+
+COOS Missions Portal
+
+&nbsp;|&nbsp;
+
+Executive Analytics Dashboard
+
+&nbsp;|&nbsp;
+
+<span id="lastRefresh">
+
+Loading...
+
+</span>
+
+</div>
+
+</footer>
+
+
+
+<!-- ====================================================== -->
+<!-- REPORTS.JS -->
+<!-- ====================================================== -->
+
+<script src="reports.js"></script>
+
+</body>
+
+</html>
+  
