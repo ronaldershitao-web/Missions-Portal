@@ -36,21 +36,13 @@ HEADER
 
     <div>
 
-        <button onclick="exportExcel()">
-            Export Excel
-        </button>
+        <button onclick="exportExcel()">Export Excel</button>
 
-        <button onclick="exportCSV()">
-            Export CSV
-        </button>
+        <button onclick="exportCSV()">Export CSV</button>
 
-        <button onclick="refreshDashboard()">
-            Refresh
-        </button>
+        <button onclick="refreshDashboard()">Refresh</button>
 
-        <button onclick="goBack()">
-            Back
-        </button>
+        <button onclick="goBack()">Back</button>
 
     </div>
 
@@ -66,28 +58,45 @@ KPI SUMMARY
 
     <div class="kpiCard">
         <div class="kpiTitle">Registrations</div>
-        <div class="kpiValue" id="kpiRegistrations">-</div>
+        <div class="kpiValue" id="totalParticipants">-</div>
     </div>
 
     <div class="kpiCard">
-        <div class="kpiTitle">Participants</div>
-        <div class="kpiValue" id="kpiParticipants">-</div>
+        <div class="kpiTitle">Unique Participants</div>
+        <div class="kpiValue" id="uniqueParticipants">-</div>
     </div>
 
     <div class="kpiCard">
         <div class="kpiTitle">Events</div>
-        <div class="kpiValue" id="kpiEvents">-</div>
+        <div class="kpiValue" id="activeEvents">-</div>
+    </div>
+
+    <div class="kpiCard">
+        <div class="kpiTitle">Event Types</div>
+        <div class="kpiValue" id="eventTypes">-</div>
     </div>
 
     <div class="kpiCard">
         <div class="kpiTitle">Churches</div>
-        <div class="kpiValue" id="kpiChurches">-</div>
+        <div class="kpiValue" id="churchCount">-</div>
     </div>
 
     <div class="kpiCard">
-        <div class="kpiTitle">Attendance Rate</div>
-        <div class="kpiValue" id="kpiAttendanceRate">-</div>
+        <div class="kpiTitle">Repeat Participants</div>
+        <div class="kpiValue" id="repeatParticipants">-</div>
     </div>
+
+</div>
+
+<!-- ==========================================
+EXECUTIVE SUMMARY
+========================================== -->
+
+<div class="card">
+
+    <h2>Executive Summary</h2>
+
+    <div id="executiveSummary"></div>
 
 </div>
 
@@ -154,42 +163,50 @@ onkeyup="refreshDashboard()">
 </div>
 
 <!-- ==========================================
-CHARTS
+EXECUTIVE CHARTS
 ========================================== -->
 
-<div class="chartGrid">
+<div class="twoColumn">
 
-<div class="chartCard">
+    <div class="chartCard">
+        <h2>Participants Over Time</h2>
+        <canvas id="participantsTimeline"></canvas>
+    </div>
 
-<h2>Participants Across Time</h2>
+    <div class="chartCard">
+        <h2>Participants by Event Type</h2>
+        <canvas id="participantsByEventType"></canvas>
+    </div>
 
-<canvas id="timelineChart"></canvas>
+    <div class="chartCard">
+        <h2>Church Demographics</h2>
+        <canvas id="churchChart"></canvas>
+    </div>
 
-</div>
+    <div class="chartCard">
+        <h2>Age Distribution</h2>
+        <canvas id="ageChart"></canvas>
+    </div>
 
-<div class="chartCard">
+    <div class="chartCard">
+        <h2>Repeat Attendance</h2>
+        <canvas id="repeatAttendanceChart"></canvas>
+    </div>
 
-<h2>Participants by Event Type</h2>
+    <div class="chartCard">
+        <h2>Monthly Growth</h2>
+        <canvas id="growthChart"></canvas>
+    </div>
 
-<canvas id="eventTypeChart"></canvas>
+    <div class="chartCard">
+        <h2>Top Events</h2>
+        <canvas id="eventPopularityChart"></canvas>
+    </div>
 
-</div>
-
-<div class="chartCard">
-
-<h2>Church Demographics</h2>
-
-<canvas id="churchChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h2>Repeat Attendance</h2>
-
-<canvas id="repeatChart"></canvas>
-
-</div>
+    <div class="chartCard">
+        <h2>Attendance Rate by Event Type</h2>
+        <canvas id="attendanceRateChart"></canvas>
+    </div>
 
 </div>
 
@@ -210,17 +227,11 @@ EVENT SUMMARY
 <tr>
 
 <th>Date</th>
-
 <th>Event</th>
-
 <th>Type</th>
-
 <th>Registered</th>
-
 <th>Attended</th>
-
 <th>Attendance %</th>
-
 <th>Unique Participants</th>
 
 </tr>
