@@ -1202,56 +1202,73 @@ WhatsApp
 
 function generateMessage(p){
 
+    let intro = "";
 
+    switch(reminderConfig.reminderType){
 
-return `Hi ${p.name},
+        case "T-7":
 
+            intro = `Hi ${p.name}! 👋
 
-This is a reminder for ${reminderConfig.eventName}.
+Thank you for registering for *${reminderConfig.eventName}*.
 
+We are delighted that you'll be joining us! Over the coming week, we encourage you to prepare your heart as we look forward to a meaningful time together.
 
-📅 Date:
+`;
 
+            break;
+
+        case "T-3":
+
+            intro = `Hi ${p.name}! 😊
+
+Only *3 days to go* until *${reminderConfig.eventName}*!
+
+Our team has been praying and preparing, and we're excited to welcome you. Here's a quick reminder of the event details.
+
+`;
+
+            break;
+
+        case "T-1":
+
+            intro = `Hi ${p.name}! 👋
+
+Just a friendly reminder that *${reminderConfig.eventName}* is happening *tomorrow*!
+
+We're looking forward to seeing you. Here are the final details before the event.
+
+`;
+
+            break;
+
+    }
+
+    return `${intro}
+
+📅 *Date*
 ${reminderConfig.eventDate}
 
-
-
-🕒 Reporting Time:
-
+🕒 *Reporting Time*
 ${reminderConfig.reportingTime}
 
-
-
-⏰ Event Time:
-
+⏰ *Programme Starts*
 ${reminderConfig.eventTime}
 
-
-
-📍 Venue:
-
+📍 *Venue*
 ${reminderConfig.venue}
 
-
-
-Location:
-
+📌 *Location*
 ${reminderConfig.location}
 
+${reminderConfig.importantInfo ? "ℹ️ *Important Information*\n" + reminderConfig.importantInfo + "\n\n" : ""}
 
+If you have any questions or need assistance, feel free to let us know.
 
-${reminderConfig.importantInfo}
-
-
-
-We look forward to seeing you!
-
+We pray that this gathering will be a meaningful and encouraging time for you, and we look forward to welcoming you soon.
 
 Blessings,
-
-Church Team`;
-
-
+*COOS Missions Team*`;
 
 }
 
