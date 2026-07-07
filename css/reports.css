@@ -86,7 +86,7 @@ body{
 
     box-shadow:0 2px 8px rgba(0,0,0,.08);
 
-    transition:.25s;
+    transition:transform .2s ease;
 
 }
 
@@ -215,17 +215,27 @@ body{
    (Maximum 2 charts per row)
 ========================================== */
 
+/* ==========================================
+   CHART GRID
+========================================== */
+
 .twoColumn{
 
     display:grid;
 
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2, minmax(0,1fr));
 
     gap:25px;
 
     margin-bottom:25px;
 
+    align-items:start;
+
 }
+
+/* ==========================================
+   CHART CARD
+========================================== */
 
 .chartCard{
 
@@ -237,21 +247,37 @@ body{
 
     box-shadow:0 2px 8px rgba(0,0,0,.08);
 
+    display:flex;
+
+    flex-direction:column;
+
+    height:430px;
+
+    overflow:hidden;
+
 }
 
-/* ==========================================
-   CHART SIZE
-========================================== */
+.chartCard h2{
 
-.card canvas{
+    margin-bottom:15px;
+
+    color:#1e3a8a;
+
+    font-size:20px;
+
+}
+
+.chartCard canvas{
+
+    flex:1;
 
     width:100% !important;
 
-    height:350px !important;
-
-    max-height:350px;
+    height:100% !important;
 
 }
+
+
 
 /* ==========================================
    PART 2 - TABLES, BUTTONS & REPORTS
@@ -314,19 +340,7 @@ button:hover{
    TABLE WRAPPER
 ========================================== */
 
-.tableWrapper{
 
-    width:100%;
-
-    overflow:auto;
-
-    max-height:700px;
-
-    border:1px solid #e5e7eb;
-
-    border-radius:8px;
-
-}
 
 
 /* ==========================================
@@ -693,11 +707,11 @@ button:hover{
 
     }
 
-    .card canvas{
+    .chartCard{
 
-        height:300px !important;
+    height:350px;
 
-    }
+}
 
 }
 
@@ -738,17 +752,13 @@ button:hover{
 
     }
 
-    .card canvas{
+    .chartCard{
 
-        height:250px !important;
+    height:300px;
 
-    }
+}
 
-    .reportTable{
-
-        font-size:12px;
-
-    }
+  
 
     .reportTable th,
     .reportTable td{
@@ -774,7 +784,15 @@ button:hover{
 
 .reportTable{
 
+    width:100%;
+
     min-width:900px;
+
+    border-collapse:collapse;
+
+    font-size:14px;
+
+    background:#fff;
 
 }
 
@@ -974,4 +992,16 @@ button:hover{
 
 .w100{
     width:100%;
+}
+
+canvas{
+
+    display:block;
+
+}
+
+.chartCard{
+
+    contain:layout;
+
 }
