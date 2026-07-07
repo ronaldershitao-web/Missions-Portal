@@ -108,7 +108,7 @@ renderChurchChart();
  ******************************************************************/
 function showLoading() {
 
-    const div = document.getElementById("loading");
+    const div = document.getElementById("loadingOverlay")
 
     if (div) {
 
@@ -120,7 +120,7 @@ function showLoading() {
 
 function hideLoading() {
 
-    const div = document.getElementById("loading");
+    const div = document.getElementById("loadingOverlay")
 
     if (div) {
 
@@ -133,25 +133,26 @@ function hideLoading() {
 /******************************************************************
  * KPI CARDS
  ******************************************************************/
-function renderKPIs() {
+function renderKPIs(){
 
-    const kpi = analytics.kpi;
+    const k = analytics.kpi;
 
-    if (!kpi) return;
+    if(!k) return;
 
-    setCardValue("kpiRegistrations", kpi.totalRegistrations);
-
-    setCardValue("kpiParticipants", kpi.totalParticipants);
-
-    setCardValue("kpiEvents", kpi.totalEvents);
-
-    setCardValue("kpiChurches", kpi.totalChurches);
-
-    setCardValue("kpiAttendance", kpi.totalAttendance);
+    setCardValue("totalParticipants", k.totalRegistrations);
+    setCardValue("uniqueParticipants", k.totalParticipants);
+    setCardValue("activeEvents", k.totalEvents);
 
     setCardValue(
-        "kpiAttendanceRate",
-        kpi.attendanceRate + "%"
+        "eventTypes",
+        analytics.eventTypes ? analytics.eventTypes.length : 0
+    );
+
+    setCardValue("churchCount", k.totalChurches);
+
+    setCardValue(
+        "repeatParticipants",
+        analytics.returning.returning
     );
 
 }
@@ -318,7 +319,7 @@ function renderTimelineChart() {
 
     timelineChart = new Chart(
 
-        document.getElementById("timelineChart"),
+        document.getElementById("participantsTimeline"),
 
         {
 
@@ -404,7 +405,7 @@ function renderEventTypeChart() {
 
     eventTypeChart = new Chart(
 
-        document.getElementById("eventTypeChart"),
+        document.getElementById("participantsByEventType"),
 
         {
 
@@ -643,7 +644,7 @@ function renderRepeatAttendanceChart() {
 
     repeatChart = new Chart(
 
-        document.getElementById("repeatChart"),
+        document.getElementById("repeatAttendanceChart"),
 
         {
 
@@ -760,7 +761,7 @@ function renderPopularityChart() {
 
     popularityChart = new Chart(
 
-        document.getElementById("popularityChart"),
+        document.getElementById("eventPopularityChart"),
 
         {
 
