@@ -1,3 +1,7 @@
+/* ==========================================
+   Missions Portal Configuration
+========================================== */
+
 const CONFIG = {
     APP_NAME: "Missions Portal",
     VERSION: "1.0.0",
