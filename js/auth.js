@@ -130,23 +130,23 @@ function getAccessToken() {
             return;
         }
 
-        try {
+      //  try {
 
-            const tokenClient = google.accounts.oauth2.initTokenClient({
+       //     const tokenClient = google.accounts.oauth2.initTokenClient({
 
-                client_id: CONFIG.CLIENT_ID,
+       //         client_id: CONFIG.CLIENT_ID,
 
-                scope: [
-                    "https://www.googleapis.com/auth/script.scriptapp",
-                    "https://www.googleapis.com/auth/spreadsheets",
-                    "https://www.googleapis.com/auth/drive.readonly"
-                ].join(" "),
+       //         scope: [
+       //             "https://www.googleapis.com/auth/script.scriptapp",
+        //            "https://www.googleapis.com/auth/spreadsheets",
+        //            "https://www.googleapis.com/auth/drive.readonly"
+         //       ].join(" "),
 
-                callback: (tokenResponse) => {
+        //        callback: (tokenResponse) => {
 
-                    if (!tokenResponse || !tokenResponse.access_token) {
-                        reject("No access token received");
-                        return;
+         //           if (!tokenResponse || !tokenResponse.access_token) {
+         //               reject("No access token received");
+         //               return;
                     }
 
                     // =========================
