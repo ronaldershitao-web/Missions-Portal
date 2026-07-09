@@ -42,72 +42,61 @@ async function callAppsScriptLogin(idToken) {
 
     try {
 
-       const url = `https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`;
-       
-       
-       
+        const res = await fetch(CONFIG.WEB_APP_URL, {
 
-        const payload = {
-            function: "login",
-            parameters: [idToken],
-            devMode: false
-        };
-
-        const res = await fetch(url, {
             method: "POST",
+
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + await getAccessToken()
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify(payload)
+
+            body: JSON.stringify({
+
+                action: "login",
+
+                token: idToken
+
+            })
+
         });
 
-        const data = await res.json();
+        const result = await res.json();
 
-        console.log("EXECUTION API RESPONSE:", data);
+        console.log("LOGIN RESPONSE:", result);
 
         hideLoading();
 
-        // API error check
-        if (data.error) {
-            console.error(data.error);
-            showMessage("Execution API error", "danger");
-            return;
-        }
-
-        const result = data.response?.result;
-
-        if (!result) {
-            showMessage("Invalid server response", "danger");
-            return;
-        }
-
-        // =========================
-        // SUCCESS
-        // =========================
         if (result.success) {
 
-            console.log("LOGIN SUCCESS:", result);
-
-            localStorage.setItem("mp_user", JSON.stringify(result.user));
+            localStorage.setItem(
+                "mp_user",
+                JSON.stringify(result.user)
+            );
 
             window.location.href = "dashboard.html";
 
-        } 
-        // =========================
-        // FAIL
-        // =========================
-        else {
+        } else {
 
-            showMessage(result.message || "Access denied", "danger");
+            showMessage(
+                result.message || "Access denied",
+                "danger"
+            );
+
         }
 
     } catch (err) {
 
         console.error(err);
+
         hideLoading();
-        showMessage("Server connection failed", "danger");
+
+        showMessage(
+            "Server connection failed",
+            "danger"
+        );
+
     }
+
 }
 
 /* ==========================================
