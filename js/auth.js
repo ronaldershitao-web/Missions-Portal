@@ -42,7 +42,16 @@ async function callAppsScriptLogin(idToken) {
 
     try {
 
-        const url = `https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`;
+      //  const url = `https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`;
+       
+       fetch(WEB_APP_URL,{
+    method:"POST",
+    body:JSON.stringify({
+        action:"login",
+        idToken:idToken
+    })
+});
+       
 
         const payload = {
             function: "login",
