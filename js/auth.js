@@ -45,22 +45,14 @@ async function callAppsScriptLogin(idToken) {
 
     try {
 
+        const formData = new URLSearchParams();
+
+        formData.append("action", "login");
+        formData.append("token", idToken);
+
         const res = await fetch(CONFIG.WEB_APP_URL, {
-
             method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                action: "login",
-
-                token: idToken
-
-            })
-
+            body: formData
         });
 
         if (!res.ok) {
@@ -69,13 +61,11 @@ async function callAppsScriptLogin(idToken) {
 
         const result = await res.json();
 
-        console.log("LOGIN RESPONSE:", result);
+        console.log(result);
 
         hideLoading();
 
         if (result.success) {
-
-            console.log("LOGIN SUCCESS:", result);
 
             localStorage.setItem(
                 "mp_user",
@@ -86,10 +76,7 @@ async function callAppsScriptLogin(idToken) {
 
         } else {
 
-            showMessage(
-                result.message || "Access denied",
-                "danger"
-            );
+            showMessage(result.message, "danger");
 
         }
 
@@ -99,10 +86,7 @@ async function callAppsScriptLogin(idToken) {
 
         hideLoading();
 
-        showMessage(
-            "Server connection failed",
-            "danger"
-        );
+        showMessage("Server connection failed", "danger");
 
     }
 
