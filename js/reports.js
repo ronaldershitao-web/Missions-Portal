@@ -103,7 +103,7 @@ async function loadMasterResponses(){
 
     */
 
-    const response = await fetch(WEB_WEB_URL + "?action=getMasterResponses");
+    const response = await fetch(WEB_APP_URL + "?action=getMasterResponses");
 
     const json = await response.json();
 
