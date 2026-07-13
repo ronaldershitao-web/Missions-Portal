@@ -8,7 +8,7 @@ const CONFIG = {
 
     CLIENT_ID: "263902111764-jdil2ttim5q05gim8tsheopgoprr6jmh.apps.googleusercontent.com",
 
-    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbz0UlPom-YTQMDA3nS5wciKH-6bHMhYafRS6GkGKlKJHGuMtgBJ8z2mibB7Lgv1SB6J/exec",
+    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbx8qNmvblKd_isBS7F_xs2DjU6xDZmu1KhSSSRTa8ThnY01c5W3frUVZbeEGFs9vhTU/exec",
 
     DEBUG: true
 };
