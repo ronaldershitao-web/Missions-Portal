@@ -1542,3 +1542,24 @@ data.averageParticipants;
 
 }
 
+function renderMissionTripSummary() {
+
+    const tbody =
+        document.getElementById("missionTripSummaryTable");
+
+    tbody.innerHTML = "";
+
+    Dashboard.data.missionCompilation.tripSummary.forEach(trip => {
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${trip.tripCode}</td>
+            <td>${trip.location}</td>
+            <td>${formatDate(trip.startDate)}</td>
+            <td>${trip.participants}</td>
+        </tr>
+        `;
+
+    });
+
+}
