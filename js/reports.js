@@ -1355,3 +1355,66 @@ function closeModal(){
 
 }
 
+/* ==========================================================
+   DATE FORMATTER
+========================================================== */
+
+function formatDate(date){
+
+    if(!date)
+        return "-";
+
+    try {
+
+        return new Date(date)
+            .toLocaleDateString(
+                "en-SG",
+                {
+                    year:"numeric",
+                    month:"short",
+                    day:"numeric"
+                }
+            );
+
+    }
+    catch(err){
+
+        return date;
+
+    }
+
+}
+
+function exportExcel(){
+
+    alert(
+        "Excel export coming soon."
+    );
+
+}
+
+
+function exportCSV(){
+
+    alert(
+        "CSV export coming soon."
+    );
+
+}
+
+function exportEventTable(){
+
+    alert(
+        "Event export coming soon."
+    );
+
+}
+
+function exportParticipants(){
+
+    alert(
+        "Participant export coming soon."
+    );
+
+}
+
