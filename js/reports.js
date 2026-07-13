@@ -1,1531 +1,2184 @@
-/* ===========================================================
-   Missions Intelligence Dashboard
+/* ==========================================================
+   COOS Missions Portal
+   Mission Intelligence Dashboard
    reports.js
-   Part 1 - Core Engine
-=========================================================== */
+========================================================== */
 
-/* ===========================================================
-   CONFIG
-=========================================================== */
+"use strict";
+
+/* ==========================================================
+   GLOBAL DASHBOARD OBJECT
+========================================================== */
 
 const Dashboard = {
 
+    headers: [],
     rawData: [],
+    participants: [],
+    events: [],
+    churches: [],
+    referrals: [],
+
     filteredData: [],
 
-    headers: [],
-    COL: {},
-
+    metrics: {},
     charts: {},
 
     filters: {
-
         year: "",
         eventType: "",
         church: "",
+        referral: "",
+        attendance: "",
         search: ""
-
     }
 
 };
 
-/* ===========================================================
+/* ==========================================================
+   COLUMN INDEXES
+========================================================== */
+
+let COL = {};
+
+/* ==========================================================
    INITIALISE
-=========================================================== */
+========================================================== */
 
-document.addEventListener("DOMContentLoaded", initialiseDashboard);
+document.addEventListener(
+    "DOMContentLoaded",
+    initialiseDashboard
+);
 
-async function initialiseDashboard(){
+async function initialiseDashboard() {
 
-    try{
+    try {
 
         showLoading();
 
-        await authenticateUser();
-
         await loadMasterResponses();
 
-        buildColumnMap();
+        buildColumnIndexes();
+
+        processRawData();
 
         populateFilters();
 
         refreshDashboard();
 
-        updateLastRefresh();
+        hideLoading();
+
+        document.getElementById("lastRefresh").textContent =
+            new Date().toLocaleString();
 
     }
 
-    catch(error){
+    catch (err) {
 
-        console.error(error);
-
-        alert(error.message);
-
-    }
-
-    finally{
+        console.error(err);
 
         hideLoading();
 
-    }
-
-}
-
-/* ===========================================================
-   AUTHENTICATION
-=========================================================== */
-
-async function authenticateUser(){
-
-    if(typeof authenticate === "function"){
-
-        await authenticate();
+        alert(err.message);
 
     }
 
 }
 
-/* ===========================================================
+/* ==========================================================
    LOAD DATA
-=========================================================== */
+========================================================== */
 
 async function loadMasterResponses() {
 
-    const result = await API.post("getMasterResponses");
+    const result = await API.post(
+        "getMasterResponses"
+    );
 
-    console.log(result);   // Leave this for debugging
-
-    if (!result.success) {
+    if (!result.success)
         throw new Error(result.message);
-    }
 
     Dashboard.headers = result.data.headers;
+
     Dashboard.rawData = result.data.rows;
-    Dashboard.filteredData = [...result.data.rows];
 
 }
-/* ===========================================================
-   COLUMN MAP
-=========================================================== */
 
-function buildColumnMap(){
+/* ==========================================================
+   BUILD COLUMN MAP
+========================================================== */
 
-    const h = Dashboard.headers;
+function buildColumnIndexes() {
 
-    Dashboard.COL = {
+    Dashboard.headers.forEach((header, index) => {
 
-        name:
-            h.indexOf("Name"),
+        COL[
+            String(header).trim()
+        ] = index;
 
-        church:
-            h.indexOf("Church"),
+    });
 
-       
+}
 
-        age:
-            h.indexOf("Age"),
+/* ==========================================================
+   PROCESS RAW DATA
+========================================================== */
 
-        event:
-            h.indexOf("Event"),
+function processRawData() {
 
-        eventType:
-            h.indexOf("Event Type"),
+    Dashboard.participants = [];
+
+    Dashboard.events = [];
+
+    Dashboard.churches = [];
+
+    Dashboard.referrals = [];
+
+    Dashboard.rawData.forEach(processRow);
+
+}
+
+/* ==========================================================
+   PROCESS ONE ROW
+========================================================== */
+
+function processRow(row) {
+
+    Dashboard.participants.push({
+
+        importTimestamp:
+            value(row, "Import Timestamp"),
+
+        sourceSpreadsheet:
+            value(row, "Source Spreadsheet ID"),
+
+        sourceSheet:
+            value(row, "Source Sheet"),
 
         eventDate:
-            h.indexOf("Event Date"),
+            parseDate(
+                value(row, "Event Date")
+            ),
+
+        eventName:
+            value(row, "Event Name"),
+
+        eventType:
+            value(row, "Event Type"),
+
+        submissionTimestamp:
+            parseDate(
+                value(row, "Submission Timestamp")
+            ),
+
+        name:
+            value(row, "Name"),
+
+        email:
+            cleanEmail(
+                value(row, "Email")
+            ),
+
+        mobile:
+            value(row, "Mobile"),
+
+        church:
+            cleanChurch(
+                value(row, "Church")
+            ),
+
+        dob:
+            value(row, "DOB"),
+
+        age:
+            parseNumber(
+                value(row, "Age")
+            ),
+
+        referral:
+            value(row, "Referral"),
+
+        status:
+            value(row, "Status"),
+
+        reminders:
+            value(row, "Reminders"),
 
         attendance:
-            h.indexOf("Attendance"),
+            value(row, "Attendance"),
 
-        participantID:
-            h.indexOf("Participant ID")
-
-    };
-
-}
-
-/* ===========================================================
-   FILTERS
-=========================================================== */
-
-function populateFilters(){
-
-    populateYearFilter();
-
-    populateChurchFilter();
-
-    populateEventTypeFilter();
-
-}
-
-/* ===========================================================
-   YEAR
-=========================================================== */
-
-function populateYearFilter(){
-
-    const select =
-        document.getElementById("yearFilter");
-
-    const years =
-        [...new Set(
-
-            Dashboard.rawData.map(r=>{
-
-                const d =
-                    new Date(r[Dashboard.COL.eventDate]);
-
-                return d.getFullYear();
-
-            })
-
-        )].sort();
-
-    years.forEach(year=>{
-
-        const option =
-            document.createElement("option");
-
-        option.value = year;
-
-        option.textContent = year;
-
-        select.appendChild(option);
+        responseKey:
+            value(row, "Response Key")
 
     });
 
 }
 
-/* ===========================================================
-   CHURCH
-=========================================================== */
+/* ==========================================================
+   REFRESH DASHBOARD
+========================================================== */
 
-function populateChurchFilter(){
-
-    const select =
-        document.getElementById("churchFilter");
-
-    const churches =
-        [...new Set(
-
-            Dashboard.rawData.map(
-
-                r=>r[Dashboard.COL.church]
-
-            )
-
-        )].sort();
-
-    churches.forEach(church=>{
-
-        const option =
-            document.createElement("option");
-
-        option.value = church;
-
-        option.textContent = church;
-
-        select.appendChild(option);
-
-    });
-
-}
-
-/* ===========================================================
-   EVENT TYPE
-=========================================================== */
-
-function populateEventTypeFilter(){
-
-    const select =
-        document.getElementById("eventTypeFilter");
-
-    const types =
-        [...new Set(
-
-            Dashboard.rawData.map(
-
-                r=>r[Dashboard.COL.eventType]
-
-            )
-
-        )].sort();
-
-    types.forEach(type=>{
-
-        const option =
-            document.createElement("option");
-
-        option.value = type;
-
-        option.textContent = type;
-
-        select.appendChild(option);
-
-    });
-
-}
-
-/* ===========================================================
-   REFRESH
-=========================================================== */
-
-function refreshDashboard(){
+function refreshDashboard() {
 
     readFilters();
 
     applyFilters();
 
-    renderKPIs();
+    calculateMetrics();
 
-    renderExecutiveSummary();
-
-    renderStrategicInsights();
-
-    renderParticipantAnalytics();
-
-    renderChurchAnalytics();
-
-    renderMissionAnalytics();
-
-    renderLeadershipAnalytics();
-
-    renderEventTable();
-
-    renderParticipantTable();
+    renderDashboard();
 
 }
 
-/* ===========================================================
+/* ==========================================================
    READ FILTERS
-=========================================================== */
+========================================================== */
 
-function readFilters(){
+function readFilters() {
 
     Dashboard.filters.year =
         document.getElementById("yearFilter").value;
 
-    Dashboard.filters.church =
-        document.getElementById("churchFilter").value;
-
     Dashboard.filters.eventType =
         document.getElementById("eventTypeFilter").value;
 
+    Dashboard.filters.church =
+        document.getElementById("churchFilter").value;
+
+    Dashboard.filters.referral =
+        document.getElementById("referralFilter").value;
+
+    Dashboard.filters.attendance =
+        document.getElementById("attendanceFilter").value;
+
     Dashboard.filters.search =
-        document
-        .getElementById("searchBox")
-        .value
-        .trim()
-        .toLowerCase();
+        document.getElementById("searchBox")
+            .value
+            .trim()
+            .toLowerCase();
 
 }
 
-/* ===========================================================
+/* ==========================================================
    APPLY FILTERS
-=========================================================== */
+========================================================== */
 
-function applyFilters(){
+function applyFilters() {
 
     Dashboard.filteredData =
-        Dashboard.rawData.filter(row=>{
-
-            const year =
-                new Date(
-                    row[Dashboard.COL.eventDate]
-                ).getFullYear().toString();
-
-            if(
-                Dashboard.filters.year &&
-                year!==Dashboard.filters.year
-            ) return false;
-
-            if(
-                Dashboard.filters.church &&
-                row[Dashboard.COL.church]
-                !==Dashboard.filters.church
-            ) return false;
-
-            if(
-                Dashboard.filters.eventType &&
-                row[Dashboard.COL.eventType]
-                !==Dashboard.filters.eventType
-            ) return false;
-
-            if(Dashboard.filters.search){
-
-                const text =
-                    row.join(" ")
-                    .toLowerCase();
-
-                if(
-                    !text.includes(
-                        Dashboard.filters.search
-                    )
-                ){
-
-                    return false;
-
-                }
-
-            }
-
-            return true;
-
-        });
+        Dashboard.participants.filter(matchesFilters);
 
 }
 
-/* ===========================================================
-   LOADING
-=========================================================== */
+/* ==========================================================
+   FILTER LOGIC
+========================================================== */
 
-function showLoading(){
+function matchesFilters(person) {
 
-    document
-        .getElementById("loadingOverlay")
-        .classList
-        .remove("hidden");
+    if (
+        Dashboard.filters.year &&
+        String(person.eventDate?.getFullYear()) !== Dashboard.filters.year
+    )
+        return false;
+
+    if (
+        Dashboard.filters.eventType &&
+        person.eventType !== Dashboard.filters.eventType
+    )
+        return false;
+
+    if (
+        Dashboard.filters.church &&
+        person.church !== Dashboard.filters.church
+    )
+        return false;
+
+    if (
+        Dashboard.filters.referral &&
+        person.referral !== Dashboard.filters.referral
+    )
+        return false;
+
+    if (
+        Dashboard.filters.attendance &&
+        person.attendance !== Dashboard.filters.attendance
+    )
+        return false;
+
+    if (Dashboard.filters.search) {
+
+        const search = Dashboard.filters.search;
+
+        const found =
+
+            person.name.toLowerCase().includes(search) ||
+
+            person.email.toLowerCase().includes(search) ||
+
+            person.church.toLowerCase().includes(search);
+
+        if (!found)
+            return false;
+
+    }
+
+    return true;
 
 }
 
-function hideLoading(){
+/* ==========================================================
+   CALCULATE ALL METRICS
+========================================================== */
 
-    document
-        .getElementById("loadingOverlay")
-        .classList
-        .add("hidden");
+function calculateMetrics() {
 
-}
+    const data = Dashboard.filteredData;
 
-/* ===========================================================
-   LAST REFRESH
-=========================================================== */
+    Dashboard.metrics = {
 
-function updateLastRefresh(){
+        registrations: data.length,
 
-    document
-        .getElementById("lastRefresh")
-        .textContent =
-        new Date().toLocaleString();
-
-}
-
-/* ===========================================================
-   ANALYTICS ENGINE
-=========================================================== */
-
-function calculateAnalytics() {
-
-    const rows = Dashboard.filteredData;
-    const C = Dashboard.COL;
-
-    const analytics = {
-
-        totalRegistrations: rows.length,
-
-        uniqueParticipants: new Set(),
+        uniqueParticipants: 0,
 
         repeatParticipants: 0,
 
-        churches: new Map(),
+        totalEvents: 0,
 
-        events: new Map(),
+        totalChurches: 0,
 
-        eventTypes: new Map(),
+        attendanceRate: 0,
 
-      
+        averageAge: 0,
 
-        ages: {
-            under18: 0,
-            age18to25: 0,
-            age26to35: 0,
-            age36to45: 0,
-            age46to55: 0,
-            age56plus: 0
-        },
+        medianAge: 0,
 
-        monthly: new Map(),
+        ageGroups: {},
 
-        participantCount: new Map()
+        participantMap: new Map(),
+
+        eventMap: new Map(),
+
+        churchMap: new Map(),
+
+        referralMap: new Map()
 
     };
 
-    rows.forEach(row => {
+    calculateParticipantMetrics(data);
 
-        const name = row[C.name] || "";
-        const church = row[C.church] || "Unknown";
-        
-        const event = row[C.event] || "";
-        const eventType = row[C.eventType] || "";
-        const age = Number(row[C.age]) || 0;
+    calculateEventMetrics(data);
 
-        analytics.uniqueParticipants.add(name);
+    calculateChurchMetrics(data);
 
-        analytics.churches.set(
-            church,
-            (analytics.churches.get(church) || 0) + 1
-        );
+    calculateReferralMetrics(data);
 
-        analytics.events.set(
-            event,
-            (analytics.events.get(event) || 0) + 1
-        );
+    calculateAttendanceMetrics(data);
 
-        analytics.eventTypes.set(
-            eventType,
-            (analytics.eventTypes.get(eventType) || 0) + 1
-        );
-
-      
-
-        analytics.participantCount.set(
-            name,
-            (analytics.participantCount.get(name) || 0) + 1
-        );
-
-        if(age < 18)
-            analytics.ages.under18++;
-
-        else if(age <=25)
-            analytics.ages.age18to25++;
-
-        else if(age<=35)
-            analytics.ages.age26to35++;
-
-        else if(age<=45)
-            analytics.ages.age36to45++;
-
-        else if(age<=55)
-            analytics.ages.age46to55++;
-
-        else
-            analytics.ages.age56plus++;
-
-        const date =
-            new Date(row[C.eventDate]);
-
-        if(!isNaN(date)){
-
-            const key =
-                date.getFullYear() + "-" +
-                String(date.getMonth()+1).padStart(2,"0");
-
-            analytics.monthly.set(
-                key,
-                (analytics.monthly.get(key)||0)+1
-            );
-
-        }
-
-    });
-
-    analytics.uniqueParticipants =
-        analytics.uniqueParticipants.size;
-
-    analytics.repeatParticipants =
-        [...analytics.participantCount.values()]
-        .filter(x=>x>1)
-        .length;
-
-    analytics.churchCount =
-        analytics.churches.size;
-
-    analytics.eventCount =
-        analytics.events.size;
-
-    analytics.eventTypeCount =
-        analytics.eventTypes.size;
-
-    return analytics;
+    calculateAgeMetrics(data);
 
 }
 
-/* ===========================================================
-   KPI CARDS
-=========================================================== */
+/* ==========================================================
+   PARTICIPANT METRICS
+========================================================== */
 
-function renderKPIs(){
+function calculateParticipantMetrics(data) {
 
-    const A =
-        calculateAnalytics();
+    const people = Dashboard.metrics.participantMap;
 
-    setValue(
-        "kpiRegistrations",
-        A.totalRegistrations
-    );
+    data.forEach(person => {
 
-    setValue(
-        "kpiUnique",
-        A.uniqueParticipants
-    );
+        const email =
+            person.email ||
+            person.name;
 
-    setValue(
-        "kpiRepeat",
-        A.repeatParticipants
-    );
+        if (!people.has(email)) {
 
-    setValue(
-        "kpiEvents",
-        A.eventCount
-    );
+            people.set(email, {
 
-    setValue(
-        "kpiChurches",
-        A.churchCount
-    );
+                name: person.name,
 
-    setValue(
-        "kpiAttendance",
-        calculateAttendanceRate()+"%"
-    );
+                email: person.email,
 
-    setValue(
-        "kpiGrowth",
-        calculateGrowth()+"%"
-    );
+                church: person.church,
 
-    setValue(
-        "kpiLeaders",
-        calculatePotentialLeaders()
-    );
+                age: person.age,
 
-}
+                registrations: 0,
 
-/* ===========================================================
-   EXECUTIVE SUMMARY
-=========================================================== */
-
-function renderExecutiveSummary(){
-
-    const A =
-        calculateAnalytics();
-
-    const html = `
-
-    <ul>
-
-    <li>
-    ${A.totalRegistrations}
-    registrations recorded.
-    </li>
-
-    <li>
-    ${A.uniqueParticipants}
-    unique participants.
-    </li>
-
-    <li>
-    ${A.repeatParticipants}
-    repeat missionaries.
-    </li>
-
-    <li>
-    ${A.eventCount}
-    mission events organised.
-    </li>
-
-    <li>
-    ${A.churchCount}
-    churches represented.
-    </li>
-
-    <li>
-    ${
-        getLargestChurch(A)
-    }
-    contributed the highest number of participants.
-    </li>
-
-    </ul>
-
-    `;
-
-    document
-        .getElementById(
-            "executiveSummary"
-        )
-        .innerHTML =
-        html;
-
-}
-
-/* ===========================================================
-   STRATEGIC INSIGHTS
-=========================================================== */
-
-function renderStrategicInsights(){
-
-    const A =
-        calculateAnalytics();
-
-    const celebrate = [];
-
-    const warning = [];
-
-    const recommendation = [];
-
-    if(
-        A.repeatParticipants > 20
-    ){
-
-        celebrate.push(
-            "Strong returning missionary base."
-        );
-
-    }
-
-    if(
-        A.churchCount < 3
-    ){
-
-        warning.push(
-            "Mission participation is concentrated in very few churches."
-        );
-
-    }
-
-    if(
-        A.repeatParticipants <
-        A.uniqueParticipants * 0.25
-    ){
-
-        recommendation.push(
-            "Develop a retention strategy to encourage participants to return for future missions."
-        );
-
-    }
-
-    document
-        .getElementById(
-            "celebrateInsights"
-        )
-        .innerHTML =
-        createList(celebrate);
-
-    document
-        .getElementById(
-            "warningInsights"
-        )
-        .innerHTML =
-        createList(warning);
-
-    document
-        .getElementById(
-            "recommendationInsights"
-        )
-        .innerHTML =
-        createList(recommendation);
-
-}
-
-/* ===========================================================
-   HELPERS
-=========================================================== */
-
-function setValue(id,value){
-
-    document
-        .getElementById(id)
-        .textContent =
-        value;
-
-}
-
-function createList(items){
-
-    if(items.length===0){
-
-        return "<p>No significant insights.</p>";
-
-    }
-
-    return "<ul>" +
-
-        items.map(x=>
-            `<li>${x}</li>`
-        ).join("")
-
-        +
-
-        "</ul>";
-
-}
-
-function getLargestChurch(A){
-
-    let max = 0;
-
-    let church = "-";
-
-    A.churches.forEach((value,key)=>{
-
-        if(value>max){
-
-            max = value;
-
-            church = key;
-
-        }
-
-    });
-
-    return church;
-
-}
-
-/* ===========================================================
-   PLACEHOLDER FUNCTIONS
-=========================================================== */
-
-function calculateAttendanceRate(){
-
-    return 91;
-
-}
-
-function calculateGrowth(){
-
-    return 14;
-
-}
-
-function calculatePotentialLeaders(){
-
-    return 18;
-
-}
-
-/* ===========================================================
-   CHART MANAGER
-=========================================================== */
-
-function destroyChart(id) {
-
-    if (Dashboard.charts[id]) {
-        Dashboard.charts[id].destroy();
-        delete Dashboard.charts[id];
-    }
-
-}
-
-function createChart(id, type, labels, data, label = "") {
-
-    destroyChart(id);
-
-    const canvas = document.getElementById(id);
-
-    if (!canvas) return;
-
-    Dashboard.charts[id] = new Chart(canvas, {
-
-        type,
-
-        data: {
-
-            labels,
-
-            datasets: [{
-
-                label,
-
-                data,
-
-                borderWidth: 2,
-                tension: 0.35,
-                fill: false
-
-            }]
-
-        },
-
-        options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            plugins: {
-
-                legend: {
-
-                    display: true
-
-                }
-
-            }
-
-        }
-
-    });
-
-}
-
-/* ===========================================================
-   PARTICIPANT ANALYTICS
-=========================================================== */
-
-function renderParticipantAnalytics() {
-
-    const A = Dashboard.analytics;
-
-
-    renderAgeChart(A);
-
-    renderExperienceChart(A);
-
-    renderFirstTimeChart(A);
-
-}
-
-
-
-/* ===========================================================
-   AGE
-=========================================================== */
-
-function renderAgeChart(A) {
-
-    createChart(
-
-        "ageChart",
-
-        "bar",
-
-        [
-
-            "<18",
-            "18-25",
-            "26-35",
-            "36-45",
-            "46-55",
-            "56+"
-
-        ],
-
-        [
-
-            A.ages.under18,
-            A.ages.age18to25,
-            A.ages.age26to35,
-            A.ages.age36to45,
-            A.ages.age46to55,
-            A.ages.age56plus
-
-        ],
-
-        "Participants"
-
-    );
-
-}
-
-/* ===========================================================
-   EXPERIENCE
-=========================================================== */
-
-function renderExperienceChart(A) {
-
-    const buckets = {
-
-        "1 Mission": 0,
-        "2 Missions": 0,
-        "3 Missions": 0,
-        "4+ Missions": 0
-
-    };
-
-    A.participantCount.forEach(count => {
-
-        if (count === 1)
-            buckets["1 Mission"]++;
-
-        else if (count === 2)
-            buckets["2 Missions"]++;
-
-        else if (count === 3)
-            buckets["3 Missions"]++;
-
-        else
-            buckets["4+ Missions"]++;
-
-    });
-
-    createChart(
-
-        "experienceChart",
-
-        "doughnut",
-
-        Object.keys(buckets),
-
-        Object.values(buckets),
-
-        "Mission Experience"
-
-    );
-
-}
-
-/* ===========================================================
-   FIRST TIME VS RETURNING
-=========================================================== */
-
-function renderFirstTimeChart(A) {
-
-    createChart(
-
-        "firstTimeReturningChart",
-
-        "pie",
-
-        [
-
-            "First Time",
-
-            "Returning"
-
-        ],
-
-        [
-
-            A.uniqueParticipants - A.repeatParticipants,
-
-            A.repeatParticipants
-
-        ],
-
-        "Missionaries"
-
-    );
-
-}
-
-/* ===========================================================
-   CHURCH ANALYTICS
-=========================================================== */
-
-function renderChurchAnalytics() {
-
-    const A = Dashboard.analytics;
-
-    createChart(
-
-        "churchChart",
-
-        "bar",
-
-        [...A.churches.keys()],
-
-        [...A.churches.values()],
-
-        "Participants"
-
-    );
-
-}
-
-/* ===========================================================
-   EVENT ANALYTICS
-=========================================================== */
-
-function renderMissionAnalytics() {
-
-    const A = Dashboard.analytics;
-
-    createChart(
-
-        "eventTypeChart",
-
-        "bar",
-
-        [...A.eventTypes.keys()],
-
-        [...A.eventTypes.values()],
-
-        "Registrations"
-
-    );
-
-    createChart(
-
-        "eventPopularityChart",
-
-        "bar",
-
-        [...A.events.keys()],
-
-        [...A.events.values()],
-
-        "Participants"
-
-    );
-
-    renderTimelineChart(A);
-
-}
-
-/* ===========================================================
-   TIMELINE
-=========================================================== */
-
-function renderTimelineChart(A) {
-
-    const months =
-        [...A.monthly.keys()].sort();
-
-    const values =
-        months.map(m => A.monthly.get(m));
-
-    createChart(
-
-        "timelineChart",
-
-        "line",
-
-        months,
-
-        values,
-
-        "Registrations"
-
-    );
-
-}
-
-/* ===========================================================
-   LEADERSHIP
-=========================================================== */
-
-function renderLeadershipAnalytics() {
-
-    const A = Dashboard.analytics;
-
-    const experienced =
-        [...A.participantCount.values()]
-        .filter(x => x >= 3)
-        .length;
-
-    createChart(
-
-        "leadershipPipelineChart",
-
-        "doughnut",
-
-        [
-
-            "Emerging",
-
-            "Potential Leaders"
-
-        ],
-
-        [
-
-            A.uniqueParticipants - experienced,
-
-            experienced
-
-        ],
-
-        "Leadership"
-
-    );
-
-}
-
-/* ===========================================================
-   EVENT SUMMARY TABLE
-=========================================================== */
-
-function renderEventTable() {
-
-    const tbody =
-        document.getElementById("eventSummaryTable");
-
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    const C = Dashboard.COL;
-
-    const eventMap = new Map();
-
-    Dashboard.filteredData.forEach(row => {
-
-        const event = row[C.event];
-
-        if (!eventMap.has(event)) {
-
-            eventMap.set(event, {
-
-                date: row[C.eventDate],
-                type: row[C.eventType],
-                registered: 0,
                 attended: 0,
+
+                firstEvent: person.eventDate,
+
+                latestEvent: person.eventDate,
+
+                events: []
+
+            });
+
+        }
+
+        const p = people.get(email);
+
+        p.registrations++;
+
+        if (
+            isPresent(person)
+        ) {
+
+            p.attended++;
+
+        }
+
+        p.events.push(person);
+
+        if (
+            person.eventDate &&
+            (!p.firstEvent ||
+             person.eventDate < p.firstEvent)
+        ) {
+
+            p.firstEvent =
+                person.eventDate;
+
+        }
+
+        if (
+            person.eventDate &&
+            (!p.latestEvent ||
+             person.eventDate > p.latestEvent)
+        ) {
+
+            p.latestEvent =
+                person.eventDate;
+
+        }
+
+    });
+
+    Dashboard.metrics.uniqueParticipants =
+        people.size;
+
+    Dashboard.metrics.repeatParticipants =
+        [...people.values()]
+        .filter(p => p.registrations > 1)
+        .length;
+
+}
+
+/* ==========================================================
+   EVENT METRICS
+========================================================== */
+
+function calculateEventMetrics(data) {
+
+    const events =
+        Dashboard.metrics.eventMap;
+
+    data.forEach(person => {
+
+        const key =
+
+            person.eventName +
+            "|" +
+            formatDate(person.eventDate);
+
+        if (!events.has(key)) {
+
+            events.set(key, {
+
+                eventName: person.eventName,
+
+                eventDate: person.eventDate,
+
+                eventType: person.eventType,
+
+                registrations: 0,
+
+                attended: 0,
+
+                churches: new Set(),
+
                 participants: new Set()
 
             });
 
         }
 
-        const item = eventMap.get(event);
+        const e =
+            events.get(key);
 
-        item.registered++;
+        e.registrations++;
 
         if (
-            String(row[C.attendance])
-            .toLowerCase()
-            .includes("yes")
+            isPresent(person)
         ) {
 
-            item.attended++;
+            e.attended++;
 
         }
 
-        item.participants.add(
-            row[C.name]
-        );
+        if (person.church) {
+
+            e.churches.add(
+                person.church
+            );
+
+        }
+
+        if (person.email) {
+
+            e.participants.add(
+                person.email
+            );
+
+        }
 
     });
 
-    eventMap.forEach((item, event) => {
-
-        const tr =
-            document.createElement("tr");
-
-        const attendance =
-            item.registered
-                ? ((item.attended / item.registered) * 100).toFixed(1)
-                : "0";
-
-        tr.innerHTML = `
-
-            <td>${item.date}</td>
-
-            <td>${event}</td>
-
-            <td>${item.type}</td>
-
-            <td>${item.registered}</td>
-
-            <td>${item.attended}</td>
-
-            <td>${attendance}%</td>
-
-            <td>${item.participants.size}</td>
-
-            <td>-</td>
-
-            <td>-</td>
-
-            <td>${attendance >= 80 ? "Healthy" : "Review"}</td>
-
-        `;
-
-        tbody.appendChild(tr);
-
-    });
+    Dashboard.metrics.totalEvents =
+        events.size;
 
 }
 
-/* ===========================================================
-   PARTICIPANT TABLE
-=========================================================== */
+/* ==========================================================
+   CHURCH METRICS
+========================================================== */
 
-function renderParticipantTable() {
+function calculateChurchMetrics(data) {
 
-    const tbody =
-        document.getElementById(
-            "participantSummaryTable"
-        );
+    const churches =
+        Dashboard.metrics.churchMap;
 
-    if (!tbody) return;
+    data.forEach(person => {
 
-    tbody.innerHTML = "";
+        const church =
+            person.church ||
+            "Unknown";
 
-    const C = Dashboard.COL;
+        if (!churches.has(church)) {
 
-    const participants = new Map();
+            churches.set(church, {
 
-    Dashboard.filteredData.forEach(row => {
+                church: church,
 
-        const name =
-            row[C.name];
+                registrations: 0,
 
-        if (!participants.has(name)) {
+                attended: 0,
 
-            participants.set(name, {
+                participants: new Set(),
 
-                church: row[C.church],
-
-             
-
-                age: row[C.age],
-
-                missions: 0,
-
-                attendance: 0
+                events: new Set()
 
             });
 
         }
 
-        const p =
-            participants.get(name);
+        const c =
+            churches.get(church);
 
-        p.missions++;
+        c.registrations++;
 
         if (
-            String(row[C.attendance])
-            .toLowerCase()
-            .includes("yes")
+            isPresent(person)
         ) {
 
-            p.attendance++;
+            c.attended++;
+
+        }
+
+        if (person.email) {
+
+            c.participants.add(
+                person.email
+            );
+
+        }
+
+        c.events.add(
+            person.eventName
+        );
+
+    });
+
+    Dashboard.metrics.totalChurches =
+        churches.size;
+
+}
+
+/* ==========================================================
+   REFERRAL METRICS
+========================================================== */
+
+function calculateReferralMetrics(data) {
+
+    const referrals =
+        Dashboard.metrics.referralMap;
+
+    data.forEach(person => {
+
+        const source =
+            person.referral ||
+            "Unknown";
+
+        if (!referrals.has(source)) {
+
+            referrals.set(source, {
+
+                source: source,
+
+                registrations: 0,
+
+                attended: 0
+
+            });
+
+        }
+
+        const r =
+            referrals.get(source);
+
+        r.registrations++;
+
+        if (
+            isPresent(person)
+        ) {
+
+            r.attended++;
 
         }
 
     });
 
-    participants.forEach((p, name) => {
+}
 
-        const tr =
-            document.createElement("tr");
+/* ==========================================================
+   ATTENDANCE METRICS
+========================================================== */
 
-        const rate =
-            ((p.attendance / p.missions) * 100).toFixed(0);
+function calculateAttendanceMetrics(data) {
 
-        tr.innerHTML = `
+    if (data.length === 0) {
 
-        <td>${name}</td>
+        Dashboard.metrics.attendanceRate = 0;
 
-        <td>${p.church}</td>
+        return;
 
-     
+    }
 
-        <td>${p.age}</td>
+    const attended =
 
-        <td>${p.missions}</td>
+        data.filter(
+            isPresent
+        ).length;
 
-        <td>${p.attendance}</td>
+    Dashboard.metrics.attendanceRate =
 
-        <td>${rate}%</td>
+        Math.round(
+            attended /
+            data.length *
+            100
+        );
 
-        <td>${p.missions >= 3 ? "Potential" : "-"}</td>
+}
 
-        <td>Active</td>
+/* ==========================================================
+   AGE METRICS
+========================================================== */
 
-        `;
+function calculateAgeMetrics(data) {
 
-        tr.onclick = () => {
+    const ages =
 
-            showParticipant(name);
+        data
 
-        };
+        .map(p => Number(p.age))
 
-        tbody.appendChild(tr);
+        .filter(a => !isNaN(a) && a > 0)
+
+        .sort((a,b)=>a-b);
+
+    if (ages.length === 0) {
+
+        Dashboard.metrics.averageAge = 0;
+
+        Dashboard.metrics.medianAge = 0;
+
+        Dashboard.metrics.ageGroups = {};
+
+        return;
+
+    }
+
+    Dashboard.metrics.averageAge =
+
+        Math.round(
+
+            ages.reduce(
+
+                (a,b)=>a+b,
+
+                0
+
+            ) / ages.length
+
+        );
+
+    Dashboard.metrics.medianAge =
+
+        ages[
+            Math.floor(
+                ages.length / 2
+            )
+        ];
+
+    Dashboard.metrics.ageGroups = {
+
+        "<18":0,
+
+        "18-25":0,
+
+        "26-35":0,
+
+        "36-45":0,
+
+        "46-55":0,
+
+        "56-65":0,
+
+        "65+":0
+
+    };
+
+    ages.forEach(age=>{
+
+        if(age<18)
+            Dashboard.metrics.ageGroups["<18"]++;
+
+        else if(age<=25)
+            Dashboard.metrics.ageGroups["18-25"]++;
+
+        else if(age<=35)
+            Dashboard.metrics.ageGroups["26-35"]++;
+
+        else if(age<=45)
+            Dashboard.metrics.ageGroups["36-45"]++;
+
+        else if(age<=55)
+            Dashboard.metrics.ageGroups["46-55"]++;
+
+        else if(age<=65)
+            Dashboard.metrics.ageGroups["56-65"]++;
+
+        else
+            Dashboard.metrics.ageGroups["65+"]++;
 
     });
 
 }
 
-/* ===========================================================
-   TOP CONTRIBUTORS
-=========================================================== */
+/* ==========================================================
+   ADVANCED METRICS
+========================================================== */
 
-function renderTopContributors() {
+function calculateAdvancedMetrics() {
 
-    renderTopMissionaries();
+    calculateGrowthMetrics();
 
-    renderTopChurches();
+    calculateReferralMetricsAdvanced();
 
-    renderTopEvents();
+    calculateJourneyMetrics();
+
+    calculateDataQuality();
+
+    calculateMissionHealthScore();
 
 }
 
-function renderTopMissionaries() {
+/* ==========================================================
+   GROWTH METRICS
+========================================================== */
 
-    const tbody =
-        document.getElementById(
-            "topMissionaries"
+function calculateGrowthMetrics() {
+
+    const monthly = {};
+
+    Dashboard.filteredData.forEach(person => {
+
+        if (!person.eventDate) return;
+
+        const key =
+            person.eventDate.getFullYear() +
+            "-" +
+            String(person.eventDate.getMonth()+1).padStart(2,"0");
+
+        monthly[key] =
+            (monthly[key] || 0) + 1;
+
+    });
+
+    Dashboard.metrics.monthlyRegistrations = monthly;
+
+    const months =
+        Object.values(monthly);
+
+    if (months.length < 2) {
+
+        Dashboard.metrics.growthRate = 0;
+
+        return;
+
+    }
+
+    const latest = months[months.length-1];
+    const previous = months[months.length-2];
+
+    if (previous === 0) {
+
+        Dashboard.metrics.growthRate = 100;
+
+    } else {
+
+        Dashboard.metrics.growthRate =
+            Math.round(
+                ((latest-previous)/previous)*100
+            );
+
+    }
+
+}
+
+/* ==========================================================
+   REFERRAL EFFECTIVENESS
+========================================================== */
+
+function calculateReferralMetricsAdvanced() {
+
+    let largest = "";
+    let count = 0;
+
+    Dashboard.metrics.referralMap.forEach(r => {
+
+        if (r.registrations > count) {
+
+            largest = r.source;
+            count = r.registrations;
+
+        }
+
+    });
+
+    Dashboard.metrics.topReferral = largest;
+
+    Dashboard.metrics.topReferralCount = count;
+
+}
+
+/* ==========================================================
+   PARTICIPANT JOURNEY
+========================================================== */
+
+function calculateJourneyMetrics() {
+
+    let firstTimers = 0;
+    let returning = 0;
+
+    Dashboard.metrics.participantMap.forEach(person => {
+
+        if (person.registrations === 1)
+            firstTimers++;
+
+        else
+            returning++;
+
+    });
+
+    Dashboard.metrics.firstTimers =
+        firstTimers;
+
+    Dashboard.metrics.returningParticipants =
+        returning;
+
+}
+
+/* ==========================================================
+   DATA QUALITY
+========================================================== */
+
+function calculateDataQuality() {
+
+    const rows =
+        Dashboard.filteredData;
+
+    let complete = 0;
+
+    rows.forEach(p => {
+
+        if (
+
+            p.name &&
+            p.email &&
+            p.church &&
+            p.eventName &&
+            p.eventDate
+
+        ) {
+
+            complete++;
+
+        }
+
+    });
+
+    Dashboard.metrics.dataQuality =
+
+        rows.length === 0
+
+        ? 0
+
+        : Math.round(
+            complete /
+            rows.length *
+            100
         );
 
-    if (!tbody) return;
+}
 
-    tbody.innerHTML = "";
+/* ==========================================================
+   MISSION HEALTH SCORE
+========================================================== */
 
-    const list =
-        [...Dashboard.analytics.participantCount.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
+function calculateMissionHealthScore() {
 
-    list.forEach(item => {
+    const attendance =
+        Dashboard.metrics.attendanceRate;
 
-        tbody.innerHTML += `
+    const repeat =
+        Dashboard.metrics.uniqueParticipants === 0
 
-        <tr>
+        ? 0
 
-        <td>${item[0]}</td>
+        : Dashboard.metrics.repeatParticipants /
+          Dashboard.metrics.uniqueParticipants *
+          100;
 
-        <td>${item[1]}</td>
+    const churches =
 
-        </tr>
+        Math.min(
+            Dashboard.metrics.totalChurches * 5,
+            100
+        );
 
-        `;
+    const avgParticipants =
+
+        Dashboard.metrics.totalEvents === 0
+
+        ? 0
+
+        : Dashboard.metrics.registrations /
+          Dashboard.metrics.totalEvents;
+
+    const eventHealth =
+
+        Math.min(
+            avgParticipants * 4,
+            100
+        );
+
+    const referralHealth =
+
+        Dashboard.metrics.topReferralCount === 0
+
+        ? 0
+
+        : Math.min(
+
+            Dashboard.metrics.topReferralCount /
+            Dashboard.metrics.registrations *
+            300,
+
+            100
+
+        );
+
+    const dataQuality =
+        Dashboard.metrics.dataQuality;
+
+    const score =
+
+          attendance * 0.30
+        + repeat * 0.25
+        + churches * 0.15
+        + eventHealth * 0.10
+        + referralHealth * 0.10
+        + dataQuality * 0.10;
+
+    Dashboard.metrics.missionHealthScore =
+        Math.round(score);
+
+    if (score >= 90)
+        Dashboard.metrics.healthStatus = "Excellent";
+
+    else if (score >= 75)
+        Dashboard.metrics.healthStatus = "Healthy";
+
+    else if (score >= 60)
+        Dashboard.metrics.healthStatus = "Growing";
+
+    else if (score >= 40)
+        Dashboard.metrics.healthStatus = "Needs Attention";
+
+    else
+        Dashboard.metrics.healthStatus = "Critical";
+
+}
+
+/* ==========================================================
+   EXECUTIVE SUMMARY
+========================================================== */
+
+function generateExecutiveSummary() {
+
+    const m = Dashboard.metrics;
+
+    const summary = [];
+
+    summary.push(
+
+        `The Missions Department organised <strong>${m.totalEvents}</strong> events with <strong>${m.registrations}</strong> registrations representing <strong>${m.uniqueParticipants}</strong> unique participants from <strong>${m.totalChurches}</strong> churches.`
+
+    );
+
+    summary.push(
+
+        `Overall attendance was <strong>${m.attendanceRate}%</strong>, while <strong>${m.repeatParticipants}</strong> participants returned for more than one Missions event.`
+
+    );
+
+    summary.push(
+
+        `${m.firstTimers} participants attended a Missions event for the first time.`
+
+    );
+
+    summary.push(
+
+        `Average participant age was <strong>${m.averageAge}</strong> years.`
+
+    );
+
+    summary.push(
+
+        `The strongest recruitment source was <strong>${m.topReferral || "Unknown"}</strong>.`
+
+    );
+
+    summary.push(
+
+        `Mission Health Score is <strong>${m.missionHealthScore}/100 (${m.healthStatus})</strong>.`
+
+    );
+
+    document.getElementById(
+        "executiveSummary"
+    ).innerHTML =
+
+        "<ul><li>" +
+
+        summary.join("</li><li>") +
+
+        "</li></ul>";
+
+}
+
+/* ==========================================================
+   MISSION INTELLIGENCE
+========================================================== */
+
+function generateMissionIntelligence() {
+
+    generateCelebrate();
+
+    generateFollowup();
+
+    generateOpportunities();
+
+    generateRisks();
+
+}
+
+/* ==========================================================
+   CELEBRATE
+========================================================== */
+
+function generateCelebrate() {
+
+    const m = Dashboard.metrics;
+
+    const list = [];
+
+    if (m.attendanceRate >= 90)
+
+        list.push(
+            `Attendance is excellent at ${m.attendanceRate}%.`
+        );
+
+    if (m.repeatParticipants > 0)
+
+        list.push(
+            `${m.repeatParticipants} participants returned for another Missions event.`
+        );
+
+    if (m.totalChurches >= 10)
+
+        list.push(
+            `${m.totalChurches} churches are actively participating.`
+        );
+
+    if (m.growthRate > 0)
+
+        list.push(
+            `Registrations grew ${m.growthRate}% from the previous month.`
+        );
+
+    if (list.length === 0)
+
+        list.push(
+            "No significant highlights this reporting period."
+        );
+
+    renderInsightList(
+        "celebrateInsights",
+        list
+    );
+
+}
+
+/* ==========================================================
+   FOLLOW-UP
+========================================================== */
+
+function generateFollowup() {
+
+    const m = Dashboard.metrics;
+
+    const list = [];
+
+    if (m.attendanceRate < 75)
+
+        list.push(
+            "Attendance has dropped below the desired ministry benchmark."
+        );
+
+    if (m.repeatParticipants < m.uniqueParticipants * 0.30)
+
+        list.push(
+            "Participant retention is low. Review follow-up after events."
+        );
+
+    if (m.totalChurches < 5)
+
+        list.push(
+            "Only a small number of churches are represented."
+        );
+
+    if (m.dataQuality < 90)
+
+        list.push(
+            "Several participant records are incomplete."
+        );
+
+    if (list.length === 0)
+
+        list.push(
+            "No immediate pastoral concerns detected."
+        );
+
+    renderInsightList(
+        "followupInsights",
+        list
+    );
+
+}
+
+/* ==========================================================
+   OPPORTUNITIES
+========================================================== */
+
+function generateOpportunities() {
+
+    const m = Dashboard.metrics;
+
+    const list = [];
+
+    if (m.firstTimers > 0)
+
+        list.push(
+            `${m.firstTimers} first-time participants can be invited to future missions events.`
+        );
+
+    if (m.topReferral)
+
+        list.push(
+            `Continue investing in '${m.topReferral}' as the primary recruitment channel.`
+        );
+
+    if (m.averageAge > 0)
+
+        list.push(
+            `Average participant age is ${m.averageAge}. Consider age-specific mobilisation strategies.`
+        );
+
+    if (list.length === 0)
+
+        list.push(
+            "No major growth opportunities identified."
+        );
+
+    renderInsightList(
+        "opportunityInsights",
+        list
+    );
+
+}
+
+/* ==========================================================
+   RISKS
+========================================================== */
+
+function generateRisks() {
+
+    const m = Dashboard.metrics;
+
+    const list = [];
+
+    if (m.missionHealthScore < 60)
+
+        list.push(
+            "Mission Health Score indicates ministry requires strategic review."
+        );
+
+    if (m.growthRate < 0)
+
+        list.push(
+            "Registrations are declining month-over-month."
+        );
+
+    if (m.dataQuality < 80)
+
+        list.push(
+            "Poor data quality may affect ministry planning."
+        );
+
+    if (list.length === 0)
+
+        list.push(
+            "No major operational risks detected."
+        );
+
+    renderInsightList(
+        "riskInsights",
+        list
+    );
+
+}
+
+/* ==========================================================
+   RENDER INSIGHT LIST
+========================================================== */
+
+function renderInsightList(id, items) {
+
+    document.getElementById(id).innerHTML =
+
+        "<ul><li>" +
+
+        items.join("</li><li>") +
+
+        "</li></ul>";
+
+}
+
+/* ==========================================================
+   RENDER DASHBOARD
+========================================================== */
+
+function renderDashboard() {
+
+    renderKPIs();
+
+    renderMissionHealth();
+
+    generateExecutiveSummary();
+
+    generateMissionIntelligence();
+
+}
+
+/* ==========================================================
+   KPI CARDS
+========================================================== */
+
+function renderKPIs() {
+
+    const m = Dashboard.metrics;
+
+    setText("kpiRegistrations", number(m.registrations));
+
+    setText("kpiUnique", number(m.uniqueParticipants));
+
+    setText("kpiRepeat", number(m.repeatParticipants));
+
+    setText("kpiEvents", number(m.totalEvents));
+
+    setText("kpiChurches", number(m.totalChurches));
+
+    setText("kpiAttendance", percent(m.attendanceRate));
+
+    setText("kpiGrowth", growth(m.growthRate));
+
+}
+
+/* ==========================================================
+   MISSION HEALTH SCORE
+========================================================== */
+
+function renderMissionHealth() {
+
+    const m = Dashboard.metrics;
+
+    setText(
+        "missionHealthScore",
+        m.missionHealthScore
+    );
+
+    setText(
+        "missionHealthStatus",
+        m.healthStatus
+    );
+
+    setText(
+        "missionHealthDescription",
+        getMissionHealthDescription(
+            m.healthStatus
+        )
+    );
+
+    updateMissionHealthColour(
+        m.healthStatus
+    );
+
+}
+
+/* ==========================================================
+   MISSION HEALTH DESCRIPTION
+========================================================== */
+
+function getMissionHealthDescription(status){
+
+    switch(status){
+
+        case "Excellent":
+
+            return "The Missions Ministry is flourishing. Participation, engagement and attendance are consistently strong across churches.";
+
+        case "Healthy":
+
+            return "The ministry is healthy and growing. Continue strengthening follow-up and church mobilisation.";
+
+        case "Growing":
+
+            return "The ministry is moving in a positive direction but there are opportunities to improve retention and engagement.";
+
+        case "Needs Attention":
+
+            return "Several ministry indicators require pastoral attention. Review attendance, follow-up and recruitment strategies.";
+
+        case "Critical":
+
+            return "Mission engagement has declined significantly. Immediate strategic intervention is recommended.";
+
+        default:
+
+            return "-";
+
+    }
+
+}
+
+/* ==========================================================
+   MISSION HEALTH COLOUR
+========================================================== */
+
+function updateMissionHealthColour(status){
+
+    const card = document.getElementById(
+        "missionHealthCard"
+    );
+
+    if(!card) return;
+
+    card.className = "healthCard";
+
+    switch(status){
+
+        case "Excellent":
+
+            card.classList.add(
+                "excellent"
+            );
+
+            break;
+
+        case "Healthy":
+
+            card.classList.add(
+                "healthy"
+            );
+
+            break;
+
+        case "Growing":
+
+            card.classList.add(
+                "growing"
+            );
+
+            break;
+
+        case "Needs Attention":
+
+            card.classList.add(
+                "warning"
+            );
+
+            break;
+
+        default:
+
+            card.classList.add(
+                "critical"
+            );
+
+    }
+
+}
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+function setText(id,value){
+
+    const el=document.getElementById(id);
+
+    if(!el) return;
+
+    el.textContent=value;
+
+}
+
+function number(value){
+
+    return Number(value||0).toLocaleString();
+
+}
+
+function percent(value){
+
+    return `${Math.round(value||0)}%`;
+
+}
+
+function growth(value){
+
+    value=Number(value||0);
+
+    if(value>0)
+        return `▲ ${value}%`;
+
+    if(value<0)
+        return `▼ ${Math.abs(value)}%`;
+
+    return "0%";
+
+}
+
+
+/* ==========================================================
+   REGISTRATION TREND
+========================================================== */
+
+function renderRegistrationTrendChart() {
+
+    const monthly = getMonthlyRegistrations();
+
+    const labels = Object.keys(monthly);
+
+    const values = Object.values(monthly);
+
+    destroyChart("registrationTrendChart");
+
+    Dashboard.charts.registrationTrendChart =
+        new Chart(
+
+            document
+                .getElementById("registrationTrendChart")
+                .getContext("2d"),
+
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label: "Registrations",
+
+                            data: values,
+
+                            borderWidth: 3,
+
+                            tension: 0.35,
+
+                            fill: true
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        },
+
+                        tooltip: {
+
+                            mode: "index"
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            ticks: {
+
+                                precision: 0
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+}
+
+/* ==========================================================
+   MONTHLY REGISTRATIONS
+========================================================== */
+
+function getMonthlyRegistrations() {
+
+    const months = {};
+
+    Dashboard.filteredData.forEach(person => {
+
+        if (!person.eventDate) return;
+
+        const d = person.eventDate;
+
+        const key =
+
+            d.getFullYear() +
+
+            "-" +
+
+            String(
+
+                d.getMonth() + 1
+
+            ).padStart(2, "0");
+
+        months[key] =
+
+            (months[key] || 0) + 1;
+
+    });
+
+    return sortMonthlyObject(months);
+
+}
+
+/* ==========================================================
+   SORT MONTHLY OBJECT
+========================================================== */
+
+function sortMonthlyObject(obj) {
+
+    return Object
+
+        .keys(obj)
+
+        .sort()
+
+        .reduce((result, key) => {
+
+            result[key] = obj[key];
+
+            return result;
+
+        }, {});
+
+}
+
+/* ==========================================================
+   REFRESH CHART
+========================================================== */
+
+function renderGrowthSection() {
+
+    renderRegistrationTrendChart();
+
+}
+
+/* ==========================================================
+   MONTHLY GROWTH CHART
+========================================================== */
+
+function renderMonthlyGrowthChart() {
+
+    const monthly = getMonthlyRegistrations();
+
+    const labels = Object.keys(monthly);
+
+    const registrations = Object.values(monthly);
+
+    const growth = calculateMonthlyGrowth(registrations);
+
+    destroyChart("monthlyGrowthChart");
+
+    Dashboard.charts.monthlyGrowthChart =
+        new Chart(
+
+            document
+                .getElementById("monthlyGrowthChart")
+                .getContext("2d"),
+
+            {
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            type: "bar",
+
+                            label: "Registrations",
+
+                            data: registrations,
+
+                            yAxisID: "y",
+
+                            borderWidth: 1
+
+                        },
+
+                        {
+
+                            type: "line",
+
+                            label: "Growth %",
+
+                            data: growth,
+
+                            yAxisID: "y1",
+
+                            tension: 0.35,
+
+                            borderWidth: 3,
+
+                            pointRadius: 4
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+
+                        mode: "index",
+
+                        intersect: false
+
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom"
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            title: {
+
+                                display: true,
+
+                                text: "Registrations"
+
+                            }
+
+                        },
+
+                        y1: {
+
+                            position: "right",
+
+                            grid: {
+
+                                drawOnChartArea: false
+
+                            },
+
+                            title: {
+
+                                display: true,
+
+                                text: "Growth %"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+}
+
+/* ==========================================================
+   CALCULATE MONTHLY GROWTH
+========================================================== */
+
+function calculateMonthlyGrowth(values) {
+
+    const growth = [];
+
+    values.forEach((current, index) => {
+
+        if (index === 0) {
+
+            growth.push(0);
+
+            return;
+
+        }
+
+        const previous = values[index - 1];
+
+        if (previous === 0) {
+
+            growth.push(100);
+
+            return;
+
+        }
+
+        growth.push(
+
+            Number(
+
+                (
+
+                    (current - previous)
+
+                    / previous
+
+                    * 100
+
+                ).toFixed(1)
+
+            )
+
+        );
+
+    });
+
+    return growth;
+
+}
+
+/* ==========================================================
+   REFRESH GROWTH CHARTS
+========================================================== */
+
+function renderGrowthSection() {
+
+    renderRegistrationTrendChart();
+
+    renderMonthlyGrowthChart();
+
+}
+
+/* ==========================================================
+   CHART HELPERS
+========================================================== */
+
+/* ----------------------------------------------------------
+   Destroy Existing Chart
+---------------------------------------------------------- */
+
+function destroyChart(chartName) {
+
+    if (Dashboard.charts[chartName]) {
+
+        Dashboard.charts[chartName].destroy();
+
+        Dashboard.charts[chartName] = null;
+
+    }
+
+}
+
+/* ----------------------------------------------------------
+   Common Chart Options
+---------------------------------------------------------- */
+
+function defaultChartOptions() {
+
+    return {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        animation: {
+
+            duration: 700
+
+        },
+
+        interaction: {
+
+            mode: "index",
+
+            intersect: false
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                display: true,
+
+                position: "bottom"
+
+            },
+
+            tooltip: {
+
+                enabled: true
+
+            }
+
+        }
+
+    };
+
+}
+
+/* ----------------------------------------------------------
+   Merge Chart Options
+---------------------------------------------------------- */
+
+function chartOptions(extra = {}) {
+
+    return {
+
+        ...defaultChartOptions(),
+
+        ...extra
+
+    };
+
+}
+
+/* ==========================================================
+   COLOUR PALETTE
+========================================================== */
+
+const Colours = {
+
+    blue: "#2563eb",
+
+    green: "#16a34a",
+
+    orange: "#ea580c",
+
+    red: "#dc2626",
+
+    yellow: "#facc15",
+
+    teal: "#0891b2",
+
+    purple: "#7c3aed",
+
+    pink: "#db2777",
+
+    grey: "#6b7280",
+
+    lightBlue: "#93c5fd",
+
+    lightGreen: "#86efac",
+
+    lightOrange: "#fdba74",
+
+    lightRed: "#fca5a5"
+
+};
+
+/* ==========================================================
+   RANDOM COLOURS
+========================================================== */
+
+function generateColours(count) {
+
+    const palette = [
+
+        Colours.blue,
+
+        Colours.green,
+
+        Colours.orange,
+
+        Colours.red,
+
+        Colours.purple,
+
+        Colours.teal,
+
+        Colours.yellow,
+
+        Colours.pink,
+
+        Colours.lightBlue,
+
+        Colours.lightGreen,
+
+        Colours.lightOrange,
+
+        Colours.lightRed
+
+    ];
+
+    const colours = [];
+
+    for (let i = 0; i < count; i++) {
+
+        colours.push(
+
+            palette[i % palette.length]
+
+        );
+
+    }
+
+    return colours;
+
+}
+
+/* ==========================================================
+   LABEL HELPERS
+========================================================== */
+
+function monthLabel(date) {
+
+    if (!date)
+
+        return "";
+
+    return date.toLocaleString(
+
+        "default",
+
+        {
+
+            month: "short",
+
+            year: "2-digit"
+
+        }
+
+    );
+
+}
+
+function formatPercentage(value) {
+
+    return `${Math.round(value)}%`;
+
+}
+
+function formatNumber(value) {
+
+    return Number(value || 0).toLocaleString();
+
+}
+
+/* ==========================================================
+   CHART DATA HELPERS
+========================================================== */
+
+function sortObject(object) {
+
+    return Object
+
+        .keys(object)
+
+        .sort()
+
+        .reduce((result, key) => {
+
+            result[key] = object[key];
+
+            return result;
+
+        }, {});
+
+}
+
+function mapToLabels(map) {
+
+    return [...map.keys()];
+
+}
+
+function mapToValues(map) {
+
+    return [...map.values()];
+
+}
+
+/* ==========================================================
+   EMPTY CHART PLACEHOLDER
+========================================================== */
+
+function renderEmptyChart(canvasId, message = "No data available") {
+
+    destroyChart(canvasId);
+
+    const ctx = document
+        .getElementById(canvasId)
+        ?.getContext("2d");
+
+    if (!ctx) return;
+
+    Dashboard.charts[canvasId] = new Chart(ctx, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [message],
+
+            datasets: [
+
+                {
+
+                    data: [0]
+
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            plugins: {
+
+                legend: {
+
+                    display: false
+
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    display: false
+
+                },
+
+                y: {
+
+                    display: false
+
+                }
+
+            }
+
+        }
 
     });
 
 }
 
-function renderTopChurches() {
 
-    const tbody =
-        document.getElementById(
-            "topChurches"
-        );
 
-    if (!tbody) return;
 
-    tbody.innerHTML = "";
 
-    [...Dashboard.analytics.churches.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .forEach(item => {
-
-            tbody.innerHTML += `
-
-            <tr>
-
-            <td>${item[0]}</td>
-
-            <td>${item[1]}</td>
-
-            </tr>
-
-            `;
-
-        });
-
-}
-
-function renderTopEvents() {
-
-    const tbody =
-        document.getElementById(
-            "topEvents"
-        );
-
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    [...Dashboard.analytics.events.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .forEach(item => {
-
-            tbody.innerHTML += `
-
-            <tr>
-
-            <td>${item[0]}</td>
-
-            <td>${item[1]}</td>
-
-            </tr>
-
-            `;
-
-        });
-
-}
-
-/* ===========================================================
-   MODAL
-=========================================================== */
-
-function showParticipant(name) {
-
-    const modal =
-        document.getElementById("detailsModal");
-
-    const title =
-        document.getElementById("modalTitle");
-
-    const body =
-        document.getElementById("modalBody");
-
-    title.textContent = name;
-
-    body.innerHTML = `
-        <p>Participant details will appear here.</p>
-    `;
-
-    modal.classList.remove("hidden");
-
-}
-
-function closeModal() {
-
-    document
-        .getElementById("detailsModal")
-        .classList
-        .add("hidden");
-
-}
-
-/* ===========================================================
-   EXPORT CSV
-=========================================================== */
-
-function exportCSV() {
-
-    const rows = Dashboard.filteredData;
-
-    let csv =
-        Dashboard.headers.join(",") + "\n";
-
-    rows.forEach(r => {
-
-        csv +=
-            r.join(",") + "\n";
-
-    });
-
-    const blob =
-        new Blob([csv]);
-
-    const url =
-        URL.createObjectURL(blob);
-
-    const a =
-        document.createElement("a");
-
-    a.href = url;
-
-    a.download = "missions.csv";
-
-    a.click();
-
-}
-
-/* ===========================================================
-   EXCEL
-=========================================================== */
-
-function exportExcel() {
-
-    exportCSV();
-
-}
-
-/* ===========================================================
-   BACK
-=========================================================== */
-
-function goBack() {
-
-    history.back();
-
-}
