@@ -550,6 +550,7 @@ async function loadUsers(){
             {}
         );
 
+
         console.log("USER RESULT:", result);
 
 
@@ -562,54 +563,214 @@ async function loadUsers(){
         }
 
 
-        const tbody =
-        document.getElementById("usersTable");
+        // Store globally for search/filter later
+        window.loadedUsers = result.data.users;
 
 
-        tbody.innerHTML = "";
-
-
-        result.data.users.forEach(user=>{
-
-
-            tbody.innerHTML += `
-
-            <tr>
-
-                <td>${user.name}</td>
-
-                <td>${user.email}</td>
-
-                <td>${user.role}</td>
-
-                <td>${user.status}</td>
-
-                <td>
-                    <button 
-                    class="btn btn-sm btn-danger"
-                    onclick="archiveUser('${user.email}')">
-                    Archive
-                    </button>
-                </td>
-
-            </tr>
-
-            `;
-
-
-        });
+        renderUsers(
+            window.loadedUsers
+        );
 
 
     }
     catch(err){
 
-        console.error(err);
+        console.error(
+            "LOAD USERS ERROR:",
+            err
+        );
+
 
         alert(
             "Unable to load users"
         );
 
     }
+
+}
+
+
+/* ==========================================
+   RENDER USER ACCESS TABLE
+========================================== */
+
+function renderUsers(users){
+
+
+    const tbody =
+    document.getElementById(
+        "usersTable"
+    );
+
+
+    if(!tbody){
+
+        console.error(
+            "usersTable element not found"
+        );
+
+        return;
+
+    }
+
+
+    tbody.innerHTML = "";
+
+
+    users.forEach(user=>{
+
+
+        let roleBadge;
+
+
+        switch(user.role){
+
+
+            case "Admin":
+
+                roleBadge = `
+                <span class="badge bg-danger">
+                    Admin
+                </span>`;
+
+                break;
+
+
+            case "Head of Missions":
+
+                roleBadge = `
+                <span class="badge bg-primary">
+                    Head of Missions
+                </span>`;
+
+                break;
+
+
+            case "Intern":
+
+                roleBadge = `
+                <span class="badge bg-secondary">
+                    Intern
+                </span>`;
+
+                break;
+
+
+            default:
+
+                roleBadge = `
+                <span class="badge bg-info">
+                    ${user.role || "-"}
+                </span>`;
+
+        }
+
+
+
+        let statusBadge;
+
+
+        if(user.status === "Active"){
+
+            statusBadge = `
+            <span class="badge bg-success">
+                Active
+            </span>`;
+
+        }
+        else {
+
+            statusBadge = `
+            <span class="badge bg-secondary">
+                ${user.status || "-"}
+            </span>`;
+
+        }
+
+
+
+        tbody.innerHTML += `
+
+
+        <tr>
+
+
+            <td>
+
+                <strong>
+                    ${user.name || "-"}
+                </strong>
+
+            </td>
+
+
+            <td>
+
+                ${user.email || "-"}
+
+            </td>
+
+
+            <td>
+
+                ${roleBadge}
+
+            </td>
+
+
+            <td>
+
+                ${statusBadge}
+
+            </td>
+
+
+            <td>
+
+                ${
+                    user.lastLogin
+                    ?
+                    new Date(user.lastLogin)
+                    .toLocaleDateString()
+                    :
+                    "-"
+                }
+
+            </td>
+
+
+            <td>
+
+
+                <button
+                class="btn btn-sm btn-outline-primary">
+
+                    <i class="bi bi-pencil"></i>
+
+                </button>
+
+
+
+                <button
+                class="btn btn-sm btn-outline-danger ms-1"
+                onclick="archiveUser('${user.email}')">
+
+                    <i class="bi bi-archive"></i>
+
+                </button>
+
+
+            </td>
+
+
+        </tr>
+
+
+        `;
+
+
+    });
+
 
 }
 
