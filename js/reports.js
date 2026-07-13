@@ -93,13 +93,15 @@ async function loadMasterResponses() {
 
     const result = await API.post("getMasterResponses");
 
+    console.log(result);   // Leave this for debugging
+
     if (!result.success) {
         throw new Error(result.message);
     }
 
-    Dashboard.headers = result.headers;
-    Dashboard.rawData = result.rows;
-    Dashboard.filteredData = [...result.rows];
+    Dashboard.headers = result.data.headers;
+    Dashboard.rawData = result.data.rows;
+    Dashboard.filteredData = [...result.data.rows];
 
 }
 /* ===========================================================
