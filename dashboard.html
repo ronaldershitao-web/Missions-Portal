@@ -578,15 +578,16 @@ async function loadUsers(){
 
 
         // Store globally for search/filter later
-        window.loadedUsers = result.data.users;
+       window.loadedUsers = result.data.users;
 
-console.log(
-    "ABOUT TO RENDER:",
-    window.loadedUsers
+
+// First load: hide Archived users
+const activeUsers = window.loadedUsers.filter(
+    user => user.status !== "Archived"
 );
 
-renderUsers(window.loadedUsers);
 
+renderUsers(activeUsers);
 
     }
     catch(err){
@@ -909,6 +910,59 @@ Choose Status:
 
 
     loadUsers();
+
+}
+
+  function filterUsers(){
+
+
+    const keyword =
+    document
+    .getElementById("userSearch")
+    .value
+    .toLowerCase();
+
+
+
+    const filteredUsers =
+    window.loadedUsers.filter(user => {
+
+
+        // Always hide archived
+        if(user.status === "Archived"){
+            return false;
+        }
+
+
+        return (
+
+            (user.name || "")
+            .toLowerCase()
+            .includes(keyword)
+
+
+            ||
+
+            (user.email || "")
+            .toLowerCase()
+            .includes(keyword)
+
+
+            ||
+
+            (user.role || "")
+            .toLowerCase()
+            .includes(keyword)
+
+        );
+
+
+    });
+
+
+
+    renderUsers(filteredUsers);
+
 
 }
 
