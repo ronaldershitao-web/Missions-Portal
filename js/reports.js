@@ -1449,3 +1449,43 @@ function populateSelect(
 
 }
 
+async function loadMissionDashboard(){
+
+ const result = await API.post(
+   "getMissionTripDashboard",
+   {}
+ );
+
+
+ if(result.success){
+
+    document.getElementById("kpiMissionTrips")
+    .innerText =
+    result.data.totalTrips;
+
+
+    document.getElementById("kpiTrippers")
+    .innerText =
+    result.data.totalTrippers;
+
+
+    document.getElementById("kpiCountries")
+    .innerText =
+    result.data.countries;
+
+
+    document.getElementById("kpiAvgTeam")
+    .innerText =
+    result.data.averageTeamSize;
+
+
+    document.getElementById("missionAnalysis")
+    .innerHTML =
+    result.data.analysis
+    .map(x=>`<p>• ${x}</p>`)
+    .join("");
+
+ }
+
+}
+
