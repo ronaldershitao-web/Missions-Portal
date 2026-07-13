@@ -566,10 +566,12 @@ async function loadUsers(){
         // Store globally for search/filter later
         window.loadedUsers = result.data.users;
 
+console.log(
+    "ABOUT TO RENDER:",
+    window.loadedUsers
+);
 
-        renderUsers(
-            window.loadedUsers
-        );
+renderUsers(window.loadedUsers);
 
 
     }
@@ -597,9 +599,15 @@ async function loadUsers(){
 function renderUsers(users){
 
 
+   console.log("ENTERED renderUsers");
+    console.log("USERS:", users);
+
     const tbody =
-    document.getElementById(
-        "usersTable"
+    document.getElementById("usersTable");
+
+    console.log(
+        "tbody found:",
+        tbody
     );
 
 
