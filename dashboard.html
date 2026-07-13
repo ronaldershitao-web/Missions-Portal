@@ -763,26 +763,28 @@ function renderUsers(users){
 
             <td>
 
+    <div class="action-buttons">
 
-                <button
-                class="btn btn-sm btn-outline-primary">
+        <button
+        class="action-btn edit-btn"
+        onclick="editUser('${user.email}')">
 
-                    <i class="bi bi-pencil"></i>
+            ✏️ Update Authorization
 
-                </button>
-
-
-
-                <button
-                class="btn btn-sm btn-outline-danger ms-1"
-                onclick="archiveUser('${user.email}')">
-
-                    <i class="bi bi-archive"></i>
-
-                </button>
+        </button>
 
 
-            </td>
+        <button
+        class="action-btn archive-btn"
+        onclick="archiveUser('${user.email}')">
+
+            🗄 Update User Status
+
+        </button>
+
+    </div>
+
+</td>
 
 
         </tr>
