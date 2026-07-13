@@ -870,7 +870,6 @@ function renderParticipantAnalytics() {
 
     const A = Dashboard.analytics;
 
-    renderGenderChart(A);
 
     renderAgeChart(A);
 
@@ -884,23 +883,7 @@ function renderParticipantAnalytics() {
    GENDER
 =========================================================== */
 
-function renderGenderChart(A) {
 
-    createChart(
-
-        "genderChart",
-
-        "pie",
-
-        [...A.gender.keys()],
-
-        [...A.gender.values()],
-
-        "Gender"
-
-    );
-
-}
 
 /* ===========================================================
    AGE
