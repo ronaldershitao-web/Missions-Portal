@@ -476,57 +476,61 @@ rel="stylesheet">
 
  async function importSheet() {
 
-  const url = document.getElementById("sheetUrl").value;
-   const eventDate =
-    document.getElementById("importEventDate").value;
-  const eventType = document.getElementById("importEventType").value;
-  const eventName = document.getElementById("importEventName").value;
+    const url = document.getElementById("sheetUrl").value;
+    const eventDate = document.getElementById("importEventDate").value;
+    const eventType = document.getElementById("importEventType").value;
+    const eventName = document.getElementById("importEventName").value;
 
-  const user = JSON.parse(localStorage.getItem("mp_user"));
+    const user = JSON.parse(
+        localStorage.getItem("mp_user")
+    );
 
-  if (!url || !eventName || !eventDate) {
+    if (!url || !eventDate || !eventName) {
 
-    alert("Please complete all fields.");
+        alert("Please complete all fields.");
 
-    return;
+        return;
 
-}
-
-  try {
-
-    const res = await fetch(`https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + await getAccessToken()
-      },
-      body: JSON.stringify({
-  function: "importExternalSheet",
-  parameters: [{
-    url,
-    eventDate,
-    eventType,
-    eventName,
-    importedBy: user.email
-  }],
-  devMode: false
-})
-    });
-
-    const data = await res.json();
-
-    console.log(data);
-
-    if (data.response?.result?.success) {
-      alert("Import successful");
-    } else {
-      alert(data.response?.result?.message || "Import failed");
     }
 
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
+    try {
+
+        const result = await API.post(
+            "importExternalSheet",
+            {
+                url: url,
+                eventDate: eventDate,
+                eventType: eventType,
+                eventName: eventName,
+                importedBy: user.email
+            }
+        );
+
+        console.log(result);
+
+        if (result.success) {
+
+            alert(result.message);
+
+        } else {
+
+            alert(result.message);
+
+        }
+
+    }
+    catch(err){
+
+        console.error(
+            "IMPORT ERROR:",
+            err
+        );
+
+        alert(
+            err.message || "Server error"
+        );
+
+    }
 
 }
 
