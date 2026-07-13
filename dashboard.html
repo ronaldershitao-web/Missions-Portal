@@ -129,13 +129,13 @@ rel="stylesheet">
     User Access Control
   </div>
 
-  <div class="nav-item cell-only" onclick="showSection('cell')">
+ <div class="nav-item cell-only" onclick="showSection('event')">
     Event Management
-  </div>
+</div>
 
-  <div class="nav-item pastoral-only" onclick="showSection('pastoral')">
+<div class="nav-item pastoral-only" onclick="showSection('migration')">
     Data Migrations
-  </div>
+</div>
 
   <div class="nav-item intern-only" onclick="showSection('intern')">
     Missions Intelligence Center
@@ -407,16 +407,16 @@ rel="stylesheet">
     }
 
     // Cell + Admin
-    if (!["Admin", "Cell Leader"].includes(role)) {
+    if (!["Admin", "Support"].includes(role)) {
       hide(".cell-only");
     }
 
     // Pastor + Admin
-    if (!["Admin", "Pastor"].includes(role)) {
+    if (!["Admin", ,"Support","Pastor"].includes(role)) {
       hide(".pastoral-only");
     }
 
-    if (!["Admin", "Intern"].includes(role)) {
+    if (!["Admin", "Pastor", "Support","Intern"].includes(role)) {
     hide(".intern-only");
 }
 
