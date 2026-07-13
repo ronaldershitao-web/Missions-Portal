@@ -118,8 +118,7 @@ function buildColumnMap(){
         church:
             h.indexOf("Church"),
 
-        gender:
-            h.indexOf("Gender"),
+       
 
         age:
             h.indexOf("Age"),
@@ -432,7 +431,7 @@ function calculateAnalytics() {
 
         eventTypes: new Map(),
 
-        gender: new Map(),
+      
 
         ages: {
             under18: 0,
@@ -453,7 +452,7 @@ function calculateAnalytics() {
 
         const name = row[C.name] || "";
         const church = row[C.church] || "Unknown";
-        const gender = row[C.gender] || "Unknown";
+        
         const event = row[C.event] || "";
         const eventType = row[C.eventType] || "";
         const age = Number(row[C.age]) || 0;
@@ -475,10 +474,7 @@ function calculateAnalytics() {
             (analytics.eventTypes.get(eventType) || 0) + 1
         );
 
-        analytics.gender.set(
-            gender,
-            (analytics.gender.get(gender) || 0) + 1
-        );
+      
 
         analytics.participantCount.set(
             name,
@@ -879,10 +875,6 @@ function renderParticipantAnalytics() {
 
 }
 
-/* ===========================================================
-   GENDER
-=========================================================== */
-
 
 
 /* ===========================================================
@@ -1264,7 +1256,7 @@ function renderParticipantTable() {
 
                 church: row[C.church],
 
-                gender: row[C.gender],
+             
 
                 age: row[C.age],
 
@@ -1307,7 +1299,7 @@ function renderParticipantTable() {
 
         <td>${p.church}</td>
 
-        <td>${p.gender}</td>
+     
 
         <td>${p.age}</td>
 
