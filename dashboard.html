@@ -126,19 +126,19 @@ rel="stylesheet">
   <div class="nav-item" onclick="showSection('home')">Home</div>
 
   <div class="nav-item admin-only" onclick="showSection('admin')">
-    Admin Panel
+    User Access Control
   </div>
 
   <div class="nav-item cell-only" onclick="showSection('cell')">
-    Cell Groups
+    Event Management
   </div>
 
   <div class="nav-item pastoral-only" onclick="showSection('pastoral')">
-    Pastoral Care
+    Data Migrations
   </div>
 
   <div class="nav-item intern-only" onclick="showSection('intern')">
-    Intern Workspace
+    Missions Intelligence Center
   </div>
 
 </div>
@@ -166,63 +166,8 @@ rel="stylesheet">
     <div class="intern-grid">
 
     <!-- DATA MIGRATION -->
-    <div class="task-card">
-
-        <h3>📥 Data Migration</h3>
-
-        <p>Import a Google Form response sheet into the Missions Portal.</p>
-
-        <input
-            id="sheetUrl"
-            placeholder="Paste Google Sheet URL"
-            style="width:100%;padding:8px;">
-
-        <input
-            type="date"
-            id="importEventDate"
-            style="width:100%;padding:8px;margin-top:8px;">
-
-        <select
-            id="importEventType"
-            style="width:100%;padding:8px;margin-top:8px;">
-
-            <option value="FIRESIDE">Fireside Chat</option>
-            <option value="WORKSHOP">Workshop</option>
-            <option value="PRAYER">Prayer Meeting</option>
-
-        </select>
-
-        <input
-            id="importEventName"
-            placeholder="Event Name"
-            style="width:100%;padding:8px;margin-top:8px;">
-
-        <button onclick="importSheet()">
-            Import Event
-        </button>
-
-    </div>
-
-    <!-- EVENT MANAGEMENT -->
-
-    <div class="task-card">
-
-        <h3>📅 Event Management</h3>
-
-        <p>Manage imported events.</p>
-
-        <ul style="padding-left:18px;">
-            <li>View events</li>
-            <li>Sync registrations</li>
-            <li>Close events</li>
-            <li>View participant count</li>
-        </ul>
-
-        <button onclick="openEventManager()">
-            Open Event Manager
-        </button>
-
-    </div>
+   
+    
 
     <!-- COMMUNICATION -->
 
@@ -367,16 +312,65 @@ rel="stylesheet">
 </div>
 
   <!-- CELL -->
-  <div id="cell" class="card hidden cell-only">
-    <h3>Cell Groups</h3>
-    <p>Cell group management area.</p>
-  </div>
+  <!-- EVENT MANAGEMENT -->
+
+    <div class="task-card">
+
+        <h3>📅 Event Management</h3>
+
+        <p>Manage imported events.</p>
+
+        <ul style="padding-left:18px;">
+            <li>View events</li>
+            <li>Sync registrations</li>
+            <li>Close events</li>
+            <li>View participant count</li>
+        </ul>
+
+        <button onclick="openEventManager()">
+            Open Event Manager
+        </button>
+
+    </div>
 
   <!-- PASTORAL -->
-  <div id="pastoral" class="card hidden pastoral-only">
-    <h3>Pastoral Care</h3>
-    <p>Care tracking and follow-ups.</p>
-  </div>
+   <div class="task-card">
+
+        <h3>📥 Data Migration</h3>
+
+        <p>Import a Google Form response sheet into the Missions Portal.</p>
+
+        <input
+            id="sheetUrl"
+            placeholder="Paste Google Sheet URL"
+            style="width:100%;padding:8px;">
+
+        <input
+            type="date"
+            id="importEventDate"
+            style="width:100%;padding:8px;margin-top:8px;">
+
+        <select
+            id="importEventType"
+            style="width:100%;padding:8px;margin-top:8px;">
+
+            <option value="FIRESIDE">Fireside Chat</option>
+            <option value="WORKSHOP">Workshop</option>
+            <option value="PRAYER">Prayer Meeting</option>
+
+        </select>
+
+        <input
+            id="importEventName"
+            placeholder="Event Name"
+            style="width:100%;padding:8px;margin-top:8px;">
+
+        <button onclick="importSheet()">
+            Import Event
+        </button>
+
+    </div>
+
 
 </div>
 
