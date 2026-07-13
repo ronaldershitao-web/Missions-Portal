@@ -89,21 +89,21 @@ async function authenticateUser(){
    LOAD DATA
 =========================================================== */
 
-async function loadMasterResponses(){
+async function loadMasterResponses() {
 
-    /*
-        Replace this section with your Apps Script API
+    const response = await fetch(CONFIG.WEB_APP_URL, {
 
-        Example response
+        method: "POST",
 
-        {
-            headers:[],
-            rows:[]
-        }
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-    */
+        body: JSON.stringify({
+            action: "getMasterResponses"
+        })
 
-    const response = await fetch(WEB_APP_URL + "?action=getMasterResponses");
+    });
 
     const json = await response.json();
 
