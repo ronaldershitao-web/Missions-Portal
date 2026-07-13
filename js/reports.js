@@ -253,10 +253,7 @@ function renderExecutiveSummary() {
     const summary =
         Dashboard.data.executive;
 
-    const container =
-        document.getElementById(
-            "executiveSummary"
-        );
+  
 
     container.innerHTML = "";
 
