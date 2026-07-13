@@ -798,6 +798,120 @@ function renderUsers(users){
 
 }
 
+  async function editUser(email){
+
+    const role = prompt(
+`Update Authorization
+
+Choose Role:
+
+1 - Administrator
+2 - Support
+3 - Pastor
+4 - Intern`
+    );
+
+
+    let newRole;
+
+
+    switch(role){
+
+        case "1":
+            newRole = "Administrator";
+            break;
+
+        case "2":
+            newRole = "Support";
+            break;
+
+        case "3":
+            newRole = "Pastor";
+            break;
+
+        case "4":
+            newRole = "Intern";
+            break;
+
+        default:
+            alert("Invalid role");
+            return;
+
+    }
+
+
+    const result = await API.post(
+        "updateUserRole",
+        {
+            email: email,
+            role: newRole
+        }
+    );
+
+
+    alert(result.message);
+
+
+    loadUsers();
+
+}
+
+  async function archiveUser(email){
+
+
+    const status = prompt(
+`Update User Status
+
+Choose Status:
+
+1 - Scheduled
+2 - Active
+3 - Archived`
+    );
+
+
+    let newStatus;
+
+
+    switch(status){
+
+        case "1":
+            newStatus = "Scheduled";
+            break;
+
+        case "2":
+            newStatus = "Active";
+            break;
+
+        case "3":
+            newStatus = "Archived";
+            break;
+
+        default:
+            alert("Invalid status");
+            return;
+
+    }
+
+
+
+    const result = await API.post(
+        "updateUserStatus",
+        {
+            email: email,
+            status: newStatus
+        }
+    );
+
+
+
+    alert(result.message);
+
+
+    loadUsers();
+
+}
+
 </script>
 
 </body>
