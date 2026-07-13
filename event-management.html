@@ -940,28 +940,74 @@ async function fetchEvents(){
 
 }
 
-    await runScript(
-    "syncEvent",
-    {
-        spreadsheetId:id
+
+async function syncEvent(id){
+
+    showLoading();
+
+    try {
+
+        await runScript(
+            "syncEvent",
+            {
+                spreadsheetId:id
+            }
+        );
+
+        await loadEvents();
+
     }
-);
+    catch(err){
+
+        console.error(err);
+        alert(err.message);
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+
+async function closeEvent(id){
+
+    if(!confirm("Close this event?")) return;
+
 
     await runScript(
-    "setEventStatus",
-    {
-        spreadsheetId:id,
-        status:"CLOSED"
-    }
-);
+        "setEventStatus",
+        {
+            spreadsheetId:id,
+            status:"CLOSED"
+        }
+    );
+
+
+    await loadEvents();
+
+}
+
+
+
+async function reopenEvent(id){
+
 
     await runScript(
-    "setEventStatus",
-    {
-        spreadsheetId:id,
-        status:"ACTIVE"
-    }
-);
+        "setEventStatus",
+        {
+            spreadsheetId:id,
+            status:"ACTIVE"
+        }
+    );
+
+
+    await loadEvents();
+
+}
 
     async function saveAttendance() {
 
