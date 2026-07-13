@@ -250,10 +250,70 @@
   </div>
 
   <!-- ADMIN -->
-  <div id="admin" class="card hidden admin-only">
-    <h3>Admin Panel</h3>
-    <p>Manage users, roles, system settings.</p>
-  </div>
+ <div id="admin" class="card hidden admin-only">
+
+
+<h3>
+    Admin Panel
+</h3>
+
+
+<hr>
+
+
+<h4>
+    User Access Control
+</h4>
+
+
+<button 
+class="btn btn-primary"
+onclick="loadUsers()">
+
+Refresh Users
+
+</button>
+
+
+<table 
+class="table table-striped mt-3">
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+
+<th>Email</th>
+
+<th>Role</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="usersTable">
+
+<tr>
+
+<td colspan="5">
+Click Refresh Users
+</td>
+
+</tr>
+
+</tbody>
+
+
+</table>
+
+
+</div>
 
   <!-- CELL -->
   <div id="cell" class="card hidden cell-only">
@@ -432,6 +492,117 @@ function openReports() {
     localStorage.removeItem("mp_user");
     window.location.href = "index.html";
   }
+
+  async function loadUsers(){
+
+
+try{
+
+
+const result =
+await API.post(
+"getUsers",
+{}
+);
+
+
+console.log(result);
+
+
+const tbody =
+document.getElementById(
+"usersTable"
+);
+
+
+tbody.innerHTML="";
+
+
+result.users.forEach(user=>{
+
+
+tbody.innerHTML += `
+
+<tr>
+
+<td>${user.name}</td>
+
+<td>${user.email}</td>
+
+<td>
+
+<select
+onchange="changeRole('${user.email}',this.value)">
+
+<option 
+${user.role=="Intern"?"selected":""}>
+Intern
+</option>
+
+
+<option 
+${user.role=="Cell Leader"?"selected":""}>
+Cell Leader
+</option>
+
+
+<option 
+${user.role=="Pastor"?"selected":""}>
+Pastor
+</option>
+
+
+<option 
+${user.role=="Admin"?"selected":""}>
+Admin
+</option>
+
+
+</select>
+
+</td>
+
+
+<td>
+
+${user.status}
+
+</td>
+
+
+<td>
+
+<button
+class="btn btn-danger btn-sm"
+onclick="archiveUser('${user.email}')">
+
+Archive
+
+</button>
+
+
+</td>
+
+
+</tr>
+
+`;
+
+});
+
+
+}
+catch(err){
+
+console.error(err);
+
+alert(
+"Unable to load users"
+);
+
+}
+
+}
 
 </script>
 
