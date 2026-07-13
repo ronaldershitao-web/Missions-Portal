@@ -115,7 +115,7 @@ function renderDashboard() {
 
     renderKPIs();
 
-    renderExecutiveSummary();
+    
 
     renderMissionInsights();
 
@@ -248,58 +248,6 @@ function renderKPIs() {
    EXECUTIVE SUMMARY
 ========================================================== */
 
-function renderExecutiveSummary() {
-
-    const summary =
-        Dashboard.data.executive;
-
-  
-
-    container.innerHTML = "";
-
-    addInsightRow(
-        container,
-        "👥 Total Registrations",
-        summary.totalRegistrations
-    );
-
-    addInsightRow(
-        container,
-        "🙋 Unique Participants",
-        summary.uniqueParticipants
-    );
-
-    addInsightRow(
-        container,
-        "📅 Mission Events",
-        summary.totalEvents
-    );
-
-    addInsightRow(
-        container,
-        "⛪ Participating Churches",
-        summary.totalChurches
-    );
-
-    addInsightRow(
-        container,
-        "✅ Attendance Rate",
-        summary.attendanceRate + "%"
-    );
-
-    addInsightRow(
-        container,
-        "📈 Growth",
-        summary.growthRate + "%"
-    );
-
-    addInsightRow(
-        container,
-        "🌱 Potential STM Candidates",
-        summary.potentialLeaders
-    );
-
-}
 
 /* ==========================================================
    MINISTRY INSIGHTS
