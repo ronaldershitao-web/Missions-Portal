@@ -83,14 +83,39 @@ async function loadDashboard() {
             Dashboard.filters
         );
 
+
     if (!result.success) {
 
         throw new Error(result.message);
 
     }
 
+
     Dashboard.data =
         result.data;
+
+
+
+    // Load Mission Trip Compilation KPI
+    const missionResult =
+        await API.post(
+            "getMissionCompilationReport",
+            {}
+        );
+
+
+    if (!missionResult.success) {
+
+        throw new Error(
+            missionResult.message
+        );
+
+    }
+
+
+    Dashboard.missionData =
+        missionResult.data;
+
 
 }
 
@@ -241,6 +266,38 @@ function renderKPIs() {
         "kpiAverageEvent",
         Dashboard.data.events.averages.average
     );
+
+
+
+    // ====================================
+    // Mission Trip KPIs
+    // ====================================
+
+    const m =
+    Dashboard.missionData;
+
+
+    if(m){
+
+        setText(
+            "kpiMissionTrips",
+            m.totalTrips
+        );
+
+
+        setText(
+            "kpiTrippers",
+            m.uniqueMissionaries
+        );
+
+
+        setText(
+            "kpiAvgTeam",
+            m.averageParticipants
+        );
+
+    }
+
 
 }
 
