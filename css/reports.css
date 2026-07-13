@@ -1,76 +1,191 @@
-/* ==========================================
-   MISSIONS PORTAL REPORTS
-   PART 1 - GLOBAL LAYOUT
-========================================== */
+/* ==========================================================
+   MISSIONS INTELLIGENCE DASHBOARD
+========================================================== */
+
+:root{
+
+    --primary:#2563eb;
+    --success:#16a34a;
+    --warning:#d97706;
+    --danger:#dc2626;
+
+    --background:#f5f7fb;
+
+    --card:#ffffff;
+
+    --text:#1f2937;
+
+    --muted:#6b7280;
+
+    --border:#e5e7eb;
+
+    --shadow:
+        0 4px 16px rgba(0,0,0,.08);
+
+    --radius:14px;
+
+}
+
+/* ==========================================================
+   RESET
+========================================================== */
 
 *{
+
     margin:0;
+
     padding:0;
+
     box-sizing:border-box;
+
 }
 
 body{
-    font-family:Arial, Helvetica, sans-serif;
-    background:#f4f6f8;
-    color:#333;
-    line-height:1.5;
+
+    background:var(--background);
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color:var(--text);
+
 }
 
-/* ==========================================
-   HEADER
-========================================== */
+/* ==========================================================
+   TOP BAR
+========================================================== */
 
-.header{
-    background:#1e3a8a;
-    color:#fff;
-    padding:18px 25px;
+.topBar{
+
+    background:white;
+
+    padding:24px 40px;
 
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
-    flex-wrap:wrap;
 
-    gap:15px;
+    box-shadow:var(--shadow);
 
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    position:sticky;
+
+    top:0;
+
+    z-index:100;
+
 }
 
-.header h1{
-    font-size:28px;
+.topBar h1{
+
+    font-size:30px;
+
 }
 
-.subtitle{
-    font-size:14px;
-    opacity:.85;
-    margin-top:5px;
+.topBar p{
+
+    color:var(--muted);
+
+    margin-top:6px;
+
 }
 
-.header button{
-    margin-left:8px;
+/* ==========================================================
+   TOOLBAR
+========================================================== */
+
+.toolbar{
+
+    display:flex;
+
+    gap:10px;
+
 }
 
-/* ==========================================
-   MAIN CONTAINER
-========================================== */
+button{
 
-.container{
-    max-width:1500px;
-    margin:auto;
-    padding:25px;
+    background:var(--primary);
+
+    color:white;
+
+    border:none;
+
+    padding:
+
+        10px
+        18px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
 }
 
-/* ==========================================
-   KPI CARDS
-========================================== */
+button:hover{
 
-.kpiGrid{
+    transform:translateY(-2px);
+
+    opacity:.9;
+
+}
+
+/* ==========================================================
+   MAIN DASHBOARD
+========================================================== */
+
+.dashboard{
+
+    padding:30px;
+
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.card{
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    padding:24px;
+
+    margin-bottom:24px;
+
+}
+
+.card h2{
+
+    margin-bottom:16px;
+
+}
+
+.card h3{
+
+    margin-bottom:14px;
+
+}
+
+/* ==========================================================
+   KPI GRID
+========================================================== */
+
+.kpiSection{
 
     display:grid;
 
     grid-template-columns:
-        repeat(auto-fit,minmax(220px,1fr));
+        repeat(auto-fit,minmax(180px,1fr));
 
-    gap:20px;
+    gap:18px;
 
     margin-bottom:30px;
 
@@ -78,15 +193,15 @@ body{
 
 .kpiCard{
 
-    background:#fff;
+    background:white;
 
-    border-radius:12px;
+    border-radius:14px;
 
-    padding:22px;
+    box-shadow:var(--shadow);
 
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    padding:20px;
 
-    transition:transform .2s ease;
+    transition:.2s;
 
 }
 
@@ -98,254 +213,250 @@ body{
 
 .kpiTitle{
 
-    font-size:13px;
-
-    color:#666;
-
-    text-transform:uppercase;
-
-    letter-spacing:.5px;
-
-}
-
-.kpiValue{
-
-    margin-top:12px;
-
-    font-size:34px;
-
-    font-weight:bold;
-
-    color:#1e3a8a;
-
-}
-
-.kpiSub{
-
-    margin-top:8px;
-
-    font-size:13px;
-
-    color:#777;
-
-}
-
-/* ==========================================
-   GENERAL CARD
-========================================== */
-
-.card{
-
-    background:#fff;
-
-    border-radius:12px;
-
-    padding:20px;
-
-    margin-bottom:25px;
-
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-
-}
-
-.card h2{
-
-    color:#1e3a8a;
-
-    margin-bottom:15px;
-
-    font-size:22px;
-
-}
-
-.sectionDescription{
-
-    margin-bottom:18px;
-
-    color:#666;
+    color:var(--muted);
 
     font-size:14px;
 
 }
 
-/* ==========================================
+.kpiValue{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    margin-top:10px;
+
+    color:var(--primary);
+
+}
+
+/* ==========================================================
+   EXECUTIVE GRID
+========================================================== */
+
+.executiveGrid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        2fr 1fr;
+
+    gap:20px;
+
+    margin-bottom:25px;
+
+}
+
+/* ==========================================================
    FILTERS
-========================================== */
+========================================================== */
 
 .filterGrid{
 
     display:grid;
 
     grid-template-columns:
+
         repeat(auto-fit,minmax(220px,1fr));
 
-    gap:18px;
+    gap:20px;
 
 }
 
-.filterGrid label{
+label{
 
     display:block;
 
-    margin-bottom:6px;
+    margin-bottom:8px;
 
-    font-size:13px;
-
-    font-weight:bold;
+    font-weight:600;
 
 }
 
-.filterGrid input,
-.filterGrid select{
+input,
+select{
 
     width:100%;
 
-    padding:10px;
+    padding:12px;
 
-    border:1px solid #ccc;
+    border-radius:8px;
 
-    border-radius:6px;
+    border:1px solid var(--border);
 
-    font-size:14px;
+    background:white;
 
 }
 
-/* ==========================================
-   CHART GRID
-   (Maximum 2 charts per row)
-========================================== */
+input:focus,
+select:focus{
 
-/* ==========================================
-   CHART GRID
-========================================== */
+    outline:none;
 
-.twoColumn{
+    border-color:var(--primary);
+
+}
+
+/* ==========================================================
+   SECTION HEADER
+========================================================== */
+
+.sectionHeader{
+
+    margin:
+
+        40px 0 18px;
+
+}
+
+.sectionHeader h2{
+
+    font-size:26px;
+
+}
+
+.sectionHeader p{
+
+    color:var(--muted);
+
+    margin-top:6px;
+
+}
+
+/* ==========================================================
+   CHART GRID
+========================================================== */
+
+.analyticsGrid{
 
     display:grid;
 
-    grid-template-columns:repeat(2, minmax(0,1fr));
+    grid-template-columns:
 
-    gap:25px;
+        repeat(auto-fit,minmax(420px,1fr));
 
-    margin-bottom:25px;
+    gap:22px;
 
-    align-items:start;
+    margin-bottom:35px;
 
 }
-
-/* ==========================================
-   CHART CARD
-========================================== */
 
 .chartCard{
 
-    background:#fff;
+    background:white;
 
-    border-radius:12px;
+    border-radius:14px;
 
-    padding:20px;
+    box-shadow:var(--shadow);
 
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    padding:22px;
 
-    display:flex;
-
-    flex-direction:column;
-
-    height:430px;
-
-    overflow:hidden;
-
-}
-
-.chartCard h2{
-
-    margin-bottom:15px;
-
-    color:#1e3a8a;
-
-    font-size:20px;
+    min-height:360px;
 
 }
 
 .chartCard canvas{
 
-    flex:1;
-
     width:100% !important;
 
-    height:100% !important;
+    height:280px !important;
 
 }
 
+/* ==========================================================
+   STRATEGIC INSIGHTS
+========================================================== */
 
+.insightGrid{
 
-/* ==========================================
-   PART 2 - TABLES, BUTTONS & REPORTS
-========================================== */
+    display:grid;
 
-/* ==========================================
-   BUTTONS
-========================================== */
+    grid-template-columns:
+        repeat(auto-fit,minmax(300px,1fr));
 
-button{
+    gap:20px;
 
-    background:#1e3a8a;
-    color:#fff;
+    margin-bottom:35px;
 
-    border:none;
-    border-radius:6px;
+}
 
-    padding:10px 18px;
+.insightCard{
 
-    cursor:pointer;
+    background:white;
 
-    font-size:14px;
+    border-radius:14px;
+
+    box-shadow:var(--shadow);
+
+    padding:20px;
+
+    border-left:6px solid var(--primary);
 
     transition:.2s;
 
 }
 
-button:hover{
+.insightCard:hover{
 
-    background:#163172;
-
-}
-
-.export{
-
-    background:#0f766e;
+    transform:translateY(-4px);
 
 }
 
-.export:hover{
+.insightCard h3{
 
-    background:#115e59;
-
-}
-
-.refresh{
-
-    background:#0284c7;
+    margin-bottom:15px;
 
 }
 
-.refresh:hover{
+.success{
 
-    background:#0369a1;
+    border-left-color:var(--success);
 
 }
 
+.warning{
 
-/* ==========================================
-   TABLE WRAPPER
-========================================== */
+    border-left-color:var(--warning);
 
+}
 
+.danger{
 
+    border-left-color:var(--danger);
 
-/* ==========================================
-   REPORT TABLE
-========================================== */
+}
+
+.info{
+
+    border-left-color:var(--primary);
+
+}
+
+.insightCard ul{
+
+    margin-left:18px;
+
+}
+
+.insightCard li{
+
+    margin-bottom:10px;
+
+}
+
+/* ==========================================================
+   TABLES
+========================================================== */
+
+.tableWrapper{
+
+    overflow:auto;
+
+    margin-top:20px;
+
+}
 
 .reportTable{
 
@@ -353,15 +464,19 @@ button:hover{
 
     border-collapse:collapse;
 
-    font-size:14px;
-
-    background:#fff;
+    background:white;
 
 }
 
-.reportTable thead{
+.reportTable th{
 
-    background:#eef2ff;
+    background:#f3f4f6;
+
+    padding:14px;
+
+    text-align:left;
+
+    font-weight:600;
 
     position:sticky;
 
@@ -371,439 +486,81 @@ button:hover{
 
 }
 
-.reportTable th{
+.reportTable td{
 
-    color:#1e3a8a;
+    padding:12px 14px;
 
-    font-weight:bold;
-
-    white-space:nowrap;
+    border-bottom:1px solid var(--border);
 
 }
 
-.reportTable th,
-.reportTable td{
+.reportTable tr:hover{
 
-    padding:10px 12px;
+    background:#f8fafc;
 
-    border:1px solid #ddd;
+}
+
+.tableToolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:16px;
+
+    gap:10px;
+
+}
+
+.tableToolbar input{
+
+    max-width:320px;
+
+}
+
+/* ==========================================================
+   MINI TABLE
+========================================================== */
+
+.miniTable{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.miniTable th{
+
+    background:#f8fafc;
+
+    padding:10px;
 
     text-align:left;
 
 }
 
-.reportTable tbody tr:nth-child(even){
+.miniTable td{
 
-    background:#fafafa;
+    padding:10px;
 
-}
-
-.reportTable tbody tr:hover{
-
-    background:#edf4ff;
+    border-bottom:1px solid var(--border);
 
 }
 
+.miniTable tr:hover{
 
-/* ==========================================
-   SUMMARY TABLE
-========================================== */
-
-.summaryTable td:first-child{
-
-    font-weight:bold;
-
-    width:260px;
+    background:#f8fafc;
 
 }
 
-.summaryTable td:last-child{
-
-    text-align:right;
-
-}
-
-
-/* ==========================================
-   PARTICIPANT JOURNEY MATRIX
-========================================== */
-
-.matrix{
-
-    overflow:auto;
-
-}
-
-.matrix table{
-
-    min-width:1400px;
-
-}
-
-.matrix th{
-
-    position:sticky;
-
-    top:0;
-
-    z-index:3;
-
-}
-
-.matrix td:first-child,
-.matrix th:first-child{
-
-    position:sticky;
-
-    left:0;
-
-    background:#fff;
-
-    z-index:4;
-
-    font-weight:bold;
-
-}
-
-
-/* ==========================================
-   RANKING
-========================================== */
-
-.rank{
-
-    width:55px;
-
-    text-align:center;
-
-    font-weight:bold;
-
-}
-
-.rank.gold{
-
-    color:#b8860b;
-
-}
-
-.rank.silver{
-
-    color:#6b7280;
-
-}
-
-.rank.bronze{
-
-    color:#92400e;
-
-}
-
-
-/* ==========================================
-   BADGES
-========================================== */
-
-.badge{
-
-    display:inline-block;
-
-    padding:4px 10px;
-
-    border-radius:20px;
-
-    font-size:12px;
-
-    font-weight:bold;
-
-    background:#dbeafe;
-
-    color:#1e3a8a;
-
-}
-
-.success{
-
-    background:#dcfce7;
-
-    color:#15803d;
-
-}
-
-.warning{
-
-    background:#fef3c7;
-
-    color:#b45309;
-
-}
-
-.danger{
-
-    background:#fee2e2;
-
-    color:#b91c1c;
-
-}
-
-
-/* ==========================================
-   TIMELINE
-========================================== */
-
-.timeline{
-
-    border-left:4px solid #1e3a8a;
-
-    padding-left:20px;
-
-}
-
-.timelineItem{
-
-    margin-bottom:20px;
-
-    position:relative;
-
-}
-
-.timelineItem::before{
-
-    content:"";
-
-    width:12px;
-
-    height:12px;
-
-    border-radius:50%;
-
-    background:#1e3a8a;
-
-    position:absolute;
-
-    left:-28px;
-
-    top:5px;
-
-}
-
-
-/* ==========================================
-   LOADING
-========================================== */
-
-#loadingOverlay{
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(255,255,255,.8);
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    z-index:9999;
-
-}
-
-.loadingCard{
-
-    background:#fff;
-
-    padding:30px;
-
-    border-radius:12px;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
-
-    text-align:center;
-
-}
-
-.loadingText{
-
-    margin-top:15px;
-
-    color:#666;
-
-}
-
-
-/* ==========================================
-   FOOTER
-========================================== */
-
-.footer{
-
-    text-align:center;
-
-    color:#777;
-
-    font-size:13px;
-
-    padding:25px;
-
-}
-
-/* ==========================================
-   PART 3 - RESPONSIVE & UTILITIES
-========================================== */
-
-/* ==========================================
-   LARGE TABLETS
-========================================== */
-
-@media (max-width:1200px){
-
-    .container{
-        padding:20px;
-    }
-
-    .twoColumn{
-        grid-template-columns:1fr;
-    }
-
-    .kpiGrid{
-        grid-template-columns:repeat(3,1fr);
-    }
-
-}
-
-
-/* ==========================================
-   TABLETS
-========================================== */
-
-@media (max-width:900px){
-
-    .header{
-
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:15px;
-
-    }
-
-    .header button{
-
-        margin-top:5px;
-
-    }
-
-    .kpiGrid{
-
-        grid-template-columns:repeat(2,1fr);
-
-    }
-
-    .filterGrid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    .chartCard{
-
-    height:350px;
-
-}
-
-}
-
-
-/* ==========================================
-   MOBILE
-========================================== */
-
-@media (max-width:600px){
-
-    .container{
-
-        padding:15px;
-
-    }
-
-    .kpiGrid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    .card{
-
-        padding:15px;
-
-    }
-
-    .card h2{
-
-        font-size:20px;
-
-    }
-
-    .kpiValue{
-
-        font-size:28px;
-
-    }
-
-    .chartCard{
-
-    height:300px;
-
-}
-
-  
-
-    .reportTable th,
-    .reportTable td{
-
-        padding:8px;
-
-    }
-
-}
-
-
-/* ==========================================
-   TABLE SCROLL
-========================================== */
-
-.tableWrapper{
-
-    overflow-x:auto;
-
-    overflow-y:auto;
-
-}
-
-.reportTable{
-
-    width:100%;
-
-    min-width:900px;
-
-    border-collapse:collapse;
-
-    font-size:14px;
-
-    background:#fff;
-
-}
-
-
-/* ==========================================
-   MODALS
-========================================== */
+/* ==========================================================
+   MODAL
+========================================================== */
 
 .modal{
-
-    display:none;
 
     position:fixed;
 
@@ -811,27 +568,33 @@ button:hover{
 
     background:rgba(0,0,0,.45);
 
-    z-index:9999;
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999;
+
+}
+
+.hidden{
+
+    display:none !important;
 
 }
 
 .modalContent{
 
-    background:#fff;
+    width:min(900px,95%);
 
-    width:90%;
+    background:white;
 
-    max-width:900px;
+    border-radius:16px;
 
-    max-height:90vh;
+    box-shadow:var(--shadow);
 
-    overflow:auto;
-
-    margin:5vh auto;
-
-    border-radius:12px;
-
-    box-shadow:0 6px 18px rgba(0,0,0,.2);
+    overflow:hidden;
 
 }
 
@@ -843,165 +606,256 @@ button:hover{
 
     align-items:center;
 
-    padding:18px 20px;
+    padding:20px 24px;
 
-    border-bottom:1px solid #eee;
-
-}
-
-.modalBody{
-
-    padding:20px;
+    border-bottom:1px solid var(--border);
 
 }
 
-.close{
+.modalHeader h2{
 
-    font-size:28px;
+    margin:0;
+
+}
+
+#modalBody{
+
+    padding:24px;
+
+    max-height:70vh;
+
+    overflow:auto;
+
+}
+
+.closeButton{
+
+    background:none;
+
+    border:none;
+
+    color:var(--muted);
+
+    font-size:22px;
 
     cursor:pointer;
 
-    color:#888;
+}
+
+.closeButton:hover{
+
+    color:var(--danger);
 
 }
 
-.close:hover{
+/* ==========================================================
+   LOADING
+========================================================== */
 
-    color:#000;
+.loadingOverlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(255,255,255,.75);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:1000;
 
 }
 
+.loadingCard{
 
-/* ==========================================
-   LOADER
-========================================== */
+    background:white;
+
+    padding:30px 40px;
+
+    border-radius:16px;
+
+    box-shadow:var(--shadow);
+
+    text-align:center;
+
+}
 
 .loader{
 
-    width:42px;
+    width:50px;
 
-    height:42px;
+    height:50px;
 
-    border:4px solid #ddd;
+    border:5px solid #e5e7eb;
 
-    border-top:4px solid #1e3a8a;
+    border-top:5px solid var(--primary);
 
     border-radius:50%;
 
     animation:spin 1s linear infinite;
 
-    margin:auto;
+    margin:0 auto 16px;
+
+}
+
+.loadingText{
+
+    color:var(--muted);
 
 }
 
 @keyframes spin{
 
     from{
+
         transform:rotate(0deg);
+
     }
 
     to{
+
         transform:rotate(360deg);
+
     }
 
 }
 
+/* ==========================================================
+   FOOTER
+========================================================== */
 
+.footer{
 
-/* ==========================================
-   PART 4 - PRINT & UTILITIES
-========================================== */
+    margin-top:40px;
 
-/* ==========================================
-   PRINT
-========================================== */
+    padding:24px;
 
-@media print{
-
-    body{
-        background:#fff;
-    }
-
-    .header button,
-    .filterGrid,
-    #loadingOverlay,
-    .modal{
-        display:none !important;
-    }
-
-    .card{
-        box-shadow:none;
-        border:1px solid #ddd;
-        break-inside:avoid;
-    }
-
-    canvas{
-        max-width:100%;
-    }
-
-    .footer{
-        margin-top:30px;
-    }
-
-}
-
-
-/* ==========================================
-   UTILITIES
-========================================== */
-
-.textCenter{
     text-align:center;
-}
 
-.textRight{
-    text-align:right;
-}
+    color:var(--muted);
 
-.mt10{
-    margin-top:10px;
-}
-
-.mt20{
-    margin-top:20px;
-}
-
-.mb10{
-    margin-bottom:10px;
-}
-
-.mb20{
-    margin-bottom:20px;
-}
-
-.hidden{
-    display:none !important;
-}
-
-.flex{
-    display:flex;
-}
-
-.spaceBetween{
-    justify-content:space-between;
-}
-
-.alignCenter{
-    align-items:center;
-}
-
-.w100{
-    width:100%;
-}
-
-canvas{
-
-    display:block;
+    font-size:14px;
 
 }
 
-.chartCard{
+/* ==========================================================
+   STATUS BADGES
+========================================================== */
 
-    contain:layout;
+.badge{
+
+    display:inline-block;
+
+    padding:4px 10px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+.badge-success{
+
+    background:#dcfce7;
+
+    color:#166534;
+
+}
+
+.badge-warning{
+
+    background:#fef3c7;
+
+    color:#92400e;
+
+}
+
+.badge-danger{
+
+    background:#fee2e2;
+
+    color:#991b1b;
+
+}
+
+.badge-info{
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:1100px){
+
+    .executiveGrid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:900px){
+
+    .analyticsGrid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .topBar{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:18px;
+
+    }
+
+    .toolbar{
+
+        width:100%;
+
+        flex-wrap:wrap;
+
+    }
+
+    button{
+
+        flex:1;
+
+    }
+
+    .dashboard{
+
+        padding:18px;
+
+    }
+
+}
+
+@media(max-width:500px){
+
+    .kpiSection{
+
+        grid-template-columns:1fr;
+
+    }
 
 }
