@@ -430,52 +430,6 @@ const presetEvent =
 params.get("event");
 
 
-async function apiCall(action, data={}){
-
-
-const response = await fetch(
-    CONFIG.WEB_APP_URL,
-    {
-        method:"POST",
-
-        headers:{
-            "Content-Type":"application/x-www-form-urlencoded"
-        },
-
-        body:new URLSearchParams({
-
-            action: action,
-
-            data: JSON.stringify(data)
-
-        })
-
-    }
-);
-
-
-const result = await response.json();
-
-
-console.log(action,result);
-
-
-
-if(!result.success){
-
-    throw new Error(
-        result.message || "API Error"
-    );
-
-}
-
-
-return result.data;
-
-
-}
-
-
 
 
 // =====================================
@@ -497,20 +451,24 @@ async function loadReminderEvents(){
 try{
 
 
-const result =
-
-await apiCall(
-
-"getActiveEventsForReminder",
-
+const response =
+await API.post(
+    "getActiveEventsForReminder",
     {}
-
 );
 
 
+if(!response.success){
+
+    throw new Error(
+        response.message
+    );
+
+}
+
 
 reminderEvents =
-result || [];
+response.data || [];
 
 
 
@@ -788,25 +746,18 @@ document.getElementById(
 try{
 
 
-const saved =
-
-await apiCall(
-
+const response =
+await API.post(
 "getReminderConfiguration",
-
-    
-
 {
-
-spreadsheetId:eventId,
-
-reminderType:event.reminderType
-
+    spreadsheetId:eventId,
+    reminderType:event.reminderType
 }
-
-    
-
 );
+
+
+const saved =
+response.data;
 
 
 
@@ -921,13 +872,20 @@ document.getElementById(
 
 
 
-await apiCall(
-
+const response =
+await API.post(
 "saveReminderConfiguration",
-
 reminderConfig
-
 );
+
+
+if(!response.success){
+
+    throw new Error(
+        response.message
+    );
+
+}
 
 
 
@@ -968,39 +926,30 @@ return;
 try{
 
 
-const result =
-
-await apiCall(
-
+const response =
+await API.post(
 "getReminderParticipants",
-
-
-
 {
+    spreadsheetId:
+    reminderConfig.spreadsheetId,
+
+    reminderType:
+    reminderConfig.reminderType
+}
+);
 
 
-spreadsheetId:
+if(!response.success){
 
-reminderConfig.spreadsheetId,
-
-
-reminderType:
-
-reminderConfig.reminderType
-
+    throw new Error(
+        response.message
+    );
 
 }
 
 
-
-
-);
-
-
-
 participants =
-result || [];
-
+response.data || [];
 
 
 renderParticipants();
