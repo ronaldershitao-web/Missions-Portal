@@ -140,7 +140,7 @@ function renderDashboard() {
 
     renderKPIs();
 
-    
+     renderMissionTripSummary(); 
 
     renderMissionInsights();
 
@@ -1547,17 +1547,24 @@ function renderMissionTripSummary() {
     const tbody =
         document.getElementById("missionTripSummaryTable");
 
+    if (!tbody) return;
+
     tbody.innerHTML = "";
 
-    Dashboard.data.missionCompilation.tripSummary.forEach(trip => {
+    if (!Dashboard.missionData ||
+        !Dashboard.missionData.tripSummary) {
+        return;
+    }
+
+    Dashboard.missionData.tripSummary.forEach(trip => {
 
         tbody.innerHTML += `
-        <tr>
-            <td>${trip.tripCode}</td>
-            <td>${trip.location}</td>
-            <td>${formatDate(trip.startDate)}</td>
-            <td>${trip.participants}</td>
-        </tr>
+            <tr>
+                <td>${trip.tripCode}</td>
+                <td>${trip.location}</td>
+                <td>${formatDate(trip.startDate)}</td>
+                <td>${trip.participants}</td>
+            </tr>
         `;
 
     });
