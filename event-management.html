@@ -576,16 +576,18 @@ location="dashboard.html";
     // =====================================
 // Generic Apps Script Runner
 // =====================================
-async function runScript(functionName, parameters = []) {
+async function runScript(action, data = {}) {
 
     const result = await API.post(
-        functionName,
-        {
-            parameters: parameters
-        }
+        action,
+        data
     );
 
-    return result;
+    if(!result.success){
+        throw new Error(result.message || "Request failed");
+    }
+
+    return result.data || result;
 
 }
 
@@ -920,53 +922,46 @@ function closeModal() {
    
 async function fetchEvents(){
 
-    return await runScript("getEventList");
+    return await runScript(
+        "getEventList",
+        {}
+    );
 
 }
 
     async function fetchParticipants(id){
 
-    return await runScript("getParticipants",[id]);
+    return await runScript(
+        "getParticipants",
+        {
+            spreadsheetId:id
+        }
+    );
 
 }
 
-    async function syncEvent(id){
-
-    showLoading();
-
-    try{
-
-        await runScript("syncEvent",[id]);
-
-        await loadEvents();
-
+    await runScript(
+    "syncEvent",
+    {
+        spreadsheetId:id
     }
+);
 
-    finally{
-
-        hideLoading();
-
+    await runScript(
+    "setEventStatus",
+    {
+        spreadsheetId:id,
+        status:"CLOSED"
     }
+);
 
-}
-
-    async function closeEvent(id){
-
-    if(!confirm("Close this event?")) return;
-
-    await runScript("setEventStatus",[id,"CLOSED"]);
-
-    loadEvents();
-
-}
-
-    async function reopenEvent(id){
-
-    await runScript("setEventStatus",[id,"ACTIVE"]);
-
-    loadEvents();
-
-}
+    await runScript(
+    "setEventStatus",
+    {
+        spreadsheetId:id,
+        status:"ACTIVE"
+    }
+);
 
     async function saveAttendance() {
 
@@ -989,12 +984,12 @@ async function fetchEvents(){
 
         showLoading();
 
-        await runScript(
+       await runScript(
     "saveAttendance",
-    [
-        currentEvent,
-        attendance
-    ]
+    {
+        spreadsheetId:currentEvent,
+        attendanceList:JSON.stringify(attendance)
+    }
 );
 
         hideLoading();
