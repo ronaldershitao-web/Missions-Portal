@@ -1,9 +1,8 @@
 /* ==========================================
    Missions Portal - AUTH
-   (GIS + Apps Script Web App)
+   (Google Identity Services + API)
 ========================================== */
 
-let idTokenGlobal = null;
 
 /* ==========================================
    GOOGLE LOGIN CALLBACK (GIS)
@@ -18,101 +17,80 @@ async function handleCredentialResponse(response) {
 
         console.log("GIS LOGIN SUCCESS");
 
-        // Store ID Token from Google Identity Services
-        idTokenGlobal = response.credential;
 
-        // OPTIONAL DEBUG
-        // console.log(parseJwt(idTokenGlobal));
+        /*
+            Send Google ID Token
+            to Apps Script API
+        */
 
-        // Send ID Token to Apps Script Web App
-        await callAppsScriptLogin(idTokenGlobal);
+        const result = await API.post(
+            "login",
+            {
+                token: response.credential
+            }
+        );
 
-    } catch (err) {
-
-        console.error(err);
-
-        hideLoading();
-
-        showMessage("Login failed", "danger");
-    }
-}
-
-/* ==========================================
-   APPS SCRIPT WEB APP LOGIN
-========================================== */
-
-async function callAppsScriptLogin(idToken) {
-
-    try {
-
-        const formData = new URLSearchParams();
-
-        formData.append("action", "login");
-        formData.append("token", idToken);
-
-        const res = await fetch(CONFIG.WEB_APP_URL, {
-            method: "POST",
-            body: formData
-        });
-
-        if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-        }
-
-        const result = await res.json();
 
         console.log(result);
 
+
         hideLoading();
+
+
+        /*
+            Login Success
+        */
 
         if (result.success) {
 
+
             localStorage.setItem(
                 "mp_user",
-                JSON.stringify(result.user)
+                JSON.stringify(
+                    result.data.user
+                )
             );
 
-            window.location.href = "dashboard.html";
 
-        } else {
+            window.location.href =
+                "dashboard.html";
 
-            showMessage(result.message, "danger");
+
+        } 
+        
+        /*
+            Login Failed
+        */
+
+        else {
+
+
+            showMessage(
+                result.message,
+                "danger"
+            );
+
 
         }
 
+
     } catch (err) {
 
-        console.error(err);
+
+        console.error(
+            "Login Error:",
+            err
+        );
+
 
         hideLoading();
 
-        showMessage("Server connection failed", "danger");
 
-    }
+        showMessage(
+            "Unable to login. Please try again.",
+            "danger"
+        );
 
-}
-
-/* ==========================================
-   OPTIONAL DEBUG: JWT PARSER
-========================================== */
-
-function parseJwt(token) {
-
-    try {
-
-        const base64Url = token.split(".")[1];
-
-        const base64 = base64Url
-            .replace(/-/g, "+")
-            .replace(/_/g, "/");
-
-        return JSON.parse(atob(base64));
-
-    } catch (e) {
-
-        console.error("JWT parse error", e);
-
-        return null;
 
     }
 
