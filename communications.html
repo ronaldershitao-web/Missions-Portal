@@ -447,58 +447,59 @@ params.get("event");
 
 async function loadReminderEvents(){
 
+    try{
 
-try{
-
-
-const response =
-await API.post(
-    "getActiveEventsForReminder",
-    {}
-);
+        const response = await API.post(
+            "getActiveEventsForReminder",
+            {}
+        );
 
 
-if(!response.success){
+        console.log(
+            "Reminder Events API:",
+            response
+        );
 
-    throw new Error(
-        response.message
-    );
+
+        if(!response.success){
+
+            throw new Error(
+                response.message || 
+                "Unable to load events"
+            );
+
+        }
+
+
+        reminderEvents =
+            response.data ||
+            response.result ||
+            [];
+
+
+        renderEvents();
+
+        populateEventDropdown();
+
+
+    }
+    catch(err){
+
+        console.error(
+            "loadReminderEvents error:",
+            err
+        );
+
+
+        document.getElementById(
+            "eventList"
+        ).innerHTML =
+        "Unable to load events";
+
+
+    }
 
 }
-
-
-reminderEvents =
-response.data || [];
-
-
-
-renderEvents();
-
-populateEventDropdown();
-
-
-
-}
-
-catch(err){
-
-
-console.error(err);
-
-
-document.getElementById(
-"eventList"
-).innerHTML =
-"Unable to load events";
-
-
-}
-
-
-
-}
-
-
 
 
 
