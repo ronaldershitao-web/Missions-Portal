@@ -194,25 +194,52 @@ function renderKPIs() {
 
     const k = Dashboard.data.kpis;
 
-    setText("kpiRegistrations", k.registrations);
-    setText("kpiUnique", k.uniqueParticipants);
-    setText("kpiRepeat", k.repeatParticipants);
-    setText("kpiEvents", k.totalEvents);
-    setText("kpiChurches", k.totalChurches);
+
+    setText(
+        "kpiRegistrations",
+        k.registrations
+    );
+
+
+    setText(
+        "kpiUnique",
+        k.uniqueParticipants
+    );
+
+
+    setText(
+        "kpiReturning",
+        k.repeatParticipants
+    );
+
+
+    setText(
+        "kpiFirstTimers",
+        k.firstTimers
+    );
+
+
+    setText(
+        "kpiEvents",
+        k.totalEvents
+    );
+
+
+    setText(
+        "kpiChurches",
+        k.totalChurches
+    );
+
 
     setText(
         "kpiAttendance",
-        `${k.attendanceRate}%`
+        k.attendanceRate + "%"
     );
 
-    setText(
-        "kpiGrowth",
-        `${k.growthRate}%`
-    );
 
     setText(
-        "kpiLeaders",
-        k.potentialLeaders
+        "kpiAverageEvent",
+        Dashboard.data.events.averages.average
     );
 
 }
@@ -284,32 +311,34 @@ function renderExecutiveSummary() {
 function renderMissionInsights() {
 
     const insights =
-        Dashboard.data.missionInsights;
+        Dashboard.data.missionInsights || {};
+
 
     renderInsightList(
         "celebrateInsights",
         insights.celebrate
     );
 
+
     renderInsightList(
-        "warningInsights",
+        "followupInsights",
         insights.warning
     );
 
+
     renderInsightList(
-        "recommendationInsights",
+        "opportunityInsights",
         insights.recommendation
     );
+
 
     renderInsightList(
         "riskInsights",
         insights.risk
     );
 
-    renderStrategicCorner();
 
 }
-
 /* ==========================================================
    PASTOR'S CORNER
 ========================================================== */
@@ -321,7 +350,7 @@ function renderStrategicCorner() {
 
     const div =
         document.getElementById(
-            "strategicInsights"
+            "missionIntelligence"
         );
 
     div.innerHTML = "";
@@ -535,10 +564,10 @@ function renderParticipantCharts() {
     const p = Dashboard.data.participants;
 
     renderChart(
-        "firstTimeReturningChart",
-        "doughnut",
-        p.firstTimeVsReturning
-    );
+ "newReturningChart",
+ "doughnut",
+ p.firstTimeVsReturning
+);
 
     renderChart(
         "ageChart",
