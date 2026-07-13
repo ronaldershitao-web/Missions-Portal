@@ -6,14 +6,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Missions Intelligence Dashboard</title>
+<title>Mission Intelligence Centre</title>
 
 <link rel="stylesheet" href="./css/reports.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="./js/config.js"></script>
-    <script src="./js/api.js"></script>
+<script src="./js/api.js"></script>
 <script src="./js/auth.js"></script>
 <script src="./js/reports.js" defer></script>
 
@@ -21,43 +21,267 @@
 
 <body>
 
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
+
 <header class="topBar">
 
-<div>
+    <div>
 
-<h1>📊 Missions Intelligence Dashboard</h1>
+        <h1>🌏 Mission Intelligence Centre</h1>
 
-<p>
-Executive Analytics for Missions Pastors
-</p>
+        <p>
+            Executive Dashboard for COOS Missions Department
+        </p>
 
-</div>
+    </div>
 
-<div class="toolbar">
+    <div class="toolbar">
 
-<button onclick="refreshDashboard()">
-🔄 Refresh
-</button>
+        <button onclick="refreshDashboard()">
+            🔄 Refresh
+        </button>
 
-<button onclick="exportExcel()">
-📄 Excel
-</button>
+        <button onclick="exportExcel()">
+            📄 Export Excel
+        </button>
 
-<button onclick="exportCSV()">
-📑 CSV
-</button>
+        <button onclick="exportCSV()">
+            📑 Export CSV
+        </button>
 
-<button onclick="goBack()">
-← Back
-</button>
+        <button onclick="goBack()">
+            ← Back
+        </button>
 
-</div>
+    </div>
 
 </header>
 
 <main class="dashboard">
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- MISSION HEALTH -->
+<!-- ===================================================== -->
+
+<section class="missionHealthCard">
+
+<div class="missionScore">
+
+<div class="scoreCircle">
+
+<div id="missionHealthScore">
+
+85
+
+</div>
+
+<span>/100</span>
+
+</div>
+
+<div class="scoreContent">
+
+<h2>
+
+Mission Health Score
+
+</h2>
+
+<p>
+
+The Mission Health Score provides an overall view of the health
+and effectiveness of the COOS Missions Ministry.
+
+The score combines participation, engagement, attendance,
+church involvement and ministry growth into one strategic indicator
+to help leaders identify strengths, opportunities and areas
+requiring pastoral attention.
+
+</p>
+
+<div class="scopeNote">
+
+<strong>Current Scope</strong>
+
+Missions Department Events
+
+&nbsp;&nbsp;|&nbsp;&nbsp;
+
+<strong>Future Scope</strong>
+
+Department Events • Short-Term Missions • Missionary Development • Church Engagement
+
+</div>
+
+</div>
+
+</div>
+
+<div class="scoreBreakdown">
+
+<div class="scoreItem">
+
+<span>Participation Growth</span>
+
+<div class="progress">
+
+<div
+id="scoreGrowth"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreGrowthLabel">
+
+0 / 25
+
+</label>
+
+</div>
+
+<div class="scoreItem">
+
+<span>Participant Retention</span>
+
+<div class="progress">
+
+<div
+id="scoreRetention"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreRetentionLabel">
+
+0 / 20
+
+</label>
+
+</div>
+
+<div class="scoreItem">
+
+<span>Attendance</span>
+
+<div class="progress">
+
+<div
+id="scoreAttendance"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreAttendanceLabel">
+
+0 / 20
+
+</label>
+
+</div>
+
+<div class="scoreItem">
+
+<span>Church Engagement</span>
+
+<div class="progress">
+
+<div
+id="scoreChurch"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreChurchLabel">
+
+0 / 15
+
+</label>
+
+</div>
+
+<div class="scoreItem">
+
+<span>First-Time Participants</span>
+
+<div class="progress">
+
+<div
+id="scoreFirstTime"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreFirstTimeLabel">
+
+0 / 10
+
+</label>
+
+</div>
+
+<div class="scoreItem">
+
+<span>Event Diversity</span>
+
+<div class="progress">
+
+<div
+id="scoreDiversity"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreDiversityLabel">
+
+0 / 5
+
+</label>
+
+</div>
+
+<div class="scoreItem">
+
+<span>Referral Effectiveness</span>
+
+<div class="progress">
+
+<div
+id="scoreReferral"
+class="progressFill">
+
+</div>
+
+</div>
+
+<label id="scoreReferralLabel">
+
+0 / 5
+
+</label>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- KPI SUMMARY -->
+<!-- ===================================================== -->
 
 <section class="kpiSection">
 
@@ -74,6 +298,12 @@ class="kpiValue"
 id="kpiRegistrations">
 
 0
+
+</div>
+
+<div class="kpiSubtitle">
+
+Total event registrations
 
 </div>
 
@@ -95,21 +325,57 @@ id="kpiUnique">
 
 </div>
 
+<div class="kpiSubtitle">
+
+Unique individuals engaged
+
+</div>
+
 </div>
 
 <div class="kpiCard">
 
 <div class="kpiTitle">
 
-Repeat Missionaries
+Returning Participants
 
 </div>
 
 <div
 class="kpiValue"
-id="kpiRepeat">
+id="kpiReturning">
 
 0
+
+</div>
+
+<div class="kpiSubtitle">
+
+Attended multiple events
+
+</div>
+
+</div>
+
+<div class="kpiCard">
+
+<div class="kpiTitle">
+
+First-Time Participants
+
+</div>
+
+<div
+class="kpiValue"
+id="kpiFirstTimers">
+
+0
+
+</div>
+
+<div class="kpiSubtitle">
+
+New to Missions
 
 </div>
 
@@ -131,13 +397,19 @@ id="kpiEvents">
 
 </div>
 
+<div class="kpiSubtitle">
+
+Events conducted
+
+</div>
+
 </div>
 
 <div class="kpiCard">
 
 <div class="kpiTitle">
 
-Churches
+Churches Engaged
 
 </div>
 
@@ -149,13 +421,19 @@ id="kpiChurches">
 
 </div>
 
+<div class="kpiSubtitle">
+
+Represented churches
+
+</div>
+
 </div>
 
 <div class="kpiCard">
 
 <div class="kpiTitle">
 
-Attendance %
+Attendance Rate
 
 </div>
 
@@ -167,21 +445,9 @@ id="kpiAttendance">
 
 </div>
 
-</div>
+<div class="kpiSubtitle">
 
-<div class="kpiCard">
-
-<div class="kpiTitle">
-
-Growth
-
-</div>
-
-<div
-class="kpiValue"
-id="kpiGrowth">
-
-0%
+Registered vs attended
 
 </div>
 
@@ -191,15 +457,21 @@ id="kpiGrowth">
 
 <div class="kpiTitle">
 
-Potential Leaders
+Average Event Size
 
 </div>
 
 <div
 class="kpiValue"
-id="kpiLeaders">
+id="kpiAverageEvent">
 
 0
+
+</div>
+
+<div class="kpiSubtitle">
+
+Participants per event
 
 </div>
 
@@ -207,7 +479,9 @@ id="kpiLeaders">
 
 </section>
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- EXECUTIVE SUMMARY -->
+<!-- ===================================================== -->
 
 <section class="executiveGrid">
 
@@ -215,13 +489,13 @@ id="kpiLeaders">
 
 <h2>
 
-Executive Summary
+📈 Executive Summary
 
 </h2>
 
 <div id="executiveSummary">
 
-Loading...
+Loading executive summary...
 
 </div>
 
@@ -231,13 +505,13 @@ Loading...
 
 <h2>
 
-Pastor's Corner
+🧠 Mission Intelligence
 
 </h2>
 
-<div id="strategicInsights">
+<div id="missionIntelligence">
 
-Loading...
+Loading mission intelligence...
 
 </div>
 
@@ -245,7 +519,9 @@ Loading...
 
 </section>
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- FILTERS -->
+<!-- ===================================================== -->
 
 <section class="card">
 
@@ -265,8 +541,7 @@ Year
 
 </label>
 
-<select
-id="yearFilter">
+<select id="yearFilter">
 
 <option value="">
 
@@ -282,16 +557,15 @@ All Years
 
 <label>
 
-Event Type
+Mission Event Type
 
 </label>
 
-<select
-id="eventTypeFilter">
+<select id="eventTypeFilter">
 
 <option value="">
 
-All Types
+All Event Types
 
 </option>
 
@@ -307,12 +581,63 @@ Church
 
 </label>
 
-<select
-id="churchFilter">
+<select id="churchFilter">
 
 <option value="">
 
 All Churches
+
+</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>
+
+Referral Source
+
+</label>
+
+<select id="referralFilter">
+
+<option value="">
+
+All Referrals
+
+</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>
+
+Attendance
+
+</label>
+
+<select id="attendanceFilter">
+
+<option value="">
+
+All
+
+</option>
+
+<option>
+
+Attended
+
+</option>
+
+<option>
+
+Absent
 
 </option>
 
@@ -339,16 +664,23 @@ placeholder="Search participant...">
 
 </section>
 
-    <!-- ========================================================= -->
-<!-- PARTICIPANT INSIGHTS -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- MINISTRY GROWTH -->
+<!-- Part 2 starts here -->
+<!-- ===================================================== -->
+
+    <!-- ===================================================== -->
+<!-- MINISTRY GROWTH -->
+<!-- ===================================================== -->
 
 <section class="sectionHeader">
 
-<h2>👥 Participant Insights</h2>
+<h2>📈 Ministry Growth</h2>
 
 <p>
-Understand who is responding to missions and how participation is changing.
+
+Track the overall growth and momentum of the Missions Ministry.
+
 </p>
 
 </section>
@@ -357,27 +689,55 @@ Understand who is responding to missions and how participation is changing.
 
 <div class="chartCard">
 
-<h3>Participants Over Time</h3>
+<h3>Registrations Over Time</h3>
 
-<canvas id="participantsTimelineChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>First Time vs Returning</h3>
-
-<canvas id="firstTimeReturningChart"></canvas>
+<canvas id="registrationTrendChart"></canvas>
 
 </div>
 
 <div class="chartCard">
 
-<h3>Mission Experience</h3>
+<h3>Monthly Growth</h3>
 
-<canvas id="experienceChart"></canvas>
+<canvas id="monthlyGrowthChart"></canvas>
 
 </div>
+
+<div class="chartCard">
+
+<h3>New vs Returning Participants</h3>
+
+<canvas id="newReturningChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Mission Activity Calendar</h3>
+
+<canvas id="activityHeatmapChart"></canvas>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- PARTICIPANT INSIGHTS -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+<h2>👥 Participant Insights</h2>
+
+<p>
+
+Understand who is responding to missions and how participants are progressing throughout their missions journey.
+
+</p>
+
+</section>
+
+<section class="analyticsGrid">
 
 <div class="chartCard">
 
@@ -389,61 +749,119 @@ Understand who is responding to missions and how participation is changing.
 
 <div class="chartCard">
 
-<h3>Gender Distribution</h3>
+<h3>Participant Journey</h3>
 
-<canvas id="genderChart"></canvas>
+<canvas id="journeyChart"></canvas>
 
 </div>
 
 <div class="chartCard">
 
-<h3>Participant Growth</h3>
+<h3>Repeat Participation</h3>
 
-<canvas id="growthChart"></canvas>
+<canvas id="repeatParticipantsChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Retention Trend</h3>
+
+<canvas id="retentionTrendChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Referral Sources</h3>
+
+<canvas id="referralChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Participant Status</h3>
+
+<canvas id="participantStatusChart"></canvas>
 
 </div>
 
 </section>
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- PARTICIPANT JOURNEY TABLE -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>
+
+Participant Journey
+
+</h2>
+
+<p>
+
+Track the ministry journey of every participant across Missions events.
+
+</p>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+
+<th>Church</th>
+
+<th>Age</th>
+
+<th>First Event</th>
+
+<th>Latest Event</th>
+
+<th>Total Events</th>
+
+<th>Attendance %</th>
+
+<th>Journey Stage</th>
+
+</tr>
+
+</thead>
+
+<tbody id="participantJourneyTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
 <!-- CHURCH ENGAGEMENT -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
 
 <section class="sectionHeader">
 
 <h2>⛪ Church Engagement</h2>
 
 <p>
-Which churches are actively sending and growing missionaries?
+
+Measure how churches are partnering with the Missions Department.
+
 </p>
 
 </section>
 
 <section class="analyticsGrid">
-
-<div class="chartCard">
-
-<h3>Participants by Church</h3>
-
-<canvas id="churchChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>Church Growth Trend</h3>
-
-<canvas id="churchGrowthChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>Repeat Participants by Church</h3>
-
-<canvas id="churchRetentionChart"></canvas>
-
-</div>
 
 <div class="chartCard">
 
@@ -453,18 +871,166 @@ Which churches are actively sending and growing missionaries?
 
 </div>
 
+<div class="chartCard">
+
+<h3>Church Participation</h3>
+
+<canvas id="churchParticipationChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Church Growth</h3>
+
+<canvas id="churchGrowthChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Church Retention</h3>
+
+<canvas id="churchRetentionChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Churchs Represented by Year</h3>
+
+<canvas id="churchYearChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Participants per Church</h3>
+
+<canvas id="participantsPerChurchChart"></canvas>
+
+</div>
+
 </section>
 
-<!-- ========================================================= -->
-<!-- MISSION EVENTS -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- CHURCH SUMMARY -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>
+
+Church Engagement Summary
+
+</h2>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Church</th>
+
+<th>Participants</th>
+
+<th>Events</th>
+
+<th>Attendance %</th>
+
+<th>Returning</th>
+
+<th>First Timers</th>
+
+<th>Latest Event</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody id="churchSummaryTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- CHURCHS REQUIRING FOLLOW-UP -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>
+
+⚠ Churches Requiring Follow-up
+
+</h2>
+
+<p>
+
+Churches with declining participation or no recent engagement.
+
+</p>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Church</th>
+
+<th>Participants</th>
+
+<th>Last Event</th>
+
+<th>Days Since Last Event</th>
+
+<th>Recommendation</th>
+
+</tr>
+
+</thead>
+
+<tbody id="churchFollowupTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- PART 3 STARTS HERE -->
+<!-- EVENT EFFECTIVENESS -->
+<!-- ===================================================== -->
+
+<!-- ===================================================== -->
+<!-- EVENT EFFECTIVENESS -->
+<!-- ===================================================== -->
 
 <section class="sectionHeader">
 
-<h2>📅 Mission Event Analytics</h2>
+<h2>📅 Event Effectiveness</h2>
 
 <p>
-Evaluate the effectiveness and engagement of mission events.
+
+Evaluate how each Missions event contributes to participation,
+engagement and ministry impact.
+
 </p>
 
 </section>
@@ -481,15 +1047,15 @@ Evaluate the effectiveness and engagement of mission events.
 
 <div class="chartCard">
 
-<h3>Top Events</h3>
+<h3>Top Mission Events</h3>
 
-<canvas id="eventPopularityChart"></canvas>
+<canvas id="topEventsChart"></canvas>
 
 </div>
 
 <div class="chartCard">
 
-<h3>Attendance Rate</h3>
+<h3>Attendance Rate by Event</h3>
 
 <canvas id="attendanceChart"></canvas>
 
@@ -497,161 +1063,47 @@ Evaluate the effectiveness and engagement of mission events.
 
 <div class="chartCard">
 
-<h3>Monthly Registration Trend</h3>
+<h3>Average Event Size</h3>
 
-<canvas id="monthlyTrendChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>Mission Timeline</h3>
-
-<canvas id="timelineChart"></canvas>
+<canvas id="averageEventChart"></canvas>
 
 </div>
 
 <div class="chartCard">
 
-<h3>Average Participants per Event</h3>
+<h3>Monthly Event Activity</h3>
 
-<canvas id="averageAttendanceChart"></canvas>
+<canvas id="monthlyEventChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Event Diversity</h3>
+
+<canvas id="eventDiversityChart"></canvas>
 
 </div>
 
 </section>
 
-<!-- ========================================================= -->
-<!-- LEADERSHIP PIPELINE -->
-<!-- ========================================================= -->
-
-<section class="sectionHeader">
-
-<h2>🌱 Leadership Pipeline</h2>
-
-<p>
-Identify future leaders and experienced missionaries.
-</p>
-
-</section>
-
-<section class="analyticsGrid">
-
-<div class="chartCard">
-
-<h3>Leadership Pipeline</h3>
-
-<canvas id="leadershipPipelineChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>Mission Experience Levels</h3>
-
-<canvas id="experienceLevelChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>Potential Team Leaders</h3>
-
-<canvas id="leaderCandidatesChart"></canvas>
-
-</div>
-
-<div class="chartCard">
-
-<h3>Repeat Missionaries</h3>
-
-<canvas id="repeatMissionariesChart"></canvas>
-
-</div>
-
-</section>
-
-<!-- ========================================================= -->
-<!-- STRATEGIC DASHBOARD -->
-<!-- ========================================================= -->
-
-<section class="sectionHeader">
-
-<h2>🎯 Strategic Ministry Insights</h2>
-
-<p>
-Automatically generated highlights requiring pastoral attention.
-</p>
-
-</section>
-
-<section class="insightGrid">
-
-<div class="insightCard success">
-
-<h3>Celebrate</h3>
-
-<div id="celebrateInsights">
-
-Loading...
-
-</div>
-
-</div>
-
-<div class="insightCard warning">
-
-<h3>Needs Attention</h3>
-
-<div id="warningInsights">
-
-Loading...
-
-</div>
-
-</div>
-
-<div class="insightCard info">
-
-<h3>Recommendations</h3>
-
-<div id="recommendationInsights">
-
-Loading...
-
-</div>
-
-</div>
-
-<div class="insightCard danger">
-
-<h3>Operational Risks</h3>
-
-<div id="riskInsights">
-
-Loading...
-
-</div>
-
-</div>
-
-</section>
-
-    <!-- ========================================================= -->
+<!-- ===================================================== -->
 <!-- EVENT SUMMARY -->
-<!-- ========================================================= -->
-
-<section class="sectionHeader">
-
-<h2>📋 Mission Event Summary</h2>
-
-<p>
-Executive overview of every mission event.
-</p>
-
-</section>
+<!-- ===================================================== -->
 
 <section class="card">
+
+<h2>
+
+Mission Event Summary
+
+</h2>
+
+<p>
+
+Overall performance of every Missions Department event.
+
+</p>
 
 <div class="tableToolbar">
 
@@ -680,7 +1132,7 @@ Export
 
 <th>Mission Event</th>
 
-<th>Type</th>
+<th>Event Type</th>
 
 <th>Registered</th>
 
@@ -690,11 +1142,13 @@ Export
 
 <th>First Timers</th>
 
-<th>Repeat</th>
+<th>Returning</th>
 
 <th>Churches</th>
 
-<th>Status</th>
+<th>Average Age</th>
+
+<th>Impact Score</th>
 
 </tr>
 
@@ -710,16 +1164,459 @@ Export
 
 </section>
 
-<!-- ========================================================= -->
-<!-- PARTICIPANT SUMMARY -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- RECRUITMENT ANALYTICS -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+<h2>📢 Recruitment Analytics</h2>
+
+<p>
+
+Understand how participants are discovering Missions opportunities.
+
+</p>
+
+</section>
+
+<section class="analyticsGrid">
+
+<div class="chartCard">
+
+<h3>Referral Sources</h3>
+
+<canvas id="referralSourceChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Referral Trend</h3>
+
+<canvas id="referralTrendChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Referral by Event Type</h3>
+
+<canvas id="referralEventChart"></canvas>
+
+</div>
+
+<div class="chartCard">
+
+<h3>Referral by Church</h3>
+
+<canvas id="referralChurchChart"></canvas>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- RECRUITMENT SUMMARY -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>
+
+Recruitment Summary
+
+</h2>
+
+<div class="tableWrapper">
+
+<table class="reportTable">
+
+<thead>
+
+<tr>
+
+<th>Referral Source</th>
+
+<th>Participants</th>
+
+<th>Attendance %</th>
+
+<th>Returning</th>
+
+<th>First Timers</th>
+
+<th>Recommendation</th>
+
+</tr>
+
+</thead>
+
+<tbody id="referralSummaryTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- MISSION INTELLIGENCE -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+<h2>🧠 Mission Intelligence</h2>
+
+<p>
+
+Automatically generated insights based on ministry data.
+
+</p>
+
+</section>
+
+<section class="insightGrid">
+
+<div class="insightCard success">
+
+<h3>
+
+🎉 Celebrate
+
+</h3>
+
+<div id="celebrateInsights">
+
+Loading...
+
+</div>
+
+</div>
+
+<div class="insightCard warning">
+
+<h3>
+
+⚠ Pastoral Follow-up
+
+</h3>
+
+<div id="followupInsights">
+
+Loading...
+
+</div>
+
+</div>
+
+<div class="insightCard info">
+
+<h3>
+
+💡 Growth Opportunities
+
+</h3>
+
+<div id="opportunityInsights">
+
+Loading...
+
+</div>
+
+</div>
+
+<div class="insightCard danger">
+
+<h3>
+
+🚨 Operational Risks
+
+</h3>
+
+<div id="riskInsights">
+
+Loading...
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- MISSION HEALTH INDICATORS -->
+<!-- ===================================================== -->
+
+<section class="analyticsGrid">
+
+<div class="card">
+
+<h3>
+
+Healthy Indicators
+
+</h3>
+
+<ul id="healthyIndicators">
+
+<li>Loading...</li>
+
+</ul>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Areas for Improvement
+
+</h3>
+
+<ul id="improvementIndicators">
+
+<li>Loading...</li>
+
+</ul>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Recommended Actions
+
+</h3>
+
+<ul id="recommendedActions">
+
+<li>Loading...</li>
+
+</ul>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- MINISTRY SNAPSHOT -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>
+
+📌 Ministry Snapshot
+
+</h2>
+
+<div class="snapshotGrid">
+
+<div class="snapshotCard">
+
+<h3>Fastest Growing Event</h3>
+
+<div id="snapshotGrowingEvent">-</div>
+
+</div>
+
+<div class="snapshotCard">
+
+<h3>Largest Sending Church</h3>
+
+<div id="snapshotChurch">-</div>
+
+</div>
+
+<div class="snapshotCard">
+
+<h3>Strongest Referral Source</h3>
+
+<div id="snapshotReferral">-</div>
+
+</div>
+
+<div class="snapshotCard">
+
+<h3>Highest Attendance Event</h3>
+
+<div id="snapshotAttendance">-</div>
+
+</div>
+
+<div class="snapshotCard">
+
+<h3>Most Returning Participants</h3>
+
+<div id="snapshotRetention">-</div>
+
+</div>
+
+<div class="snapshotCard">
+
+<h3>Biggest Opportunity</h3>
+
+<div id="snapshotOpportunity">-</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- PART 4 STARTS HERE -->
+<!-- ACTION CENTRE -->
+<!-- ===================================================== -->
+
+    <!-- ===================================================== -->
+<!-- ACTION CENTRE -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+<h2>🎯 Action Centre</h2>
+
+<p>
+
+Automatically generated follow-up actions for the Missions Department.
+
+</p>
+
+</section>
+
+<section class="analyticsGrid">
+
+<div class="card">
+
+<h3>
+
+👥 Participants Requiring Follow-up
+
+</h3>
+
+<div class="tableWrapper">
+
+<table class="miniTable">
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+
+<th>Church</th>
+
+<th>Last Event</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="followupParticipantsTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+⛪ Churches Requiring Engagement
+
+</h3>
+
+<div class="tableWrapper">
+
+<table class="miniTable">
+
+<thead>
+
+<tr>
+
+<th>Church</th>
+
+<th>Participants</th>
+
+<th>Last Event</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="churchActionTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+📅 Events Requiring Review
+
+</h3>
+
+<div class="tableWrapper">
+
+<table class="miniTable">
+
+<thead>
+
+<tr>
+
+<th>Event</th>
+
+<th>Issue</th>
+
+<th>Recommendation</th>
+
+</tr>
+
+</thead>
+
+<tbody id="eventReviewTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- PARTICIPANT DIRECTORY -->
+<!-- ===================================================== -->
 
 <section class="sectionHeader">
 
 <h2>👥 Participant Directory</h2>
 
 <p>
-Search and analyse every participant.
+
+Search and analyse every Missions participant.
+
 </p>
 
 </section>
@@ -753,19 +1650,17 @@ Export
 
 <th>Church</th>
 
-<th>Gender</th>
-
 <th>Age</th>
 
-<th>Missions</th>
+<th>Referral</th>
 
 <th>Events</th>
 
 <th>Attendance %</th>
 
-<th>Leadership</th>
+<th>Journey Stage</th>
 
-<th>Status</th>
+<th>Latest Event</th>
 
 </tr>
 
@@ -781,16 +1676,18 @@ Export
 
 </section>
 
-<!-- ========================================================= -->
-<!-- TOP CONTRIBUTORS -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- TOP RANKINGS -->
+<!-- ===================================================== -->
 
 <section class="sectionHeader">
 
-<h2>⭐ Top Contributors</h2>
+<h2>🏆 Ministry Rankings</h2>
 
 <p>
-Participants with the highest mission engagement.
+
+Recognising the strongest areas of Missions engagement.
+
 </p>
 
 </section>
@@ -799,7 +1696,11 @@ Participants with the highest mission engagement.
 
 <div class="card">
 
-<h3>Most Active Missionaries</h3>
+<h3>
+
+⭐ Most Active Participants
+
+</h3>
 
 <table class="miniTable">
 
@@ -809,7 +1710,7 @@ Participants with the highest mission engagement.
 
 <th>Name</th>
 
-<th>Missions</th>
+<th>Events</th>
 
 </tr>
 
@@ -825,7 +1726,11 @@ Participants with the highest mission engagement.
 
 <div class="card">
 
-<h3>Top Sending Churches</h3>
+<h3>
+
+⛪ Top Sending Churches
+
+</h3>
 
 <table class="miniTable">
 
@@ -851,7 +1756,11 @@ Participants with the highest mission engagement.
 
 <div class="card">
 
-<h3>Most Popular Events</h3>
+<h3>
+
+📅 Most Popular Events
+
+</h3>
 
 <table class="miniTable">
 
@@ -875,11 +1784,197 @@ Participants with the highest mission engagement.
 
 </div>
 
+<div class="card">
+
+<h3>
+
+📢 Top Referral Sources
+
+</h3>
+
+<table class="miniTable">
+
+<thead>
+
+<tr>
+
+<th>Referral</th>
+
+<th>Participants</th>
+
+</tr>
+
+</thead>
+
+<tbody id="topReferrals">
+
+</tbody>
+
+</table>
+
+</div>
+
 </section>
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- DATA QUALITY -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+<h2>🗂 Data Quality Dashboard</h2>
+
+<p>
+
+Monitor the completeness and quality of Missions data.
+
+</p>
+
+</section>
+
+<section class="analyticsGrid">
+
+<div class="card">
+
+<h3>Duplicate Emails</h3>
+
+<div
+class="qualityMetric"
+id="duplicateEmails">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Missing Attendance</h3>
+
+<div
+class="qualityMetric"
+id="missingAttendance">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Missing Church</h3>
+
+<div
+class="qualityMetric"
+id="missingChurch">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Missing Referral</h3>
+
+<div
+class="qualityMetric"
+id="missingReferral">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Duplicate Response Keys</h3>
+
+<div
+class="qualityMetric"
+id="duplicateResponses">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Incomplete Records</h3>
+
+<div
+class="qualityMetric"
+id="incompleteRecords">
+
+0
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- DASHBOARD INFORMATION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>
+
+ℹ About this Dashboard
+
+</h2>
+
+<div class="dashboardInfo">
+
+<p>
+
+<strong>Mission Intelligence Centre</strong> provides ministry
+leaders with an overview of the health of the Missions Department
+through registrations, attendance, church engagement and
+participant journeys.
+
+</p>
+
+<p>
+
+The dashboard currently analyses data collected through
+<strong>Missions Department Events</strong>.
+
+Future versions will incorporate:
+
+</p>
+
+<ul>
+
+<li>Short-Term Mission Trips</li>
+
+<li>Mission Team Deployment</li>
+
+<li>Missionary Development Pathways</li>
+
+<li>Volunteer & Team Leader Analytics</li>
+
+<li>Financial & Giving Analytics</li>
+
+<li>Long-term Ministry Impact</li>
+
+</ul>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
 <!-- DRILL DOWN MODAL -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
 
 <div
 id="detailsModal"
@@ -905,8 +2000,7 @@ onclick="closeModal()">
 
 </div>
 
-<div
-id="modalBody">
+<div id="modalBody">
 
 Loading...
 
@@ -916,9 +2010,9 @@ Loading...
 
 </div>
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
 <!-- LOADING -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
 
 <div
 id="loadingOverlay"
@@ -930,7 +2024,7 @@ class="loadingOverlay hidden">
 
 <div class="loadingText">
 
-Loading Missions Intelligence...
+Loading Mission Intelligence...
 
 </div>
 
@@ -944,11 +2038,11 @@ Loading Missions Intelligence...
 
 <div class="footer">
 
-COOS Missions Portal
+<strong>COOS Missions Portal</strong>
 
 &nbsp; | &nbsp;
 
-Missions Intelligence Dashboard
+Mission Intelligence Centre
 
 &nbsp; | &nbsp;
 
@@ -967,3 +2061,4 @@ Loading...
 </body>
 
 </html>
+    
