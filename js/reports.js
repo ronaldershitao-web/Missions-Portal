@@ -1459,24 +1459,20 @@ async function loadMissionDashboard(){
 
  if(result.success){
 
-    document.getElementById("kpiMissionTrips")
-    .innerText =
-    result.data.totalTrips;
+  document.getElementById("kpiMissionTrips").innerText =
+data.totalTrips;
 
 
-    document.getElementById("kpiTrippers")
-    .innerText =
-    result.data.totalTrippers;
+  document.getElementById("kpiTrippers").innerText =
+data.totalParticipants;
 
 
-    document.getElementById("kpiCountries")
-    .innerText =
-    result.data.countries;
+   document.getElementById("kpiCountries").innerText =
+data.countriesReached;
 
 
-    document.getElementById("kpiAvgTeam")
-    .innerText =
-    result.data.averageTeamSize;
+    document.getElementById("kpiAvgTeam").innerText =
+data.averageParticipants;
 
 
     document.getElementById("missionAnalysis")
