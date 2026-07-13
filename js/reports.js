@@ -1418,3 +1418,89 @@ function exportParticipants(){
 
 }
 
+/* ==========================================================
+   FILTER POPULATION
+========================================================== */
+
+function populateFilters(){
+
+    const filters =
+        Dashboard.data.filters;
+
+    if(!filters)
+        return;
+
+
+    populateSelect(
+        "yearFilter",
+        filters.years
+    );
+
+
+    populateSelect(
+        "eventTypeFilter",
+        filters.eventTypes
+    );
+
+
+    populateSelect(
+        "churchFilter",
+        filters.churches
+    );
+
+
+    populateSelect(
+        "referralFilter",
+        filters.referrals
+    );
+
+}
+
+
+
+/* ==========================================================
+   SELECT HELPER
+========================================================== */
+
+function populateSelect(
+    id,
+    values
+){
+
+    const select =
+        document.getElementById(id);
+
+
+    if(!select || !values)
+        return;
+
+
+    // keep first "All" option
+    const first =
+        select.options[0];
+
+
+    select.innerHTML = "";
+
+
+    select.appendChild(first);
+
+
+    values.forEach(value=>{
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = value;
+
+        option.textContent = value;
+
+
+        select.appendChild(option);
+
+    });
+
+}
+
