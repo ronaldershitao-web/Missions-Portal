@@ -496,114 +496,75 @@ function openReports() {
     window.location.href = "index.html";
   }
 
-  async function loadUsers(){
+async function loadUsers(){
+
+    try {
+
+        const result = await API.post(
+            "getUsers",
+            {}
+        );
+
+        console.log("USER RESULT:", result);
 
 
-try{
+        if(!result.success){
+
+            alert(result.message);
+
+            return;
+
+        }
 
 
-const result =
-await API.post(
-"getUsers",
-{}
-);
+        const tbody =
+        document.getElementById("usersTable");
 
 
-console.log(result);
+        tbody.innerHTML = "";
 
 
-const tbody =
-document.getElementById(
-"usersTable"
-);
+        result.data.users.forEach(user=>{
 
 
-tbody.innerHTML="";
+            tbody.innerHTML += `
+
+            <tr>
+
+                <td>${user.name}</td>
+
+                <td>${user.email}</td>
+
+                <td>${user.role}</td>
+
+                <td>${user.status}</td>
+
+                <td>
+                    <button 
+                    class="btn btn-sm btn-danger"
+                    onclick="archiveUser('${user.email}')">
+                    Archive
+                    </button>
+                </td>
+
+            </tr>
+
+            `;
 
 
-result.users.forEach(user=>{
+        });
 
 
-tbody.innerHTML += `
+    }
+    catch(err){
 
-<tr>
+        console.error(err);
 
-<td>${user.name}</td>
+        alert(
+            "Unable to load users"
+        );
 
-<td>${user.email}</td>
-
-<td>
-
-<select
-onchange="changeRole('${user.email}',this.value)">
-
-<option 
-${user.role=="Intern"?"selected":""}>
-Intern
-</option>
-
-
-<option 
-${user.role=="Cell Leader"?"selected":""}>
-Cell Leader
-</option>
-
-
-<option 
-${user.role=="Pastor"?"selected":""}>
-Pastor
-</option>
-
-
-<option 
-${user.role=="Admin"?"selected":""}>
-Admin
-</option>
-
-
-</select>
-
-</td>
-
-
-<td>
-
-${user.status}
-
-</td>
-
-
-<td>
-
-<button
-class="btn btn-danger btn-sm"
-onclick="archiveUser('${user.email}')">
-
-Archive
-
-</button>
-
-
-</td>
-
-
-</tr>
-
-`;
-
-});
-
-
-}
-catch(err){
-
-console.error(err);
-
-alert(
-"Unable to load users"
-);
-
-}
+    }
 
 }
 
