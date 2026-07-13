@@ -91,30 +91,24 @@ async function authenticateUser(){
 
 async function loadMasterResponses() {
 
+    const form = new FormData();
+    form.append("action", "getMasterResponses");
+
     const response = await fetch(CONFIG.WEB_APP_URL, {
-
         method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            action: "getMasterResponses"
-        })
-
+        body: form
     });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
 
     const json = await response.json();
 
     Dashboard.headers = json.headers;
-
     Dashboard.rawData = json.rows;
-
-    Dashboard.filteredData = [...Dashboard.rawData];
-
+    Dashboard.filteredData = [...json.rows];
 }
-
 /* ===========================================================
    COLUMN MAP
 =========================================================== */
