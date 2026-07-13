@@ -91,23 +91,16 @@ async function authenticateUser(){
 
 async function loadMasterResponses() {
 
-    const form = new FormData();
-    form.append("action", "getMasterResponses");
+    const result = await API.post("getMasterResponses");
 
-    const response = await fetch(CONFIG.WEB_APP_URL, {
-        method: "POST",
-        body: form
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+    if (!result.success) {
+        throw new Error(result.message);
     }
 
-    const json = await response.json();
+    Dashboard.headers = result.headers;
+    Dashboard.rawData = result.rows;
+    Dashboard.filteredData = [...result.rows];
 
-    Dashboard.headers = json.headers;
-    Dashboard.rawData = json.rows;
-    Dashboard.filteredData = [...json.rows];
 }
 /* ===========================================================
    COLUMN MAP
