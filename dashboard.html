@@ -253,67 +253,112 @@
   </div>
 
   <!-- ADMIN -->
- <div id="admin" class="card hidden admin-only">
+<div id="admin" class="card hidden admin-only">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h3 class="mb-1">
+                User Access Control
+            </h3>
+
+            <small class="text-muted">
+                Manage portal users, roles and access status
+            </small>
+        </div>
 
 
-<h3>
-    Admin Panel
-</h3>
+        <button 
+        class="btn btn-primary"
+        onclick="loadUsers()">
+
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+
+        </button>
+
+    </div>
 
 
-<hr>
+    <div class="card shadow-sm">
 
 
-<h4>
-    User Access Control
-</h4>
+        <div class="card-body">
 
 
-<button 
-class="btn btn-primary"
-onclick="loadUsers()">
-
-Refresh Users
-
-</button>
+            <div class="row mb-3">
 
 
-<table 
-class="table table-striped mt-3">
+                <div class="col-md-6">
 
-<thead>
+                    <input 
+                    id="userSearch"
+                    class="form-control"
+                    placeholder="Search name or email..."
+                    onkeyup="filterUsers()">
 
-<tr>
-
-<th>Name</th>
-
-<th>Email</th>
-
-<th>Role</th>
-
-<th>Status</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
+                </div>
 
 
-<tbody id="usersTable">
-
-<tr>
-
-<td colspan="5">
-Click Refresh Users
-</td>
-
-</tr>
-
-</tbody>
+            </div>
 
 
-</table>
+
+            <div class="table-responsive">
+
+
+                <table class="table table-hover align-middle">
+
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Name</th>
+
+                            <th>Email</th>
+
+                            <th>Role</th>
+
+                            <th>Status</th>
+
+                            <th>Last Login</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="usersTable">
+
+
+                        <tr>
+
+                            <td colspan="6"
+                            class="text-center text-muted">
+
+                                Click refresh to load users
+
+                            </td>
+
+                        </tr>
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
 
 
 </div>
