@@ -363,6 +363,7 @@ rel="stylesheet">
             <option value="FIRESIDE">Fireside Chat</option>
             <option value="WORKSHOP">Workshop</option>
             <option value="PRAYER">Prayer Meeting</option>
+          <option value="MISSION">Short Term Mission Trip</option>
 
         </select>
 
@@ -474,7 +475,7 @@ rel="stylesheet">
     alert("Reminder Tool coming soon");
   }
 
- async function importSheet() {
+async function importSheet() {
 
     const url = document.getElementById("sheetUrl").value;
     const eventDate = document.getElementById("importEventDate").value;
@@ -488,23 +489,48 @@ rel="stylesheet">
     if (!url || !eventDate || !eventName) {
 
         alert("Please complete all fields.");
-
         return;
 
     }
 
     try {
 
-        const result = await API.post(
-            "importExternalSheet",
-            {
-                url: url,
-                eventDate: eventDate,
-                eventType: eventType,
-                eventName: eventName,
-                importedBy: user.email
-            }
-        );
+        let result;
+
+        // =====================================
+        // SHORT TERM MISSION TRIP
+        // =====================================
+        if (eventType === "MISSION") {
+
+            result = await API.post(
+                "importMissionTripSheet",
+                {
+                    url: url,
+                    missionDate: eventDate,
+                    eventName: eventName,
+                    importedBy: user.email
+                }
+            );
+
+        }
+
+        // =====================================
+        // GENERAL EVENTS
+        // =====================================
+        else {
+
+            result = await API.post(
+                "importExternalSheet",
+                {
+                    url: url,
+                    eventDate: eventDate,
+                    eventType: eventType,
+                    eventName: eventName,
+                    importedBy: user.email
+                }
+            );
+
+        }
 
         console.log(result);
 
@@ -519,16 +545,11 @@ rel="stylesheet">
         }
 
     }
-    catch(err){
+    catch (err) {
 
-        console.error(
-            "IMPORT ERROR:",
-            err
-        );
+        console.error("IMPORT ERROR:", err);
 
-        alert(
-            err.message || "Server error"
-        );
+        alert(err.message || "Server error");
 
     }
 
