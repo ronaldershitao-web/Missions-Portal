@@ -345,12 +345,9 @@ return;
 
 
 eventInfo =
-await runScript(
-"getEventInfo",
-[
-spreadsheetId
-]
-);
+await API.post("getEventInfo", {
+    spreadsheetId
+});
 
 
 
@@ -449,13 +446,7 @@ return;
 try{
 
 
-await runScript(
-
-"addWalkIn",
-
-[data]
-
-);
+await API.post("addWalkIn", data);
 
 
 
