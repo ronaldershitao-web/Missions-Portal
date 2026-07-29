@@ -268,64 +268,22 @@ let eventInfo = {};
 // ================================
 
 
-async function runScript(functionName, parameters=[]){
+async function runScript(action, data = {}) {
 
+    const result = await API.post(
+        action,
+        data
+    );
 
-const response =
-await fetch(
+    if(!result.success){
+        throw new Error(
+            result.message || "Request failed"
+        );
+    }
 
-`https://script.googleapis.com/v1/scripts/${CONFIG.SCRIPT_ID}:run`,
-
-{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json",
-
-"Authorization":
-"Bearer " + await getAccessToken()
-
-},
-
-
-body:JSON.stringify({
-
-function:functionName,
-
-parameters:parameters,
-
-devMode:false
-
-})
-
-
-});
-
-
-const result =
-await response.json();
-
-
-console.log(result);
-
-
-if(result.error){
-
-throw new Error(
-result.error.message
-);
+    return result.data || result;
 
 }
-
-
-return result.response.result;
-
-
-}
-
-
 
 
 // ================================
@@ -346,9 +304,12 @@ return;
 
 
 eventInfo =
-await API.post("getEventInfo", {
-    spreadsheetId
-});
+await runScript(
+    "getEventInfo",
+    {
+        spreadsheetId
+    }
+);
 
 
 
