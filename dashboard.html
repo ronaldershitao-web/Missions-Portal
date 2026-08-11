@@ -1079,10 +1079,13 @@ Choose Status:
 }
 
 
-function addNewUser() {
+async function addNewUser() {
 
-    const emailInput = document.getElementById("newUserEmail");
-    const email = emailInput.value.trim();
+    const emailInput =
+        document.getElementById("newUserEmail");
+
+    const email =
+        emailInput.value.trim();
 
     if (!email) {
         emailInput.focus();
@@ -1094,11 +1097,75 @@ function addNewUser() {
         return;
     }
 
-    // Send email to backend
-    console.log("Adding user:", email);
+    try {
 
-    // Example:
-    // apiPost("addUser", { email: email });
+        const result = await API.post(
+            "addUser",
+            {
+                email: email
+            }
+        );
+
+        console.log(
+            "ADD USER RESULT:",
+            result
+        );
+
+
+        if (!result.success) {
+
+            alert(
+                result.message ||
+                "Unable to add user."
+            );
+
+            return;
+        }
+
+
+        alert(
+            result.message ||
+            "User added successfully."
+        );
+
+
+        // Close modal
+        const modalElement =
+            document.getElementById(
+                "newUserModal"
+            );
+
+        const modal =
+            bootstrap.Modal.getInstance(
+                modalElement
+            );
+
+        if (modal) {
+            modal.hide();
+        }
+
+
+        // Clear input
+        emailInput.value = "";
+
+
+        // Refresh table
+        loadUsers();
+
+    }
+    catch (err) {
+
+        console.error(
+            "ADD USER ERROR:",
+            err
+        );
+
+        alert(
+            err.message ||
+            "Unable to add user."
+        );
+
+    }
 
 }
 
