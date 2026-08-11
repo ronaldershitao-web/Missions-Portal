@@ -207,22 +207,32 @@ rel="stylesheet">
   <!-- ADMIN -->
 <div id="admin" class="card hidden admin-only">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+   <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <div>
-            <h3 class="mb-1">
-                User Access Control
-            </h3>
+    <div>
+        <h3 class="mb-1">
+            User Access Control
+        </h3>
 
-            <small class="text-muted">
-                Manage portal users, roles and access status
-            </small>
-        </div>
+        <small class="text-muted">
+            Manage portal users, roles and access status
+        </small>
+    </div>
 
+    <div class="d-flex gap-2">
 
         <button 
-        class="btn btn-primary"
-        onclick="loadUsers()">
+            class="btn btn-primary"
+            onclick="showNewUserModal()">
+
+            <i class="bi bi-person-plus"></i>
+            New User
+
+        </button>
+
+        <button 
+            class="btn btn-outline-secondary"
+            onclick="loadUsers()">
 
             <i class="bi bi-arrow-clockwise"></i>
             Refresh
@@ -230,6 +240,8 @@ rel="stylesheet">
         </button>
 
     </div>
+
+</div>
 
 
     <div class="shadow-sm">
