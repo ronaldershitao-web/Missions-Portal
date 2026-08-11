@@ -393,6 +393,68 @@ rel="stylesheet">
 
 </div>
 
+  <div class="modal fade" id="newUserModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Add New User
+                </h5>
+
+                <button 
+                    type="button" 
+                    class="btn-close" 
+                    data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label for="newUserEmail" class="form-label">
+                        Email Address
+                    </label>
+
+                    <input 
+                        type="email"
+                        class="form-control"
+                        id="newUserEmail"
+                        placeholder="user@example.com"
+                        required>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button 
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button 
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="addNewUser()">
+                    <i class="bi bi-person-plus"></i>
+                    Add User
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 <script>
 
   // =========================
@@ -1000,6 +1062,41 @@ Choose Status:
 
     renderUsers(filteredUsers);
 
+
+}
+
+  function showNewUserModal() {
+
+    document.getElementById("newUserEmail").value = "";
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("newUserModal")
+    );
+
+    modal.show();
+}
+
+
+function addNewUser() {
+
+    const emailInput = document.getElementById("newUserEmail");
+    const email = emailInput.value.trim();
+
+    if (!email) {
+        emailInput.focus();
+        return;
+    }
+
+    if (!emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+    }
+
+    // Send email to backend
+    console.log("Adding user:", email);
+
+    // Example:
+    // apiPost("addUser", { email: email });
 
 }
 
