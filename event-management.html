@@ -864,10 +864,10 @@ p => p.referral=="Walk In"
         <td>
 
             <input
-type="checkbox"
-class="attendance-check"
-data-email="${p.email}"
-${p.attendance=="YES" ? "checked" : ""}>
+    type="checkbox"
+    class="attendance-check"
+    data-mobile="${p.mobile || ""}"
+    ${p.attendance == "YES" ? "checked" : ""}>
         </td>
 
         <td>${p.name}</td>
