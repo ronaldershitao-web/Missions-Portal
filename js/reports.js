@@ -22,17 +22,11 @@ const Dashboard = {
 
         year: "",
         month: "",
-
-        category: "",
-        eventType: "",
-
         church: "",
+        eventType: "",
         referral: "",
-
         attendance: "",
-
-        participant: "",
-        trip: ""
+        search: ""
 
     }
 
@@ -57,17 +51,13 @@ async function initialiseDashboard() {
 
         showLoading();
 
-        if (!filtersInitialised) {
-
-            initialiseFilters();
-
-            filtersInitialised = true;
-
-        }
-
         await loadDashboard();
 
         renderDashboard();
+
+        populateFilters();
+
+        setupFilterListeners();
 
         updateLastRefresh();
 
@@ -90,6 +80,111 @@ async function initialiseDashboard() {
 
 }
 
+function setupFilterListeners() {
+
+    const year =
+        document.getElementById("yearFilter");
+
+    const eventType =
+        document.getElementById("eventTypeFilter");
+
+    const church =
+        document.getElementById("churchFilter");
+
+    const referral =
+        document.getElementById("referralFilter");
+
+    const attendance =
+        document.getElementById("attendanceFilter");
+
+    const search =
+        document.getElementById("searchBox");
+
+
+    if (year) {
+
+        year.onchange = () => {
+
+            Dashboard.filters.year =
+                year.value;
+
+            initialiseDashboard();
+
+        };
+
+    }
+
+
+    if (eventType) {
+
+        eventType.onchange = () => {
+
+            Dashboard.filters.eventType =
+                eventType.value;
+
+            initialiseDashboard();
+
+        };
+
+    }
+
+
+    if (church) {
+
+        church.onchange = () => {
+
+            Dashboard.filters.church =
+                church.value;
+
+            initialiseDashboard();
+
+        };
+
+    }
+
+
+    if (referral) {
+
+        referral.onchange = () => {
+
+            Dashboard.filters.referral =
+                referral.value;
+
+            initialiseDashboard();
+
+        };
+
+    }
+
+
+    if (attendance) {
+
+        attendance.onchange = () => {
+
+            Dashboard.filters.attendance =
+                attendance.value;
+
+            initialiseDashboard();
+
+        };
+
+    }
+
+
+    if (search) {
+
+        search.onchange = () => {
+
+            Dashboard.filters.search =
+                search.value.trim();
+
+            initialiseDashboard();
+
+        };
+
+    }
+
+}
 /* ==========================================================
    LOAD DASHBOARD
 ========================================================== */
