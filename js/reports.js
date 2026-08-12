@@ -14,14 +14,25 @@ const Dashboard = {
 
     data: null,
 
+    missionData: null,
+
     charts: {},
 
     filters: {
 
         year: "",
-        church: "",
+        month: "",
+
+        category: "",
         eventType: "",
-        search: ""
+
+        church: "",
+        referral: "",
+
+        attendance: "",
+
+        participant: "",
+        trip: ""
 
     }
 
@@ -45,6 +56,14 @@ async function initialiseDashboard() {
     try {
 
         showLoading();
+
+        if (!filtersInitialised) {
+
+            initialiseFilters();
+
+            filtersInitialised = true;
+
+        }
 
         await loadDashboard();
 
@@ -77,32 +96,37 @@ async function initialiseDashboard() {
 
 async function loadDashboard() {
 
+    // ==========================================
+    // MAIN MISSIONS DASHBOARD
+    // ==========================================
+
     const result =
         await API.post(
             "getMissionDashboard",
             Dashboard.filters
         );
 
-
     if (!result.success) {
 
-        throw new Error(result.message);
+        throw new Error(
+            result.message
+        );
 
     }
-
 
     Dashboard.data =
         result.data;
 
 
+    // ==========================================
+    // MISSION TRIP DASHBOARD
+    // ==========================================
 
-    // Load Mission Trip Compilation KPI
     const missionResult =
         await API.post(
             "getMissionCompilationReport",
-            {}
+            Dashboard.filters
         );
-
 
     if (!missionResult.success) {
 
@@ -112,10 +136,8 @@ async function loadDashboard() {
 
     }
 
-
     Dashboard.missionData =
         missionResult.data;
-
 
 }
 
@@ -137,7 +159,7 @@ function renderDashboard() {
 
     if (!Dashboard.data)
         return;
-
+  populateFilters();
     renderKPIs();
 
      renderMissionTripSummary(); 
@@ -158,7 +180,7 @@ function renderDashboard() {
 
     renderTopContributors();
 
-    populateFilters();
+  
 
 }
 
@@ -1458,6 +1480,87 @@ function populateFilters(){
 
 }
 
+/* ==========================================================
+GLOBAL FILTER CONTROLLER
+========================================================== */
+
+function initialiseFilters() {
+
+    const filterMap = {
+
+        yearFilter: "year",
+
+        monthFilter: "month",
+
+        categoryFilter: "category",
+
+        eventTypeFilter: "eventType",
+
+        churchFilter: "church",
+
+        referralFilter: "referral",
+
+        attendanceFilter: "attendance",
+
+        participantFilter: "participant",
+
+        tripFilter: "trip"
+
+    };
+
+
+    Object.keys(filterMap).forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+        if (!element)
+            return;
+
+
+        element.addEventListener(
+            "change",
+            async function () {
+
+                Dashboard.filters[
+                    filterMap[id]
+                ] = this.value;
+
+                await applyFilters();
+
+            }
+        );
+
+    });
+
+
+    // Participant text search
+    const participantSearch =
+        document.getElementById(
+            "participantFilter"
+        );
+
+    if (participantSearch) {
+
+        participantSearch.addEventListener(
+            "input",
+            debounce(
+                async function () {
+
+                    Dashboard.filters.participant =
+                        this.value.trim();
+
+                    await applyFilters();
+
+                },
+                400
+            )
+        );
+
+    }
+
+}
+
 
 
 /* ==========================================================
@@ -1568,5 +1671,61 @@ function renderMissionTripSummary() {
         `;
 
     });
+
+}
+
+async function applyFilters() {
+
+    try {
+
+        showLoading();
+
+        await loadDashboard();
+
+        renderDashboard();
+
+        updateLastRefresh();
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "FILTER ERROR:",
+            err
+        );
+
+        alert(
+            err.message ||
+            "Unable to apply filters."
+        );
+
+    }
+
+    finally {
+
+        hideLoading();
+
+    }
+
+}
+
+function debounce(
+    callback,
+    delay
+) {
+
+    let timer;
+
+    return function (...args) {
+
+        clearTimeout(timer);
+
+        timer = setTimeout(
+            () => callback.apply(this, args),
+            delay
+        );
+
+    };
 
 }
