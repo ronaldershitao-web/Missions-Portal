@@ -1446,12 +1446,12 @@ function exportParticipants(){
    FILTER POPULATION
 ========================================================== */
 
-function populateFilters(){
+function populateFilters() {
 
     const filters =
         Dashboard.data.filters;
 
-    if(!filters)
+    if (!filters)
         return;
 
 
@@ -1476,6 +1476,12 @@ function populateFilters(){
     populateSelect(
         "referralFilter",
         filters.referrals
+    );
+
+
+    populateSelect(
+        "tripFilter",
+        filters.trips
     );
 
 }
@@ -1570,17 +1576,22 @@ function initialiseFilters() {
 function populateSelect(
     id,
     values
-){
+) {
 
     const select =
         document.getElementById(id);
 
-
-    if(!select || !values)
+    if (
+        !select ||
+        !values
+    )
         return;
 
 
-    // keep first "All" option
+    const currentValue =
+        select.value;
+
+
     const first =
         select.options[0];
 
@@ -1591,7 +1602,7 @@ function populateSelect(
     select.appendChild(first);
 
 
-    values.forEach(value=>{
+    values.forEach(value => {
 
         const option =
             document.createElement(
@@ -1607,44 +1618,53 @@ function populateSelect(
 
     });
 
-}
 
-async function loadMissionDashboard(){
+    // Restore current selection
+    if (
+        values.includes(currentValue)
+    ) {
 
- const result = await API.post(
-   "getMissionTripDashboard",
-   {}
- );
+        select.value =
+            currentValue;
 
-
- if(result.success){
-
-  document.getElementById("kpiMissionTrips").innerText =
-data.totalTrips;
-
-
-  document.getElementById("kpiTrippers").innerText =
-data.totalParticipants;
-
-
-   document.getElementById("kpiCountries").innerText =
-data.countriesReached;
-
-
-    document.getElementById("kpiAvgTeam").innerText =
-data.averageParticipants;
-
-
-    document.getElementById("missionAnalysis")
-    .innerHTML =
-    result.data.analysis
-    .map(x=>`<p>• ${x}</p>`)
-    .join("");
-
- }
+    }
 
 }
 
+async function loadMissionDashboard() {
+
+    const result =
+        await API.post(
+            "getMissionTripDashboard",
+            Dashboard.filters
+        );
+
+    if (result.success) {
+
+        const data =
+            result.data;
+
+
+        document.getElementById(
+            "kpiMissionTrips"
+        ).innerText =
+            data.totalTrips;
+
+
+        document.getElementById(
+            "kpiTrippers"
+        ).innerText =
+            data.totalParticipants;
+
+
+        document.getElementById(
+            "kpiAvgTeam"
+        ).innerText =
+            data.averageParticipants;
+
+    }
+
+}
 function renderMissionTripSummary() {
 
     const tbody =
