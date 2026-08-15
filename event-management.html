@@ -819,12 +819,20 @@ async function viewParticipants(spreadsheetId) {
     participants =
         await fetchParticipants(spreadsheetId);
 
+    // Sort participants by Name A-Z
+    participants.sort((a, b) =>
+        (a.name || "").localeCompare(
+            (b.name || ""),
+            undefined,
+            { sensitivity: "base" }
+        )
+    );
+
     hideLoading();
 
     renderParticipants();
 
 }
-
 // ==========================================
 // Participant Table
 // ==========================================
