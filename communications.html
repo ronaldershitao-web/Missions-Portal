@@ -6,185 +6,284 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Communication Centre</title>
-
+<title>Publicity & Reminder Centre</title>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="./js/config.js"></script>
-
-    <script src="./js/api.js"></script>
+<script src="./js/api.js"></script>
 <script src="./js/auth.js"></script>
-
 
 <style>
 
 body{
-margin:0;
-font-family:Arial;
-background:#f4f6f8;
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f6f8;
 }
-
 
 .header{
-
-background:#1e3a8a;
-color:white;
-
-padding:20px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
+    background:#1e3a8a;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
+.header h2{
+    margin:0;
+}
 
 .container{
-
-padding:25px;
-
+    padding:25px;
+    max-width:1400px;
+    margin:auto;
 }
-
 
 .card{
-
-background:white;
-padding:20px;
-border-radius:12px;
-margin-bottom:20px;
-
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
 }
-
 
 button{
-
-padding:10px 15px;
-
-border:none;
-border-radius:6px;
-
-background:#1e3a8a;
-color:white;
-
-cursor:pointer;
-
-margin:3px;
-
+    padding:10px 15px;
+    border:none;
+    border-radius:6px;
+    background:#1e3a8a;
+    color:white;
+    cursor:pointer;
+    margin:3px;
 }
-
 
 button:hover{
-
-background:#163172;
-
+    background:#163172;
 }
 
+button:disabled{
+    background:#94a3b8;
+    cursor:not-allowed;
+}
 
 input,
 textarea,
 select{
-
-width:100%;
-
-padding:10px;
-
-border-radius:6px;
-
-border:1px solid #ccc;
-
-margin-top:5px;
-
-box-sizing:border-box;
-
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    margin-top:5px;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
+textarea{
+    resize:vertical;
+}
 
 label{
-
-font-weight:bold;
-
-display:block;
-
-margin-top:12px;
-
+    font-weight:bold;
+    display:block;
+    margin-top:12px;
 }
-
 
 .eventCard{
-
-padding:15px;
-
-background:#eef2ff;
-
-border-radius:8px;
-
-margin-top:10px;
-
+    padding:15px;
+    background:#eef2ff;
+    border-radius:8px;
+    margin-top:10px;
 }
-
-
 
 .badge{
-
-background:#dbeafe;
-
-color:#1e3a8a;
-
-padding:5px 10px;
-
-border-radius:15px;
-
+    background:#dbeafe;
+    color:#1e3a8a;
+    padding:5px 10px;
+    border-radius:15px;
+    display:inline-block;
 }
 
+.badge.sent{
+    background:#dcfce7;
+    color:#166534;
+}
 
+.badge.pending{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.badge.failed{
+    background:#fee2e2;
+    color:#991b1b;
+}
 
 .whatsapp{
-
-background:#16a34a;
-
+    background:#16a34a;
 }
 
+.whatsapp:hover{
+    background:#15803d;
+}
 
 .preview{
-
-background:#64748b;
-
+    background:#64748b;
 }
 
+.danger{
+    background:#dc2626;
+}
 
+.secondary{
+    background:#475569;
+}
+
+.activity-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+    margin-top:15px;
+}
+
+.activity-button{
+    padding:25px;
+    border:2px solid #dbeafe;
+    border-radius:12px;
+    background:#f8fafc;
+    color:#1e3a8a;
+    font-size:18px;
+    cursor:pointer;
+    text-align:left;
+}
+
+.activity-button:hover{
+    background:#eef2ff;
+    border-color:#1e3a8a;
+}
+
+.activity-button.active{
+    background:#dbeafe;
+    border-color:#1e3a8a;
+}
+
+.activity-button .icon{
+    font-size:30px;
+    display:block;
+    margin-bottom:8px;
+}
+
+.activity-button small{
+    color:#64748b;
+}
+
+.two-column{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.stat-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:15px;
+}
+
+.stat{
+    padding:15px;
+    border-radius:8px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.stat-number{
+    font-size:25px;
+    font-weight:bold;
+    color:#1e3a8a;
+}
+
+.stat-label{
+    font-size:13px;
+    color:#64748b;
+    margin-top:5px;
+}
 
 table{
-
-width:100%;
-
-border-collapse:collapse;
-
-margin-top:15px;
-
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
 }
-
-
 
 th{
-
-background:#eef2ff;
-
+    background:#eef2ff;
+    text-align:left;
 }
 
-
-
-td,th{
-
-border:1px solid #ddd;
-
-padding:10px;
-
+td,
+th{
+    border:1px solid #ddd;
+    padding:10px;
 }
 
+tr:hover{
+    background:#f8fafc;
+}
 
+.hidden{
+    display:none !important;
+}
+
+.file-box{
+    border:2px dashed #cbd5e1;
+    padding:20px;
+    border-radius:8px;
+    margin-top:10px;
+    background:#f8fafc;
+}
+
+.file-name{
+    margin-top:8px;
+    color:#475569;
+}
+
+.notice{
+    padding:12px;
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.success{
+    padding:12px;
+    background:#f0fdf4;
+    border:1px solid #bbf7d0;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.empty{
+    padding:30px;
+    text-align:center;
+    color:#64748b;
+}
+
+@media(max-width:900px){
+
+    .activity-grid,
+    .two-column,
+    .stat-grid{
+        grid-template-columns:1fr;
+    }
+
+    table{
+        font-size:13px;
+    }
+
+}
 
 </style>
-
 
 </head>
 
@@ -194,269 +293,651 @@ padding:10px;
 
 <div class="header">
 
+    <h2>📢 Publicity & Reminder Centre</h2>
 
-<h2>
-📢 Communication Centre
-</h2>
-
-
-<button onclick="goBack()">
-Back
-</button>
-
+    <button onclick="goBack()">
+        Back
+    </button>
 
 </div>
-
 
 
 <div class="container">
 
 
+<!-- =========================================================
+     EVENT SELECTION
+========================================================= -->
 
 <div class="card">
 
+    <h3>1. Select Event</h3>
 
-<h3>
-Active Reminder Events
-</h3>
+    <select id="eventFilter"
+            onchange="selectEvent()">
 
+        <option value="">
+            Select Event
+        </option>
 
-<div id="eventList">
-Loading...
-</div>
+    </select>
 
-
-</div>
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-Select Event
-</h3>
-
-
-<select id="eventFilter"
-onchange="selectEvent()">
-
-
-
-<option value="">
-Select Event
-</option>
-
-
-</select>
-
+    <div id="selectedEventInfo"
+         class="hidden">
+    </div>
 
 </div>
 
 
-
-
-
+<!-- =========================================================
+     ACTIVITY SELECTION
+========================================================= -->
 
 <div class="card"
-id="reminderConfigCard"
-style="display:none;">
+     id="activityCard"
+     style="display:none;">
+
+    <h3>2. What would you like to do?</h3>
+
+    <div class="activity-grid">
+
+        <button
+            type="button"
+            class="activity-button"
+            id="publicityActivityButton"
+            onclick="selectActivity('publicity')">
+
+            <span class="icon">📢</span>
+
+            <strong>Publicity</strong>
+
+            <br>
+
+            <small>
+                Send event publicity to people via WhatsApp
+            </small>
+
+        </button>
 
 
-<h3>
-Prepare Reminder
-</h3>
+        <button
+            type="button"
+            class="activity-button"
+            id="reminderActivityButton"
+            onclick="selectActivity('reminder')">
+
+            <span class="icon">⏰</span>
+
+            <strong>Reminder</strong>
+
+            <br>
+
+            <small>
+                Send reminders to registered participants
+            </small>
+
+        </button>
+
+    </div>
+
+</div>
 
 
+<!-- =========================================================
+     PUBLICITY MODULE
+========================================================= -->
 
-<label>
-Reporting Time
-</label>
-
-<input id="reportingTime"
-placeholder="7:00 PM">
-
+<div id="publicityModule"
+     class="hidden">
 
 
-<label>
-Event Time
-</label>
+    <!-- PUBLICITY CONFIG -->
 
-<input id="eventTime"
-placeholder="7:30 PM">
+    <div class="card">
 
+        <h3>📢 Publicity</h3>
 
-
-<label>
-Venue
-</label>
-
-<input id="venue"
-placeholder="Main Hall">
+        <p>
+            Send publicity for the selected event to your selected audience.
+        </p>
 
 
+        <div class="two-column">
 
-<label>
-Location
-</label>
+            <div>
 
-<input id="location"
-placeholder="Church Address">
+                <label>
+                    Publicity Message
+                </label>
 
+                <textarea
+                    id="publicityMessage"
+                    rows="10"
+                    placeholder="Type your publicity message here..."></textarea>
 
-
-<label>
-Important Information
-</label>
-
-
-<textarea id="importantInfo"
-rows="4"
-placeholder="Bring passport, arrive early etc."></textarea>
+            </div>
 
 
+            <div>
 
-<button onclick="saveReminderConfig()">
+                <label>
+                    Poster / Image / PDF
+                </label>
 
-Save Reminder Details
+                <div class="file-box">
 
-</button>
+                    <input
+                        type="file"
+                        id="publicityAttachment"
+                        accept="image/*,.pdf">
 
+                    <div
+                        id="attachmentName"
+                        class="file-name">
+                    </div>
+
+                </div>
+
+
+                <div class="notice">
+
+                    Supported:
+                    <strong>Image / Poster / PDF</strong>
+
+                    <br><br>
+
+                    The selected file will be passed to the WhatsApp API
+                    when the backend media-sending function is enabled.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <button
+            class="preview"
+            onclick="previewPublicity()">
+
+            Preview
+
+        </button>
+
+
+        <button
+            onclick="savePublicityConfiguration()">
+
+            Save Publicity
+
+        </button>
+
+    </div>
+
+
+    <!-- PUBLICITY AUDIENCE -->
+
+    <div class="card">
+
+        <h3>
+            Publicity Audience
+        </h3>
+
+        <div class="stat-grid">
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="publicityTotal">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Total People
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="publicitySent">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Sent
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="publicityPending">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Pending
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="publicityRegistered">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Registered
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <button
+            class="whatsapp"
+            onclick="sendSelectedPublicity()">
+
+            Send Selected via WhatsApp
+
+        </button>
+
+
+        <button
+            class="secondary"
+            onclick="refreshPublicityAudience()">
+
+            Refresh Audience
+
+        </button>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        <input
+                            type="checkbox"
+                            id="selectAllPublicity"
+                            onclick="toggleAllPublicity(this)">
+                    </th>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Mobile
+                    </th>
+
+                    <th>
+                        Publicity
+                    </th>
+
+                    <th>
+                        Engagement
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="publicityTable">
+            </tbody>
+
+        </table>
+
+    </div>
 
 
 </div>
 
 
+<!-- =========================================================
+     REMINDER MODULE
+========================================================= -->
+
+<div id="reminderModule"
+     class="hidden">
 
 
+    <!-- REMINDER CONFIG -->
+
+    <div class="card">
+
+        <h3>
+            ⏰ Prepare Reminder
+        </h3>
 
 
-<div class="card">
+        <label>
+            Reminder Stage
+        </label>
+
+        <select id="reminderType"
+                onchange="changeReminderType()">
+
+            <option value="T-7">
+                T-7
+            </option>
+
+            <option value="T-3">
+                T-3
+            </option>
+
+            <option value="T-1">
+                T-1
+            </option>
+
+        </select>
 
 
-<h3>
-Participants Requiring Reminder
-</h3>
+        <div class="two-column">
 
 
-<div id="count">
-0 people
+            <div>
+
+                <label>
+                    Reporting Time
+                </label>
+
+                <input
+                    id="reportingTime"
+                    placeholder="7:00 PM">
+
+
+                <label>
+                    Event Time
+                </label>
+
+                <input
+                    id="eventTime"
+                    placeholder="7:30 PM">
+
+
+                <label>
+                    Venue
+                </label>
+
+                <input
+                    id="venue"
+                    placeholder="Main Hall">
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Location
+                </label>
+
+                <input
+                    id="location"
+                    placeholder="Church Address">
+
+
+                <label>
+                    Important Information
+                </label>
+
+                <textarea
+                    id="importantInfo"
+                    rows="4"
+                    placeholder="Bring passport, arrive early etc."></textarea>
+
+
+                <label>
+                    Custom Message
+                </label>
+
+                <textarea
+                    id="customMessage"
+                    rows="4"
+                    placeholder="Add your customised message here..."></textarea>
+
+            </div>
+
+        </div>
+
+
+        <button
+            onclick="saveReminderConfig()">
+
+            Save Reminder Details
+
+        </button>
+
+
+        <button
+            class="preview"
+            onclick="previewReminderForFirstPerson()">
+
+            Preview Reminder
+
+        </button>
+
+    </div>
+
+
+    <!-- REMINDER PARTICIPANTS -->
+
+    <div class="card">
+
+        <h3>
+            Participants Requiring Reminder
+        </h3>
+
+
+        <div class="stat-grid">
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="reminderTotal">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Participants
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="reminderSent">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Sent
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-number"
+                    id="reminderPending">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Pending
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <br>
+
+
+        <button
+            class="whatsapp"
+            onclick="sendSelectedReminder()">
+
+            Send Selected WhatsApp
+
+        </button>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        <input
+                            type="checkbox"
+                            id="selectAllReminder"
+                            onclick="toggleAllReminder(this)">
+                    </th>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Mobile
+                    </th>
+
+                    <th>
+                        Reminder
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="participantTable">
+            </tbody>
+
+        </table>
+
+    </div>
+
+
 </div>
 
 
-
-<button onclick="sendSelectedWhatsApp()">
-
-Send Selected WhatsApp
-
-</button>
-
-
-
-<table>
-
-
-<thead>
-
-<tr>
-
-<th>
-Select
-</th>
-
-<th>
-Name
-</th>
-
-<th>
-Mobile
-</th>
-
-<th>
-Reminder
-</th>
-
-<th>
-Action
-</th>
-
-</tr>
-
-
-</thead>
-
-
-
-<tbody id="participantTable">
-
-</tbody>
-
-
-</table>
-
-
 </div>
 
-
-
-</div>
 
 <script>
 
 
-let reminderEvents = [];
+// =========================================================
+// GLOBAL STATE
+// =========================================================
+
+let events = [];
+
+let selectedEvent = null;
+
+let currentActivity = "";
 
 let participants = [];
 
+let publicityAudience = [];
+
 let reminderConfig = {};
 
+let publicityConfig = {};
 
 
-
-
-// =====================================
+// =========================================================
 // URL PARAMETERS
-// =====================================
+// =========================================================
 
 const params =
-new URLSearchParams(
-window.location.search
-);
-
+    new URLSearchParams(
+        window.location.search
+    );
 
 const presetEvent =
-params.get("event");
+    params.get("event");
 
 
-
-
-// =====================================
-// APPS SCRIPT EXECUTION API
-// =====================================
-
-
-
-
-
-// =====================================
+// =========================================================
 // LOAD EVENTS
-// =====================================
+// =========================================================
 
-
-async function loadReminderEvents(){
+async function loadEvents(){
 
     try{
 
-        const response = await API.post(
-            "getActiveEventsForReminder",
-            {}
-        );
+        const response =
+            await API.post(
+                "getActiveEventsForReminder",
+                {}
+            );
 
 
         console.log(
-            "Reminder Events API:",
+            "Events API:",
             response
         );
 
@@ -464,705 +945,1619 @@ async function loadReminderEvents(){
         if(!response.success){
 
             throw new Error(
-                response.message || 
+                response.message ||
                 "Unable to load events"
             );
 
         }
 
 
-        reminderEvents =
+        events =
             response.data ||
             response.result ||
             [];
 
 
-        renderEvents();
-
         populateEventDropdown();
+
+
+        if(events.length === 0){
+
+            document.getElementById(
+                "selectedEventInfo"
+            ).innerHTML =
+            `
+                <div class="empty">
+                    No active events available.
+                </div>
+            `;
+
+        }
 
 
     }
     catch(err){
 
         console.error(
-            "loadReminderEvents error:",
+            "loadEvents error:",
             err
         );
 
 
         document.getElementById(
-            "eventList"
+            "selectedEventInfo"
         ).innerHTML =
-        "Unable to load events";
-
+        `
+            <div class="notice">
+                Unable to load events.
+            </div>
+        `;
 
     }
 
 }
 
 
-
-
-
-
-
-// =====================================
-// DISPLAY EVENTS
-// =====================================
-
-
-function renderEvents(){
-
-
-
-const div =
-document.getElementById(
-"eventList"
-);
-
-
-
-div.innerHTML="";
-
-
-
-if(reminderEvents.length===0){
-
-
-div.innerHTML =
-"No active reminder events";
-
-
-return;
-
-
-}
-
-
-
-
-reminderEvents.forEach(e=>{
-
-
-div.innerHTML +=
-
-
-`
-
-<div class="eventCard">
-
-
-<b>
-${e.eventName}
-</b>
-
-
-<br>
-
-
-Date:
-${e.eventDate}
-
-
-<br>
-
-
-Reminder:
-<span class="badge">
-
-${e.reminderType}
-
-</span>
-
-
-</div>
-
-`;
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-// =====================================
-// EVENT DROPDOWN
-// =====================================
-
+// =========================================================
+// POPULATE EVENT DROPDOWN
+// =========================================================
 
 function populateEventDropdown(){
 
-
-const select =
-document.getElementById(
-"eventFilter"
-);
-
+    const select =
+        document.getElementById(
+            "eventFilter"
+        );
 
 
-select.innerHTML =
-
-`
-
-<option value="">
-Select Event
-</option>
-
-`;
+    select.innerHTML =
+    `
+        <option value="">
+            Select Event
+        </option>
+    `;
 
 
+    events.forEach(e=>{
+
+        select.innerHTML +=
+        `
+            <option value="${escapeHtml(e.spreadsheetId)}">
+
+                ${escapeHtml(e.eventName)}
+                -
+                ${escapeHtml(e.eventDate || "")}
+
+            </option>
+        `;
+
+    });
 
 
-reminderEvents.forEach(e=>{
+    if(presetEvent){
 
+        select.value =
+            presetEvent;
 
-select.innerHTML +=
+        selectEvent();
 
-
-`
-
-<option value="${e.spreadsheetId}">
-
-${e.eventName}
--
-${e.reminderType}
-
-</option>
-
-`;
-
-
-
-});
-
-
-
-
-
-if(presetEvent){
-
-
-select.value =
-presetEvent;
-
-
-selectEvent();
-
+    }
 
 }
 
 
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
+// =========================================================
 // SELECT EVENT
-// =====================================
-
+// =========================================================
 
 async function selectEvent(){
 
+    const eventId =
+        document.getElementById(
+            "eventFilter"
+        ).value;
 
 
-const eventId =
+    if(!eventId){
 
-document.getElementById(
-"eventFilter"
-).value;
+        selectedEvent = null;
 
+        document.getElementById(
+            "activityCard"
+        ).style.display = "none";
 
+        document.getElementById(
+            "publicityModule"
+        ).classList.add("hidden");
 
+        document.getElementById(
+            "reminderModule"
+        ).classList.add("hidden");
 
-if(!eventId)
-return;
+        return;
 
-
-
-const event =
-
-reminderEvents.find(e=>
-
-String(e.spreadsheetId)
-===
-String(eventId)
-
-);
+    }
 
 
-
-reminderConfig={
-
-
-spreadsheetId:
-event.spreadsheetId,
-
-
-eventName:
-event.eventName,
+    selectedEvent =
+        events.find(
+            e =>
+            String(e.spreadsheetId)
+            ===
+            String(eventId)
+        );
 
 
-eventDate:
-event.eventDate,
+    if(!selectedEvent)
+        return;
 
 
-reminderType:
-event.reminderType
+    document.getElementById(
+        "selectedEventInfo"
+    ).classList.remove("hidden");
 
 
-};
+    document.getElementById(
+        "selectedEventInfo"
+    ).innerHTML =
+    `
+        <div class="eventCard">
+
+            <strong>
+                ${escapeHtml(selectedEvent.eventName)}
+            </strong>
+
+            <br><br>
+
+            Date:
+            ${escapeHtml(selectedEvent.eventDate || "")}
+
+        </div>
+    `;
 
 
+    document.getElementById(
+        "activityCard"
+    ).style.display =
+    "block";
 
 
+    // Reset activity display
 
-document.getElementById(
-"reminderConfigCard"
-).style.display =
-"block";
+    currentActivity = "";
 
+    document.getElementById(
+        "publicityModule"
+    ).classList.add("hidden");
 
+    document.getElementById(
+        "reminderModule"
+    ).classList.add("hidden");
 
-
-
-// Load existing configuration
-
-try{
-
-
-const response =
-await API.post(
-"getReminderConfiguration",
-{
-    spreadsheetId:eventId,
-    reminderType:event.reminderType
-}
-);
-
-
-const saved =
-response.data;
-
-
-
-if(saved){
-
-
-document.getElementById(
-"reportingTime"
-).value =
-saved.reportingTime || "";
-
-
-document.getElementById(
-"eventTime"
-).value =
-saved.eventTime || "";
-
-
-document.getElementById(
-"venue"
-).value =
-saved.venue || "";
-
-
-document.getElementById(
-"location"
-).value =
-saved.location || "";
-
-
-document.getElementById(
-"importantInfo"
-).value =
-saved.importantInfo || "";
-
+    document
+        .querySelectorAll(".activity-button")
+        .forEach(btn =>
+            btn.classList.remove("active")
+        );
 
 }
 
 
+// =========================================================
+// ACTIVITY SELECTOR
+// =========================================================
+
+async function selectActivity(activity){
+
+    if(!selectedEvent){
+
+        alert(
+            "Please select an event first."
+        );
+
+        return;
+
+    }
+
+
+    currentActivity =
+        activity;
+
+
+    document
+        .querySelectorAll(".activity-button")
+        .forEach(btn =>
+            btn.classList.remove("active")
+        );
+
+
+    if(activity === "publicity"){
+
+        document
+            .getElementById(
+                "publicityActivityButton"
+            )
+            .classList.add("active");
+
+
+        document
+            .getElementById(
+                "publicityModule"
+            )
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById(
+                "reminderModule"
+            )
+            .classList.add("hidden");
+
+
+        await loadPublicity();
+
+    }
+
+
+    if(activity === "reminder"){
+
+        document
+            .getElementById(
+                "reminderActivityButton"
+            )
+            .classList.add("active");
+
+
+        document
+            .getElementById(
+                "reminderModule"
+            )
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById(
+                "publicityModule"
+            )
+            .classList.add("hidden");
+
+
+        await loadReminder();
+
+    }
 
 }
 
-catch(err){
 
-console.log(
-"No previous reminder configuration"
-);
+// =========================================================
+// PUBLICITY
+// =========================================================
+
+async function loadPublicity(){
+
+    if(!selectedEvent)
+        return;
+
+
+    publicityConfig = {
+
+        spreadsheetId:
+            selectedEvent.spreadsheetId,
+
+        eventName:
+            selectedEvent.eventName,
+
+        eventDate:
+            selectedEvent.eventDate
+
+    };
+
+
+    // Load saved publicity configuration
+
+    try{
+
+        const configResponse =
+            await API.post(
+                "getPublicityConfiguration",
+                {
+                    spreadsheetId:
+                        selectedEvent.spreadsheetId
+                }
+            );
+
+
+        if(
+            configResponse.success &&
+            configResponse.data
+        ){
+
+            publicityConfig =
+                {
+                    ...publicityConfig,
+                    ...configResponse.data
+                };
+
+
+            document.getElementById(
+                "publicityMessage"
+            ).value =
+                publicityConfig.message || "";
+
+        }
+
+    }
+    catch(err){
+
+        console.log(
+            "No previous publicity configuration"
+        );
+
+    }
+
+
+    await loadPublicityAudience();
 
 }
 
 
+// =========================================================
+// LOAD PUBLICITY AUDIENCE
+// =========================================================
+
+async function loadPublicityAudience(){
+
+    if(!selectedEvent)
+        return;
+
+
+    try{
+
+        const response =
+            await API.post(
+                "getPublicityAudience",
+                {
+                    spreadsheetId:
+                        selectedEvent.spreadsheetId
+                }
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "Unable to load publicity audience"
+            );
+
+        }
+
+
+        publicityAudience =
+            response.data || [];
+
+
+        renderPublicityAudience();
+
+    }
+    catch(err){
+
+        console.error(err);
+
+
+        document.getElementById(
+            "publicityTable"
+        ).innerHTML =
+        `
+            <tr>
+                <td colspan="6">
+
+                    <div class="empty">
+
+                        Unable to load publicity audience.
+
+                        <br><br>
+
+                        Backend action required:
+                        <strong>
+                            getPublicityAudience
+                        </strong>
+
+                    </div>
+
+                </td>
+            </tr>
+        `;
+
+    }
 
 }
 
 
+// =========================================================
+// PUBLICITY TABLE
+// =========================================================
+
+function renderPublicityAudience(){
+
+    const table =
+        document.getElementById(
+            "publicityTable"
+        );
 
 
+    table.innerHTML = "";
 
 
+    publicityAudience.sort(
+        (a,b)=>
+            (a.name || "").localeCompare(
+                b.name || "",
+                undefined,
+                {
+                    sensitivity:"base"
+                }
+            )
+    );
 
 
+    let sent = 0;
 
-// =====================================
-// SAVE REMINDER CONFIGURATION
-// =====================================
+    let pending = 0;
 
+    let registered = 0;
+
+
+    publicityAudience.forEach(
+        p => {
+
+            if(
+                String(p.publicityStatus || "")
+                .toUpperCase()
+                ===
+                "SENT"
+            ){
+
+                sent++;
+
+            }
+            else{
+
+                pending++;
+
+            }
+
+
+            if(
+                p.engagement &&
+                String(
+                    p.engagement
+                ).toLowerCase()
+                ===
+                "registered"
+            ){
+
+                registered++;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "publicityTotal"
+    ).textContent =
+        publicityAudience.length;
+
+
+    document.getElementById(
+        "publicitySent"
+    ).textContent =
+        sent;
+
+
+    document.getElementById(
+        "publicityPending"
+    ).textContent =
+        pending;
+
+
+    document.getElementById(
+        "publicityRegistered"
+    ).textContent =
+        registered;
+
+
+    if(publicityAudience.length === 0){
+
+        table.innerHTML =
+        `
+            <tr>
+                <td colspan="6">
+
+                    <div class="empty">
+                        No publicity audience found.
+                    </div>
+
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    publicityAudience.forEach(
+        (p,index)=>{
+
+            const status =
+                String(
+                    p.publicityStatus || "PENDING"
+                ).toUpperCase();
+
+
+            const statusClass =
+                status === "SENT"
+                    ? "sent"
+                    : status === "FAILED"
+                    ? "failed"
+                    : "pending";
+
+
+            table.innerHTML +=
+            `
+                <tr>
+
+                    <td>
+
+                        <input
+                            type="checkbox"
+                            class="publicityCheck"
+                            value="${index}"
+                            ${status === "SENT"
+                                ? "disabled"
+                                : ""}>
+
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(p.name || "")}
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(p.mobile || "")}
+                    </td>
+
+
+                    <td>
+
+                        <span class="badge ${statusClass}">
+                            ${status}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="badge">
+                            ${escapeHtml(
+                                p.engagement ||
+                                "Not Registered"
+                            )}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            class="preview"
+                            onclick="previewPublicity(${index})">
+
+                            Preview
+
+                        </button>
+
+
+                        ${
+                            status !== "SENT"
+                            ?
+
+                            `
+                            <button
+                                class="whatsapp"
+                                onclick="sendPublicity(${index})">
+
+                                WhatsApp
+
+                            </button>
+                            `
+
+                            :
+
+                            ""
+                        }
+
+                    </td>
+
+                </tr>
+            `;
+
+        }
+    );
+
+}
+
+
+// =========================================================
+// PUBLICITY PREVIEW
+// =========================================================
+
+function previewPublicity(index){
+
+    const p =
+        publicityAudience[index];
+
+
+    const message =
+        document.getElementById(
+            "publicityMessage"
+        ).value;
+
+
+    alert(
+        `To: ${p.name}\n\n${message}`
+    );
+
+}
+
+
+// =========================================================
+// SAVE PUBLICITY CONFIG
+// =========================================================
+
+async function savePublicityConfiguration(){
+
+    if(!selectedEvent)
+        return;
+
+
+    publicityConfig.message =
+        document.getElementById(
+            "publicityMessage"
+        ).value;
+
+
+    const file =
+        document.getElementById(
+            "publicityAttachment"
+        ).files[0];
+
+
+    publicityConfig.attachmentName =
+        file
+            ? file.name
+            : "";
+
+
+    try{
+
+        const response =
+            await API.post(
+                "savePublicityConfiguration",
+                publicityConfig
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message
+            );
+
+        }
+
+
+        alert(
+            "Publicity configuration saved."
+        );
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Unable to save publicity configuration."
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// REFRESH PUBLICITY AUDIENCE
+// =========================================================
+
+async function refreshPublicityAudience(){
+
+    await loadPublicityAudience();
+
+}
+
+
+// =========================================================
+// SEND SINGLE PUBLICITY
+// =========================================================
+
+async function sendPublicity(index){
+
+    const person =
+        publicityAudience[index];
+
+
+    if(!person)
+        return;
+
+
+    if(
+        String(person.publicityStatus || "")
+        .toUpperCase()
+        ===
+        "SENT"
+    ){
+
+        alert(
+            `${person.name} has already received publicity for this event.`
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            `Send publicity to ${person.name}?`
+        );
+
+
+    if(!confirmed)
+        return;
+
+
+    try{
+
+        const payload =
+            await buildWhatsAppPayload(
+                person,
+                "PUBLICITY"
+            );
+
+
+        const response =
+            await API.post(
+                "sendPublicityWhatsApp",
+                payload
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "WhatsApp sending failed"
+            );
+
+        }
+
+
+        person.publicityStatus =
+            "SENT";
+
+
+        person.sentAt =
+            new Date().toISOString();
+
+
+        renderPublicityAudience();
+
+
+        alert(
+            `Publicity sent to ${person.name}.`
+        );
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Unable to send publicity: " +
+            err.message
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// SEND SELECTED PUBLICITY
+// =========================================================
+
+async function sendSelectedPublicity(){
+
+    const selected =
+        document.querySelectorAll(
+            ".publicityCheck:checked"
+        );
+
+
+    if(selected.length === 0){
+
+        alert(
+            "Please select people first."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            `Send publicity to ${selected.length} selected people?`
+        );
+
+
+    if(!confirmed)
+        return;
+
+
+    for(
+        const checkbox of selected
+    ){
+
+        const index =
+            Number(
+                checkbox.value
+            );
+
+
+        try{
+
+            const person =
+                publicityAudience[index];
+
+
+            const payload =
+                await buildWhatsAppPayload(
+                    person,
+                    "PUBLICITY"
+                );
+
+
+            const response =
+                await API.post(
+                    "sendPublicityWhatsApp",
+                    payload
+                );
+
+
+            if(
+                response.success
+            ){
+
+                person.publicityStatus =
+                    "SENT";
+
+                person.sentAt =
+                    new Date().toISOString();
+
+            }
+            else{
+
+                person.publicityStatus =
+                    "FAILED";
+
+            }
+
+        }
+        catch(err){
+
+            console.error(
+                "Publicity send error:",
+                err
+            );
+
+            publicityAudience[index]
+                .publicityStatus =
+                "FAILED";
+
+        }
+
+    }
+
+
+    renderPublicityAudience();
+
+
+    alert(
+        "Publicity sending process completed."
+    );
+
+}
+
+
+// =========================================================
+// BUILD WHATSAPP PAYLOAD
+// =========================================================
+
+async function buildWhatsAppPayload(
+    person,
+    communicationType
+){
+
+    const file =
+        document.getElementById(
+            "publicityAttachment"
+        ).files[0];
+
+
+    let attachment = null;
+
+
+    if(file){
+
+        attachment =
+        await fileToBase64(file);
+
+    }
+
+
+    return {
+
+        personId:
+            person.personId ||
+            person.PersonID ||
+            person.mobile,
+
+        eventId:
+            selectedEvent.spreadsheetId,
+
+        eventName:
+            selectedEvent.eventName,
+
+        mobile:
+            person.mobile,
+
+        name:
+            person.name,
+
+        message:
+            document.getElementById(
+                "publicityMessage"
+            ).value,
+
+        communicationType:
+            communicationType,
+
+        attachment:
+            attachment
+
+    };
+
+}
+
+
+// =========================================================
+// FILE TO BASE64
+// =========================================================
+
+function fileToBase64(file){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                () => {
+
+                    resolve({
+
+                        fileName:
+                            file.name,
+
+                        mimeType:
+                            file.type,
+
+                        base64:
+                            reader.result
+                                .split(",")[1]
+
+                    });
+
+                };
+
+
+            reader.onerror =
+                reject;
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+// =========================================================
+// TOGGLE PUBLICITY
+// =========================================================
+
+function toggleAllPublicity(
+    checkbox
+){
+
+    document
+        .querySelectorAll(
+            ".publicityCheck:not(:disabled)"
+        )
+        .forEach(cb =>
+            cb.checked =
+                checkbox.checked
+        );
+
+}
+
+
+// =========================================================
+// REMINDER
+// =========================================================
+
+async function loadReminder(){
+
+    if(!selectedEvent)
+        return;
+
+
+    reminderConfig = {
+
+        spreadsheetId:
+            selectedEvent.spreadsheetId,
+
+        eventName:
+            selectedEvent.eventName,
+
+        eventDate:
+            selectedEvent.eventDate,
+
+        reminderType:
+            selectedEvent.reminderType ||
+            "T-7"
+
+    };
+
+
+    document.getElementById(
+        "reminderType"
+    ).value =
+        reminderConfig.reminderType;
+
+
+    await loadReminderConfiguration();
+
+    await loadParticipants();
+
+}
+
+
+// =========================================================
+// LOAD REMINDER CONFIGURATION
+// =========================================================
+
+async function loadReminderConfiguration(){
+
+    try{
+
+        const response =
+            await API.post(
+                "getReminderConfiguration",
+                {
+                    spreadsheetId:
+                        selectedEvent.spreadsheetId,
+
+                    reminderType:
+                        reminderConfig.reminderType
+                }
+            );
+
+
+        const saved =
+            response.data;
+
+
+        if(saved){
+
+            document.getElementById(
+                "reportingTime"
+            ).value =
+                saved.reportingTime || "";
+
+
+            document.getElementById(
+                "eventTime"
+            ).value =
+                saved.eventTime || "";
+
+
+            document.getElementById(
+                "venue"
+            ).value =
+                saved.venue || "";
+
+
+            document.getElementById(
+                "location"
+            ).value =
+                saved.location || "";
+
+
+            document.getElementById(
+                "importantInfo"
+            ).value =
+                saved.importantInfo || "";
+
+
+            document.getElementById(
+                "customMessage"
+            ).value =
+                saved.customMessage || "";
+
+        }
+
+    }
+    catch(err){
+
+        console.log(
+            "No previous reminder configuration"
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// CHANGE REMINDER TYPE
+// =========================================================
+
+async function changeReminderType(){
+
+    if(!selectedEvent)
+        return;
+
+
+    reminderConfig.reminderType =
+        document.getElementById(
+            "reminderType"
+        ).value;
+
+
+    await loadReminderConfiguration();
+
+    await loadParticipants();
+
+}
+
+
+// =========================================================
+// SAVE REMINDER
+// =========================================================
 
 async function saveReminderConfig(){
 
+    reminderConfig.reportingTime =
+        document.getElementById(
+            "reportingTime"
+        ).value;
 
 
-reminderConfig.reportingTime =
-
-document.getElementById(
-"reportingTime"
-).value;
-
+    reminderConfig.eventTime =
+        document.getElementById(
+            "eventTime"
+        ).value;
 
 
-reminderConfig.eventTime =
-
-document.getElementById(
-"eventTime"
-).value;
-
+    reminderConfig.venue =
+        document.getElementById(
+            "venue"
+        ).value;
 
 
-reminderConfig.venue =
-
-document.getElementById(
-"venue"
-).value;
-
+    reminderConfig.location =
+        document.getElementById(
+            "location"
+        ).value;
 
 
-reminderConfig.location =
-
-document.getElementById(
-"location"
-).value;
-
+    reminderConfig.importantInfo =
+        document.getElementById(
+            "importantInfo"
+        ).value;
 
 
-reminderConfig.importantInfo =
-
-document.getElementById(
-"importantInfo"
-).value;
-
+    reminderConfig.customMessage =
+        document.getElementById(
+            "customMessage"
+        ).value;
 
 
+    try{
+
+        const response =
+            await API.post(
+                "saveReminderConfiguration",
+                reminderConfig
+            );
 
 
+        if(!response.success){
 
-const response =
-await API.post(
-"saveReminderConfiguration",
-reminderConfig
-);
+            throw new Error(
+                response.message
+            );
+
+        }
 
 
-if(!response.success){
+        alert(
+            "Reminder configuration saved."
+        );
 
-    throw new Error(
-        response.message
-    );
+
+        await loadParticipants();
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Unable to save reminder configuration."
+        );
+
+    }
 
 }
 
 
-
-alert(
-"Reminder configuration saved"
-);
-
-
-
-loadParticipants();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
+// =========================================================
 // LOAD PARTICIPANTS
-// =====================================
-
+// =========================================================
 
 async function loadParticipants(){
 
+    if(!selectedEvent)
+        return;
 
 
-if(!reminderConfig.spreadsheetId)
-return;
+    try{
+
+        const response =
+            await API.post(
+                "getReminderParticipants",
+                {
+                    spreadsheetId:
+                        selectedEvent.spreadsheetId,
+
+                    reminderType:
+                        reminderConfig.reminderType
+                }
+            );
 
 
+        if(!response.success){
 
-try{
+            throw new Error(
+                response.message
+            );
+
+        }
 
 
-const response =
-await API.post(
-"getReminderParticipants",
-{
-    spreadsheetId:
-    reminderConfig.spreadsheetId,
+        participants =
+            response.data || [];
 
-    reminderType:
-    reminderConfig.reminderType
+
+        renderParticipants();
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        document.getElementById(
+            "participantTable"
+        ).innerHTML =
+        `
+            <tr>
+                <td colspan="6">
+
+                    <div class="empty">
+                        Unable to load participants.
+                    </div>
+
+                </td>
+            </tr>
+        `;
+
+    }
+
 }
-);
 
 
-if(!response.success){
+// =========================================================
+// RENDER PARTICIPANTS
+// =========================================================
 
-    throw new Error(
-        response.message
+function renderParticipants(){
+
+    const table =
+        document.getElementById(
+            "participantTable"
+        );
+
+
+    table.innerHTML = "";
+
+
+    participants.sort(
+        (a,b)=>
+            (a.name || "").localeCompare(
+                b.name || "",
+                undefined,
+                {
+                    sensitivity:"base"
+                }
+            )
+    );
+
+
+    let sent = 0;
+
+    let pending = 0;
+
+
+    participants.forEach(
+        p=>{
+
+            const status =
+                String(
+                    p.reminderStatus ||
+                    "PENDING"
+                ).toUpperCase();
+
+
+            if(status === "SENT")
+                sent++;
+            else
+                pending++;
+
+        }
+    );
+
+
+    document.getElementById(
+        "reminderTotal"
+    ).textContent =
+        participants.length;
+
+
+    document.getElementById(
+        "reminderSent"
+    ).textContent =
+        sent;
+
+
+    document.getElementById(
+        "reminderPending"
+    ).textContent =
+        pending;
+
+
+    if(participants.length === 0){
+
+        table.innerHTML =
+        `
+            <tr>
+
+                <td colspan="6">
+
+                    <div class="empty">
+                        No participants requiring this reminder.
+                    </div>
+
+                </td>
+
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    participants.forEach(
+        (p,index)=>{
+
+            const status =
+                String(
+                    p.reminderStatus ||
+                    "PENDING"
+                ).toUpperCase();
+
+
+            const statusClass =
+                status === "SENT"
+                    ? "sent"
+                    : status === "FAILED"
+                    ? "failed"
+                    : "pending";
+
+
+            table.innerHTML +=
+            `
+                <tr>
+
+                    <td>
+
+                        <input
+                            type="checkbox"
+                            class="personCheck"
+                            value="${index}"
+                            ${status === "SENT"
+                                ? "disabled"
+                                : ""}>
+
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(p.name || "")}
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(p.mobile || "")}
+                    </td>
+
+
+                    <td>
+
+                        <span class="badge">
+                            ${escapeHtml(
+                                reminderConfig.reminderType
+                            )}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="badge ${statusClass}">
+                            ${status}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            class="preview"
+                            onclick="previewReminder(${index})">
+
+                            Preview
+
+                        </button>
+
+
+                        ${
+                            status !== "SENT"
+                            ?
+
+                            `
+                            <button
+                                class="whatsapp"
+                                onclick="sendReminder(${index})">
+
+                                WhatsApp
+
+                            </button>
+                            `
+
+                            :
+
+                            ""
+                        }
+
+                    </td>
+
+                </tr>
+            `;
+
+        }
     );
 
 }
 
 
-participants =
-response.data || [];
-
-
-renderParticipants();
-
-
-}
-
-catch(err){
-
-
-console.error(err);
-
-
-alert(
-"Unable to load participants"
-);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-// =====================================
-// TABLE DISPLAY
-// =====================================
-
-
-function renderParticipants(){
-
-
-const table =
-document.getElementById(
-"participantTable"
-);
-
-
-
-table.innerHTML="";
-
-
-
-document.getElementById(
-"count"
-).innerHTML =
-
-participants.length
-+
-" people";
-
-
-
-
-
-participants.forEach((p,index)=>{
-
-
-table.innerHTML +=
-
-
-`
-
-<tr>
-
-
-<td>
-
-
-<input
-
-type="checkbox"
-
-class="personCheck"
-
-value="${index}">
-
-
-</td>
-
-
-
-<td>
-
-${p.name}
-
-</td>
-
-
-
-<td>
-
-${p.mobile}
-
-</td>
-
-
-
-<td>
-
-
-<span class="badge">
-
-${reminderConfig.reminderType}
-
-</span>
-
-
-</td>
-
-
-
-<td>
-
-
-<button
-
-class="preview"
-
-onclick="previewMessage(${index})">
-
-Preview
-
-</button>
-
-
-
-<button
-
-class="whatsapp"
-
-onclick="sendWhatsApp(${index})">
-
-WhatsApp
-
-</button>
-
-
-</td>
-
-
-</tr>
-
-
-`;
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-// =====================================
-// MESSAGE ENGINE
-// =====================================
-
+// =========================================================
+// REMINDER MESSAGE ENGINE
+// =========================================================
 
 function generateMessage(p){
 
     let intro = "";
 
-    switch(reminderConfig.reminderType){
+
+    switch(
+        reminderConfig.reminderType
+    ){
 
         case "T-7":
 
-            intro = `Hi ${p.name}! 👋
-            
+            intro =
+`Hi ${p.name}! 👋
+
 Thank you for registering for *${reminderConfig.eventName}*.
-We are delighted that you'll be joining us! Over the coming week, we encourage you to prepare your heart as we look forward to a meaningful time together.
-`;
+We are delighted that you'll be joining us! Over the coming week, we encourage you to prepare your heart as we look forward to a meaningful time together.`;
 
             break;
+
 
         case "T-3":
 
-            intro = `Hi ${p.name}! 😊
-            
+            intro =
+`Hi ${p.name}! 😊
+
 Only *3 days to go* until *${reminderConfig.eventName}*!
-Our team has been praying and preparing, and we're excited to welcome you. Here's a quick reminder of the event details.
-`;
+Our team has been praying and preparing, and we're excited to welcome you. Here's a quick reminder of the event details.`;
 
             break;
 
+
         case "T-1":
 
-            intro = `Hi ${p.name}! 👋
-            
+            intro =
+`Hi ${p.name}! 👋
+
 Just a friendly reminder that *${reminderConfig.eventName}* is happening *tomorrow*!
-We're looking forward to seeing you. Here are the final details before the event.
-`;
+We're looking forward to seeing you. Here are the final details before the event.`;
 
             break;
 
     }
 
-    return `${intro}
+
+    let message =
+`${intro}
 
 📅 *Date*: ${reminderConfig.eventDate}
 🕒 *Reporting Time*: ${reminderConfig.reportingTime}
@@ -1170,210 +2565,416 @@ We're looking forward to seeing you. Here are the final details before the event
 📍 *Venue*: ${reminderConfig.venue}
 📌 *Location*: ${reminderConfig.location}
 
-${reminderConfig.importantInfo ? "ℹ️ *Important Information*\n" + reminderConfig.importantInfo + "\n" : ""}
-If you have any questions or need assistance, feel free to let us know.
+`;
+
+
+    if(
+        reminderConfig.importantInfo
+    ){
+
+        message +=
+`ℹ️ *Important Information*
+${reminderConfig.importantInfo}
+
+`;
+
+    }
+
+
+    if(
+        reminderConfig.customMessage
+    ){
+
+        message +=
+`💬 *A Message From Us*
+${reminderConfig.customMessage}
+
+`;
+
+    }
+
+
+    message +=
+`If you have any questions or need assistance, feel free to let us know.
 
 We pray that this gathering will be a meaningful and encouraging time for you, and we look forward to welcoming you soon.
 
 Blessings,
 *COOS Missions Team*`;
 
-}
 
-
-
-
-function previewMessage(index){
-
-
-alert(
-
-generateMessage(
-participants[index]
-)
-
-);
-
+    return message;
 
 }
 
 
+// =========================================================
+// REMINDER PREVIEW
+// =========================================================
 
+function previewReminder(index){
 
-
-
-
-
-
-// =====================================
-// WHATSAPP
-// =====================================
-
-
-function sendWhatsApp(index){
-
-
-openWhatsApp(
-participants[index]
-);
-
+    alert(
+        generateMessage(
+            participants[index]
+        )
+    );
 
 }
 
 
+function previewReminderForFirstPerson(){
+
+    if(
+        participants.length === 0
+    ){
+
+        alert(
+            "No participants available for preview."
+        );
+
+        return;
+
+    }
 
 
-
-
-
-function openWhatsApp(p){
-
-
-const phone =
-
-String(p.mobile)
-.replace(/\D/g,'');
-
-
-
-const url =
-
-"https://wa.me/"
-
-+
-
-phone
-
-+
-
-"?text="
-
-+
-
-encodeURIComponent(
-
-generateMessage(p)
-
-);
-
-
-
-window.open(
-url,
-"_blank"
-);
-
+    previewReminder(0);
 
 }
 
 
+// =========================================================
+// SEND SINGLE REMINDER
+// =========================================================
+
+async function sendReminder(index){
+
+    const person =
+        participants[index];
 
 
+    if(!person)
+        return;
 
 
+    if(
+        String(
+            person.reminderStatus || ""
+        ).toUpperCase()
+        ===
+        "SENT"
+    ){
+
+        alert(
+            `${person.name} has already received this reminder.`
+        );
+
+        return;
+
+    }
 
 
+    if(
+        !confirm(
+            `Send ${reminderConfig.reminderType} reminder to ${person.name}?`
+        )
+    ){
 
-// =====================================
-// SEND SELECTED
-// =====================================
+        return;
 
-
-function sendSelectedWhatsApp(){
-
-
-
-const selected =
-
-document.querySelectorAll(
-".personCheck:checked"
-);
+    }
 
 
+    try{
+
+        const response =
+            await API.post(
+                "sendReminderWhatsApp",
+                {
+                    personId:
+                        person.personId ||
+                        person.PersonID ||
+                        person.mobile,
+
+                    eventId:
+                        selectedEvent.spreadsheetId,
+
+                    eventName:
+                        selectedEvent.eventName,
+
+                    mobile:
+                        person.mobile,
+
+                    name:
+                        person.name,
+
+                    reminderType:
+                        reminderConfig.reminderType,
+
+                    message:
+                        generateMessage(person)
+                }
+            );
 
 
-if(selected.length===0){
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "WhatsApp sending failed"
+            );
+
+        }
 
 
-alert(
-"Please select people first"
-);
+        person.reminderStatus =
+            "SENT";
 
 
-return;
+        renderParticipants();
 
+
+        alert(
+            `Reminder sent to ${person.name}.`
+        );
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Unable to send reminder: " +
+            err.message
+        );
+
+    }
 
 }
 
 
+// =========================================================
+// SEND SELECTED REMINDER
+// =========================================================
+
+async function sendSelectedReminder(){
+
+    const selected =
+        document.querySelectorAll(
+            ".personCheck:checked"
+        );
 
 
+    if(selected.length === 0){
 
-selected.forEach(cb=>{
+        alert(
+            "Please select people first."
+        );
 
+        return;
 
-openWhatsApp(
-
-participants[
-cb.value
-]
-
-);
+    }
 
 
-});
+    if(
+        !confirm(
+            `Send ${reminderConfig.reminderType} reminder to ${selected.length} selected people?`
+        )
+    ){
+
+        return;
+
+    }
 
 
+    for(
+        const checkbox of selected
+    ){
+
+        const index =
+            Number(
+                checkbox.value
+            );
+
+
+        const person =
+            participants[index];
+
+
+        try{
+
+            const response =
+                await API.post(
+                    "sendReminderWhatsApp",
+                    {
+                        personId:
+                            person.personId ||
+                            person.PersonID ||
+                            person.mobile,
+
+                        eventId:
+                            selectedEvent.spreadsheetId,
+
+                        eventName:
+                            selectedEvent.eventName,
+
+                        mobile:
+                            person.mobile,
+
+                        name:
+                            person.name,
+
+                        reminderType:
+                            reminderConfig.reminderType,
+
+                        message:
+                            generateMessage(person)
+                    }
+                );
+
+
+            if(response.success){
+
+                person.reminderStatus =
+                    "SENT";
+
+            }
+            else{
+
+                person.reminderStatus =
+                    "FAILED";
+
+            }
+
+        }
+        catch(err){
+
+            console.error(err);
+
+            person.reminderStatus =
+                "FAILED";
+
+        }
+
+    }
+
+
+    renderParticipants();
+
+
+    alert(
+        "Reminder sending process completed."
+    );
 
 }
 
 
+// =========================================================
+// SELECT ALL REMINDERS
+// =========================================================
+
+function toggleAllReminder(
+    checkbox
+){
+
+    document
+        .querySelectorAll(
+            ".personCheck:not(:disabled)"
+        )
+        .forEach(
+            cb =>
+                cb.checked =
+                    checkbox.checked
+        );
+
+}
 
 
+// =========================================================
+// FILE NAME DISPLAY
+// =========================================================
+
+document
+    .getElementById(
+        "publicityAttachment"
+    )
+    .addEventListener(
+        "change",
+        function(){
+
+            const file =
+                this.files[0];
 
 
+            document.getElementById(
+                "attachmentName"
+            ).textContent =
+                file
+                    ? `Selected: ${file.name}`
+                    : "";
+
+        }
+    );
 
 
+// =========================================================
+// ESCAPE HTML
+// =========================================================
+
+function escapeHtml(value){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+// =========================================================
+// BACK
+// =========================================================
 
 function goBack(){
 
-
-window.location.href =
-"event-management.html";
-
+    window.location.href =
+        "event-management.html";
 
 }
 
 
-
-
-
-
-
-
-// =====================================
+// =========================================================
 // START
-// =====================================
-
+// =========================================================
 
 window.onload =
-async function(){
+    async function(){
 
+        await loadEvents();
 
-await loadReminderEvents();
-
-
-};
-
+    };
 
 
 </script>
 
-
 </body>
-
 </html>
-
-
-
-  
