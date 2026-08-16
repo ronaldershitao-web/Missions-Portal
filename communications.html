@@ -4,281 +4,741 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Publicity & Reminder Centre</title>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script
+    src="https://accounts.google.com/gsi/client"
+    async
+    defer>
+</script>
+
 <script src="./js/config.js"></script>
 <script src="./js/api.js"></script>
 <script src="./js/auth.js"></script>
 
+
 <style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+*{
+    box-sizing:border-box;
+}
 
 body{
     margin:0;
     font-family:Arial, sans-serif;
     background:#f4f6f8;
+    color:#1e293b;
 }
 
+
+/* =========================================================
+   HEADER
+========================================================= */
+
 .header{
+
     background:#1e3a8a;
     color:white;
-    padding:20px;
+
+    padding:20px 25px;
+
     display:flex;
     justify-content:space-between;
     align-items:center;
+
 }
 
 .header h2{
     margin:0;
 }
 
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
 .container{
-    padding:25px;
-    max-width:1400px;
+
+    max-width:1500px;
+
     margin:auto;
+
+    padding:25px;
+
 }
+
+
+/* =========================================================
+   CARD
+========================================================= */
 
 .card{
+
     background:white;
+
     padding:20px;
+
     border-radius:12px;
+
     margin-bottom:20px;
-    box-shadow:0 2px 6px rgba(0,0,0,.05);
+
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.05);
+
 }
 
+.card h3{
+
+    margin-top:0;
+
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
 button{
+
     padding:10px 15px;
+
     border:none;
+
     border-radius:6px;
+
     background:#1e3a8a;
+
     color:white;
+
     cursor:pointer;
+
     margin:3px;
+
+    font-size:14px;
+
 }
 
 button:hover{
+
     background:#163172;
+
 }
 
 button:disabled{
+
     background:#94a3b8;
+
     cursor:not-allowed;
+
 }
+
+
+.whatsapp{
+
+    background:#16a34a;
+
+}
+
+.whatsapp:hover{
+
+    background:#15803d;
+
+}
+
+
+.preview{
+
+    background:#64748b;
+
+}
+
+.preview:hover{
+
+    background:#475569;
+
+}
+
+
+.secondary{
+
+    background:#475569;
+
+}
+
+
+.danger{
+
+    background:#dc2626;
+
+}
+
+
+.successButton{
+
+    background:#15803d;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
 
 input,
 textarea,
 select{
+
     width:100%;
+
     padding:10px;
+
     border-radius:6px;
-    border:1px solid #ccc;
+
+    border:1px solid #cbd5e1;
+
     margin-top:5px;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
+
+    font-family:Arial,sans-serif;
+
+    font-size:14px;
+
 }
 
 textarea{
+
     resize:vertical;
+
 }
 
 label{
+
     font-weight:bold;
+
     display:block;
+
     margin-top:12px;
+
 }
 
-.eventCard{
-    padding:15px;
+
+/* =========================================================
+   EVENT INFO
+========================================================= */
+
+.event-info{
+
     background:#eef2ff;
+
+    border-left:5px solid #1e3a8a;
+
+    padding:15px;
+
     border-radius:8px;
-    margin-top:10px;
+
+    margin-top:15px;
+
 }
+
+
+.event-title{
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    color:#1e3a8a;
+
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
 
 .badge{
-    background:#dbeafe;
-    color:#1e3a8a;
-    padding:5px 10px;
-    border-radius:15px;
+
     display:inline-block;
+
+    padding:5px 10px;
+
+    border-radius:15px;
+
+    font-size:12px;
+
+    font-weight:bold;
+
 }
 
-.badge.sent{
+
+.badge-blue{
+
+    background:#dbeafe;
+
+    color:#1e3a8a;
+
+}
+
+
+.badge-green{
+
     background:#dcfce7;
+
     color:#166534;
+
 }
 
-.badge.pending{
+
+.badge-yellow{
+
     background:#fef3c7;
+
     color:#92400e;
+
 }
 
-.badge.failed{
+
+.badge-red{
+
     background:#fee2e2;
+
     color:#991b1b;
+
 }
 
-.whatsapp{
-    background:#16a34a;
+
+.badge-grey{
+
+    background:#e2e8f0;
+
+    color:#475569;
+
 }
 
-.whatsapp:hover{
-    background:#15803d;
-}
 
-.preview{
-    background:#64748b;
-}
-
-.danger{
-    background:#dc2626;
-}
-
-.secondary{
-    background:#475569;
-}
+/* =========================================================
+   ACTIVITY SELECTION
+========================================================= */
 
 .activity-grid{
+
     display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:20px;
+
     margin-top:15px;
+
 }
+
 
 .activity-button{
+
     padding:25px;
+
     border:2px solid #dbeafe;
+
     border-radius:12px;
+
     background:#f8fafc;
+
     color:#1e3a8a;
+
     font-size:18px;
+
     cursor:pointer;
+
     text-align:left;
+
+    transition:.2s;
+
 }
+
 
 .activity-button:hover{
+
     background:#eef2ff;
+
     border-color:#1e3a8a;
+
 }
+
 
 .activity-button.active{
+
     background:#dbeafe;
+
     border-color:#1e3a8a;
+
 }
+
+
+.activity-button.disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+}
+
 
 .activity-button .icon{
-    font-size:30px;
+
+    font-size:32px;
+
     display:block;
-    margin-bottom:8px;
+
+    margin-bottom:10px;
+
 }
+
 
 .activity-button small{
+
     color:#64748b;
+
+    font-size:13px;
+
 }
+
+
+/* =========================================================
+   TWO COLUMN
+========================================================= */
 
 .two-column{
+
     display:grid;
-    grid-template-columns:1fr 1fr;
+
+    grid-template-columns:
+        1fr 1fr;
+
     gap:20px;
+
 }
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
 
 .stat-grid{
+
     display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:12px;
+
     margin-top:15px;
+
 }
+
 
 .stat{
+
     padding:15px;
+
     border-radius:8px;
+
     background:#f8fafc;
+
     text-align:center;
+
 }
+
 
 .stat-number{
-    font-size:25px;
+
+    font-size:26px;
+
     font-weight:bold;
+
     color:#1e3a8a;
+
 }
+
 
 .stat-label{
+
     font-size:13px;
+
     color:#64748b;
+
     margin-top:5px;
+
 }
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-container{
+
+    overflow-x:auto;
+
+}
+
 
 table{
+
     width:100%;
+
     border-collapse:collapse;
+
     margin-top:15px;
+
 }
 
+
 th{
+
     background:#eef2ff;
+
     text-align:left;
+
+    white-space:nowrap;
+
 }
+
 
 td,
 th{
+
     border:1px solid #ddd;
+
     padding:10px;
+
 }
+
 
 tr:hover{
+
     background:#f8fafc;
+
 }
 
-.hidden{
-    display:none !important;
-}
 
-.file-box{
+/* =========================================================
+   POSTER
+========================================================= */
+
+.poster-area{
+
     border:2px dashed #cbd5e1;
+
+    border-radius:10px;
+
     padding:20px;
-    border-radius:8px;
-    margin-top:10px;
+
     background:#f8fafc;
+
+    text-align:center;
+
 }
 
-.file-name{
-    margin-top:8px;
-    color:#475569;
+
+.poster-preview{
+
+    max-width:100%;
+
+    max-height:400px;
+
+    border-radius:8px;
+
+    margin-top:15px;
+
+    display:none;
+
 }
+
+
+.pdf-preview{
+
+    padding:20px;
+
+    background:#e2e8f0;
+
+    border-radius:8px;
+
+    margin-top:15px;
+
+    display:none;
+
+}
+
+
+/* =========================================================
+   NOTICE
+========================================================= */
 
 .notice{
+
     padding:12px;
+
     background:#fffbeb;
+
     border:1px solid #fde68a;
+
     border-radius:8px;
-    margin-top:10px;
+
+    margin-top:12px;
+
 }
+
 
 .success{
+
     padding:12px;
+
     background:#f0fdf4;
+
     border:1px solid #bbf7d0;
+
     border-radius:8px;
-    margin-top:10px;
+
+    margin-top:12px;
+
 }
 
-.empty{
-    padding:30px;
-    text-align:center;
-    color:#64748b;
+
+.info{
+
+    padding:12px;
+
+    background:#eff6ff;
+
+    border:1px solid #bfdbfe;
+
+    border-radius:8px;
+
+    margin-top:12px;
+
 }
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty{
+
+    padding:30px;
+
+    text-align:center;
+
+    color:#64748b;
+
+}
+
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+.hidden{
+
+    display:none !important;
+
+}
+
+
+/* =========================================================
+   STATUS PANEL
+========================================================= */
+
+.status-panel{
+
+    padding:15px;
+
+    border-radius:8px;
+
+    background:#f8fafc;
+
+    margin-top:15px;
+
+}
+
+
+.status-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:8px 0;
+
+    border-bottom:1px solid #e2e8f0;
+
+}
+
+
+.status-row:last-child{
+
+    border-bottom:none;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
 @media(max-width:900px){
 
     .activity-grid,
-    .two-column,
-    .stat-grid{
+    .two-column{
+
         grid-template-columns:1fr;
+
     }
 
-    table{
-        font-size:13px;
+
+    .stat-grid{
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+    }
+
+}
+
+
+@media(max-width:600px){
+
+    .container{
+
+        padding:12px;
+
+    }
+
+
+    .header{
+
+        padding:15px;
+
+    }
+
+
+    .stat-grid{
+
+        grid-template-columns:1fr;
+
     }
 
 }
@@ -291,9 +751,15 @@ tr:hover{
 <body>
 
 
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
 <div class="header">
 
-    <h2>📢 Publicity & Reminder Centre</h2>
+    <h2>
+        📢 Publicity & Reminder Centre
+    </h2>
 
     <button onclick="goBack()">
         Back
@@ -302,19 +768,24 @@ tr:hover{
 </div>
 
 
+
 <div class="container">
 
 
 <!-- =========================================================
-     EVENT SELECTION
+     1. SELECT EVENT
 ========================================================= -->
 
 <div class="card">
 
-    <h3>1. Select Event</h3>
+    <h3>
+        1. Select Event
+    </h3>
 
-    <select id="eventFilter"
-            onchange="selectEvent()">
+
+    <select
+        id="eventFilter"
+        onchange="selectEvent()">
 
         <option value="">
             Select Event
@@ -322,87 +793,152 @@ tr:hover{
 
     </select>
 
-    <div id="selectedEventInfo"
-         class="hidden">
+
+    <div
+        id="selectedEventInfo"
+        class="hidden">
     </div>
 
 </div>
+
 
 
 <!-- =========================================================
-     ACTIVITY SELECTION
+     2. EVENT LIFECYCLE
 ========================================================= -->
 
-<div class="card"
-     id="activityCard"
-     style="display:none;">
+<div
+    id="lifecycleCard"
+    class="card hidden">
 
-    <h3>2. What would you like to do?</h3>
+    <h3>
+        Event Communication Status
+    </h3>
+
+
+    <div
+        id="lifecycleStatus">
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     3. ACTIVITY
+========================================================= -->
+
+<div
+    id="activityCard"
+    class="card hidden">
+
+    <h3>
+        2. What would you like to do?
+    </h3>
+
 
     <div class="activity-grid">
 
+
+        <!-- PUBLICITY -->
+
         <button
             type="button"
-            class="activity-button"
             id="publicityActivityButton"
+            class="activity-button"
             onclick="selectActivity('publicity')">
 
-            <span class="icon">📢</span>
+            <span class="icon">
+                📢
+            </span>
 
-            <strong>Publicity</strong>
+            <strong>
+                Publicity
+            </strong>
 
-            <br>
+            <br><br>
 
             <small>
-                Send event publicity to people via WhatsApp
+                Send event publicity to your audience.
+                Publicity remains available while the
+                event is ACTIVE.
             </small>
 
         </button>
 
+
+
+        <!-- REMINDER -->
 
         <button
             type="button"
-            class="activity-button"
             id="reminderActivityButton"
+            class="activity-button"
             onclick="selectActivity('reminder')">
 
-            <span class="icon">⏰</span>
+            <span class="icon">
+                ⏰
+            </span>
 
-            <strong>Reminder</strong>
+            <strong>
+                Reminder
+            </strong>
 
-            <br>
+            <br><br>
 
-            <small>
-                Send reminders to registered participants
+            <small
+                id="reminderAvailabilityText">
+
+                Reminder becomes available nearer
+                to the event date.
+
             </small>
 
         </button>
+
 
     </div>
 
 </div>
+
 
 
 <!-- =========================================================
      PUBLICITY MODULE
 ========================================================= -->
 
-<div id="publicityModule"
-     class="hidden">
+<div
+    id="publicityModule"
+    class="hidden">
 
 
-    <!-- PUBLICITY CONFIG -->
+    <!-- =====================================================
+         PUBLICITY CONFIGURATION
+    ====================================================== -->
 
     <div class="card">
 
-        <h3>📢 Publicity</h3>
+        <h3>
+            📢 Publicity Campaign
+        </h3>
 
-        <p>
-            Send publicity for the selected event to your selected audience.
-        </p>
+
+        <div class="event-info">
+
+            <div class="event-title"
+                 id="publicityEventName">
+            </div>
+
+            <div id="publicityEventDate">
+            </div>
+
+        </div>
 
 
         <div class="two-column">
+
+
+            <!-- MESSAGE -->
 
             <div>
 
@@ -410,13 +946,27 @@ tr:hover{
                     Publicity Message
                 </label>
 
+
                 <textarea
                     id="publicityMessage"
-                    rows="10"
-                    placeholder="Type your publicity message here..."></textarea>
+                    rows="14"
+                    placeholder="Type your publicity message here...">
+                </textarea>
+
+
+                <div class="info">
+
+                    The message will be personalised
+                    with the person's name when
+                    WhatsApp is opened.
+
+                </div>
 
             </div>
 
+
+
+            <!-- POSTER -->
 
             <div>
 
@@ -424,16 +974,32 @@ tr:hover{
                     Poster / Image / PDF
                 </label>
 
-                <div class="file-box">
+
+                <div class="poster-area">
 
                     <input
                         type="file"
                         id="publicityAttachment"
                         accept="image/*,.pdf">
 
+
                     <div
                         id="attachmentName"
-                        class="file-name">
+                        style="margin-top:10px;">
+                    </div>
+
+
+                    <img
+                        id="posterPreview"
+                        class="poster-preview">
+
+
+                    <div
+                        id="pdfPreview"
+                        class="pdf-preview">
+
+                        📄 PDF selected
+
                     </div>
 
                 </div>
@@ -441,17 +1007,31 @@ tr:hover{
 
                 <div class="notice">
 
-                    Supported:
-                    <strong>Image / Poster / PDF</strong>
+                    <strong>
+                        Manual WhatsApp mode
+                    </strong>
 
                     <br><br>
 
-                    The selected file will be passed to the WhatsApp API
-                    when the backend media-sending function is enabled.
+                    The poster is saved as part of this
+                    publicity campaign.
+
+                    <br><br>
+
+                    When sending manually through
+                    WhatsApp, you will need to attach
+                    the poster yourself.
+
+                    <br><br>
+
+                    Once the WhatsApp API is enabled,
+                    the same poster can be sent
+                    automatically.
 
                 </div>
 
             </div>
+
 
         </div>
 
@@ -461,7 +1041,7 @@ tr:hover{
 
         <button
             class="preview"
-            onclick="previewPublicity()">
+            onclick="previewPublicityCampaign()">
 
             Preview
 
@@ -475,24 +1055,30 @@ tr:hover{
 
         </button>
 
+
     </div>
 
 
-    <!-- PUBLICITY AUDIENCE -->
+
+    <!-- =====================================================
+         PUBLICITY STATISTICS
+    ====================================================== -->
 
     <div class="card">
 
         <h3>
-            Publicity Audience
+            Publicity Engagement
         </h3>
 
+
         <div class="stat-grid">
+
 
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="publicityTotal">
+                    id="publicityTotal"
+                    class="stat-number">
 
                     0
 
@@ -508,15 +1094,15 @@ tr:hover{
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="publicitySent">
+                    id="publicitySent"
+                    class="stat-number">
 
                     0
 
                 </div>
 
                 <div class="stat-label">
-                    Sent
+                    Publicity Sent
                 </div>
 
             </div>
@@ -525,8 +1111,8 @@ tr:hover{
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="publicityPending">
+                    id="publicityPending"
+                    class="stat-number">
 
                     0
 
@@ -542,8 +1128,8 @@ tr:hover{
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="publicityRegistered">
+                    id="publicityRegistered"
+                    class="stat-number">
 
                     0
 
@@ -555,6 +1141,31 @@ tr:hover{
 
             </div>
 
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         PUBLICITY AUDIENCE
+    ====================================================== -->
+
+    <div class="card">
+
+        <h3>
+            Publicity Audience
+        </h3>
+
+
+        <div class="info">
+
+            Each person is uniquely identified.
+            People marked <strong>SENT</strong> will
+            not be selected again.
+
         </div>
 
 
@@ -565,7 +1176,7 @@ tr:hover{
             class="whatsapp"
             onclick="sendSelectedPublicity()">
 
-            Send Selected via WhatsApp
+            Open WhatsApp for Selected
 
         </button>
 
@@ -579,49 +1190,60 @@ tr:hover{
         </button>
 
 
-        <table>
+        <div class="table-container">
 
-            <thead>
+            <table>
 
-                <tr>
+                <thead>
 
-                    <th>
-                        <input
-                            type="checkbox"
-                            id="selectAllPublicity"
-                            onclick="toggleAllPublicity(this)">
-                    </th>
+                    <tr>
 
-                    <th>
-                        Name
-                    </th>
+                        <th>
 
-                    <th>
-                        Mobile
-                    </th>
+                            <input
+                                type="checkbox"
+                                id="selectAllPublicity"
+                                onclick="toggleAllPublicity(this)">
 
-                    <th>
-                        Publicity
-                    </th>
-
-                    <th>
-                        Engagement
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
-                </tr>
-
-            </thead>
+                        </th>
 
 
-            <tbody
-                id="publicityTable">
-            </tbody>
+                        <th>
+                            Name
+                        </th>
 
-        </table>
+
+                        <th>
+                            Mobile
+                        </th>
+
+
+                        <th>
+                            Publicity
+                        </th>
+
+
+                        <th>
+                            Engagement
+                        </th>
+
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="publicityTable">
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
@@ -629,29 +1251,47 @@ tr:hover{
 </div>
 
 
+
 <!-- =========================================================
      REMINDER MODULE
 ========================================================= -->
 
-<div id="reminderModule"
-     class="hidden">
+<div
+    id="reminderModule"
+    class="hidden">
 
 
-    <!-- REMINDER CONFIG -->
+    <!-- =====================================================
+         REMINDER CONFIGURATION
+    ====================================================== -->
 
     <div class="card">
 
         <h3>
-            ⏰ Prepare Reminder
+            ⏰ Reminder
         </h3>
+
+
+        <div class="event-info">
+
+            <div class="event-title"
+                 id="reminderEventName">
+            </div>
+
+            <div id="reminderEventDate">
+            </div>
+
+        </div>
 
 
         <label>
             Reminder Stage
         </label>
 
-        <select id="reminderType"
-                onchange="changeReminderType()">
+
+        <select
+            id="reminderType"
+            onchange="changeReminderType()">
 
             <option value="T-7">
                 T-7
@@ -666,6 +1306,12 @@ tr:hover{
             </option>
 
         </select>
+
+
+        <div
+            id="reminderStageNotice"
+            class="info">
+        </div>
 
 
         <div class="two-column">
@@ -720,7 +1366,8 @@ tr:hover{
                 <textarea
                     id="importantInfo"
                     rows="4"
-                    placeholder="Bring passport, arrive early etc."></textarea>
+                    placeholder="Bring passport, arrive early etc.">
+                </textarea>
 
 
                 <label>
@@ -729,12 +1376,16 @@ tr:hover{
 
                 <textarea
                     id="customMessage"
-                    rows="4"
-                    placeholder="Add your customised message here..."></textarea>
+                    rows="5"
+                    placeholder="Add your customised message here...">
+                </textarea>
 
             </div>
 
         </div>
+
+
+        <br>
 
 
         <button
@@ -753,25 +1404,30 @@ tr:hover{
 
         </button>
 
+
     </div>
 
 
-    <!-- REMINDER PARTICIPANTS -->
+
+    <!-- =====================================================
+         REMINDER STATISTICS
+    ====================================================== -->
 
     <div class="card">
 
         <h3>
-            Participants Requiring Reminder
+            Reminder Engagement
         </h3>
 
 
         <div class="stat-grid">
 
+
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="reminderTotal">
+                    id="reminderTotal"
+                    class="stat-number">
 
                     0
 
@@ -787,8 +1443,8 @@ tr:hover{
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="reminderSent">
+                    id="reminderSent"
+                    class="stat-number">
 
                     0
 
@@ -804,8 +1460,8 @@ tr:hover{
             <div class="stat">
 
                 <div
-                    class="stat-number"
-                    id="reminderPending">
+                    id="reminderPending"
+                    class="stat-number">
 
                     0
 
@@ -818,64 +1474,113 @@ tr:hover{
             </div>
 
 
+            <div class="stat">
+
+                <div
+                    id="reminderFailed"
+                    class="stat-number">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+                    Failed
+                </div>
+
+            </div>
+
+
         </div>
 
 
-        <br>
+    </div>
+
+
+
+    <!-- =====================================================
+         REMINDER PARTICIPANTS
+    ====================================================== -->
+
+    <div class="card">
+
+        <h3>
+            Participants Requiring Reminder
+        </h3>
 
 
         <button
             class="whatsapp"
             onclick="sendSelectedReminder()">
 
-            Send Selected WhatsApp
+            Open WhatsApp for Selected
 
         </button>
 
 
-        <table>
+        <button
+            class="secondary"
+            onclick="loadParticipants()">
 
-            <thead>
+            Refresh Participants
 
-                <tr>
-
-                    <th>
-                        <input
-                            type="checkbox"
-                            id="selectAllReminder"
-                            onclick="toggleAllReminder(this)">
-                    </th>
-
-                    <th>
-                        Name
-                    </th>
-
-                    <th>
-                        Mobile
-                    </th>
-
-                    <th>
-                        Reminder
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
-                </tr>
-
-            </thead>
+        </button>
 
 
-            <tbody
-                id="participantTable">
-            </tbody>
+        <div class="table-container">
 
-        </table>
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+
+                            <input
+                                type="checkbox"
+                                id="selectAllReminder"
+                                onclick="toggleAllReminder(this)">
+
+                        </th>
+
+
+                        <th>
+                            Name
+                        </th>
+
+
+                        <th>
+                            Mobile
+                        </th>
+
+
+                        <th>
+                            Reminder
+                        </th>
+
+
+                        <th>
+                            Status
+                        </th>
+
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="participantTable">
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
@@ -886,12 +1591,12 @@ tr:hover{
 </div>
 
 
+
 <script>
 
-
-// =========================================================
-// GLOBAL STATE
-// =========================================================
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
 
 let events = [];
 
@@ -908,9 +1613,10 @@ let reminderConfig = {};
 let publicityConfig = {};
 
 
-// =========================================================
-// URL PARAMETERS
-// =========================================================
+
+/* =========================================================
+   URL PARAMETERS
+========================================================= */
 
 const params =
     new URLSearchParams(
@@ -921,9 +1627,24 @@ const presetEvent =
     params.get("event");
 
 
-// =========================================================
-// LOAD EVENTS
-// =========================================================
+
+/* =========================================================
+   LOAD EVENTS
+========================================================= */
+
+/*
+    IMPORTANT:
+
+    We deliberately use getEventList()
+
+    rather than getActiveEventsForReminder()
+
+    because PUBLICITY must be available immediately
+    after an event is created/imported.
+
+    Reminder availability is calculated separately
+    from the event date.
+*/
 
 async function loadEvents(){
 
@@ -931,15 +1652,9 @@ async function loadEvents(){
 
         const response =
             await API.post(
-                "getActiveEventsForReminder",
+                "getEventList",
                 {}
             );
-
-
-        console.log(
-            "Events API:",
-            response
-        );
 
 
         if(!response.success){
@@ -958,6 +1673,27 @@ async function loadEvents(){
             [];
 
 
+        /*
+            Only ACTIVE events are available
+            for communication.
+
+            CLOSED events remain excluded.
+        */
+
+        events =
+            events.filter(
+                e =>
+                    String(
+                        e.status ||
+                        e.Status ||
+                        ""
+                    )
+                    .toUpperCase()
+                    ===
+                    "ACTIVE"
+            );
+
+
         populateEventDropdown();
 
 
@@ -968,12 +1704,14 @@ async function loadEvents(){
             ).innerHTML =
             `
                 <div class="empty">
-                    No active events available.
+
+                    No active events are currently
+                    available for communication.
+
                 </div>
             `;
 
         }
-
 
     }
     catch(err){
@@ -989,7 +1727,15 @@ async function loadEvents(){
         ).innerHTML =
         `
             <div class="notice">
-                Unable to load events.
+
+                Unable to load active events.
+
+                <br><br>
+
+                ${escapeHtml(
+                    err.message || ""
+                )}
+
             </div>
         `;
 
@@ -998,9 +1744,10 @@ async function loadEvents(){
 }
 
 
-// =========================================================
-// POPULATE EVENT DROPDOWN
-// =========================================================
+
+/* =========================================================
+   POPULATE EVENT DROPDOWN
+========================================================= */
 
 function populateEventDropdown(){
 
@@ -1018,20 +1765,44 @@ function populateEventDropdown(){
     `;
 
 
-    events.forEach(e=>{
+    events.forEach(
+        e => {
 
-        select.innerHTML +=
-        `
-            <option value="${escapeHtml(e.spreadsheetId)}">
+            const id =
+                e.spreadsheetId ||
+                e.SpreadsheetId ||
+                e.id ||
+                e.eventId;
 
-                ${escapeHtml(e.eventName)}
-                -
-                ${escapeHtml(e.eventDate || "")}
 
-            </option>
-        `;
+            const name =
+                e.eventName ||
+                e.EventName ||
+                e.name ||
+                "";
 
-    });
+
+            const date =
+                e.eventDate ||
+                e.EventDate ||
+                e.date ||
+                "";
+
+
+            select.innerHTML +=
+            `
+                <option
+                    value="${escapeHtml(id)}">
+
+                    ${escapeHtml(name)}
+                    -
+                    ${escapeHtml(date)}
+
+                </option>
+            `;
+
+        }
+    );
 
 
     if(presetEvent){
@@ -1046,9 +1817,10 @@ function populateEventDropdown(){
 }
 
 
-// =========================================================
-// SELECT EVENT
-// =========================================================
+
+/* =========================================================
+   SELECT EVENT
+========================================================= */
 
 async function selectEvent(){
 
@@ -1062,17 +1834,9 @@ async function selectEvent(){
 
         selectedEvent = null;
 
-        document.getElementById(
-            "activityCard"
-        ).style.display = "none";
+        currentActivity = "";
 
-        document.getElementById(
-            "publicityModule"
-        ).classList.add("hidden");
-
-        document.getElementById(
-            "reminderModule"
-        ).classList.add("hidden");
+        hideAllModules();
 
         return;
 
@@ -1082,15 +1846,55 @@ async function selectEvent(){
     selectedEvent =
         events.find(
             e =>
-            String(e.spreadsheetId)
-            ===
-            String(eventId)
+                String(
+                    e.spreadsheetId ||
+                    e.SpreadsheetId ||
+                    e.id ||
+                    e.eventId
+                )
+                ===
+                String(eventId)
         );
 
 
     if(!selectedEvent)
         return;
 
+
+    /*
+        Normalise event properties.
+    */
+
+    selectedEvent.spreadsheetId =
+        selectedEvent.spreadsheetId ||
+        selectedEvent.SpreadsheetId ||
+        selectedEvent.id ||
+        selectedEvent.eventId;
+
+
+    selectedEvent.eventName =
+        selectedEvent.eventName ||
+        selectedEvent.EventName ||
+        selectedEvent.name ||
+        "";
+
+
+    selectedEvent.eventDate =
+        selectedEvent.eventDate ||
+        selectedEvent.EventDate ||
+        selectedEvent.date ||
+        "";
+
+
+    selectedEvent.status =
+        selectedEvent.status ||
+        selectedEvent.Status ||
+        "ACTIVE";
+
+
+    /*
+        Display event.
+    */
 
     document.getElementById(
         "selectedEventInfo"
@@ -1101,16 +1905,29 @@ async function selectEvent(){
         "selectedEventInfo"
     ).innerHTML =
     `
-        <div class="eventCard">
+        <div class="event-info">
 
-            <strong>
-                ${escapeHtml(selectedEvent.eventName)}
-            </strong>
+            <div class="event-title">
 
-            <br><br>
+                ${escapeHtml(
+                    selectedEvent.eventName
+                )}
 
-            Date:
-            ${escapeHtml(selectedEvent.eventDate || "")}
+            </div>
+
+            <br>
+
+            📅
+            ${escapeHtml(
+                selectedEvent.eventDate
+            )}
+
+            <br>
+
+            📌 Status:
+            <span class="badge badge-green">
+                ACTIVE
+            </span>
 
         </div>
     `;
@@ -1118,34 +1935,323 @@ async function selectEvent(){
 
     document.getElementById(
         "activityCard"
-    ).style.display =
-    "block";
+    ).classList.remove("hidden");
 
 
-    // Reset activity display
+    document.getElementById(
+        "lifecycleCard"
+    ).classList.remove("hidden");
+
 
     currentActivity = "";
 
-    document.getElementById(
-        "publicityModule"
-    ).classList.add("hidden");
-
-    document.getElementById(
-        "reminderModule"
-    ).classList.add("hidden");
 
     document
         .querySelectorAll(".activity-button")
-        .forEach(btn =>
-            btn.classList.remove("active")
+        .forEach(
+            btn =>
+                btn.classList.remove("active")
         );
+
+
+    hideModules();
+
+
+    updateLifecycleStatus();
 
 }
 
 
-// =========================================================
-// ACTIVITY SELECTOR
-// =========================================================
+
+/* =========================================================
+   EVENT DATE CALCULATION
+========================================================= */
+
+function getDaysRemaining(){
+
+    if(!selectedEvent)
+        return null;
+
+
+    const eventDate =
+        new Date(
+            selectedEvent.eventDate
+        );
+
+
+    if(isNaN(eventDate.getTime()))
+        return null;
+
+
+    eventDate.setHours(
+        0,0,0,0
+    );
+
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,0,0,0
+    );
+
+
+    return Math.ceil(
+        (
+            eventDate -
+            today
+        )
+        /
+        (
+            1000 *
+            60 *
+            60 *
+            24
+        )
+    );
+
+}
+
+
+
+/* =========================================================
+   REMINDER AVAILABILITY
+========================================================= */
+
+/*
+    Publicity:
+        ACTIVE event
+        Available immediately.
+
+    Reminder:
+        Available once event is within 7 days.
+
+    This deliberately does NOT hide reminder after
+    T-7. Once the event enters the reminder window,
+    the reminder activity remains available so that
+    the user can see the communication history.
+
+    The user can select T-7 / T-3 / T-1 separately.
+*/
+
+function getReminderAvailability(){
+
+    const days =
+        getDaysRemaining();
+
+
+    if(days === null)
+        return {
+            available:false,
+            reason:"Event date unavailable."
+        };
+
+
+    if(days < 0){
+
+        return {
+            available:false,
+            reason:"Event has already taken place."
+        };
+
+    }
+
+
+    if(days <= 7){
+
+        return {
+            available:true,
+            reason:
+                "Reminder communication is available."
+        };
+
+    }
+
+
+    return {
+        available:false,
+        reason:
+            `Reminder will become available when the event is within 7 days. ${days} days remaining.`
+    };
+
+}
+
+
+
+/* =========================================================
+   UPDATE LIFECYCLE STATUS
+========================================================= */
+
+function updateLifecycleStatus(){
+
+    if(!selectedEvent)
+        return;
+
+
+    const days =
+        getDaysRemaining();
+
+
+    const reminder =
+        getReminderAvailability();
+
+
+    let reminderText = "";
+
+
+    if(days === null){
+
+        reminderText =
+            "Event date unavailable.";
+
+    }
+    else if(days > 7){
+
+        reminderText =
+            `Reminder not yet available — ${days} days until event.`;
+
+    }
+    else if(days === 7){
+
+        reminderText =
+            "T-7 reminder is now available.";
+
+    }
+    else if(days > 3){
+
+        reminderText =
+            "Reminder window is active. T-7 is available.";
+
+    }
+    else if(days === 3){
+
+        reminderText =
+            "T-3 reminder is now available.";
+
+    }
+    else if(days > 1){
+
+        reminderText =
+            "Reminder window is active.";
+
+    }
+    else if(days === 1){
+
+        reminderText =
+            "T-1 reminder is now available.";
+
+    }
+    else{
+
+        reminderText =
+            "Event is today.";
+
+    }
+
+
+    document.getElementById(
+        "lifecycleStatus"
+    ).innerHTML =
+    `
+        <div class="status-panel">
+
+
+            <div class="status-row">
+
+                <strong>
+                    📢 Publicity
+                </strong>
+
+                <span class="badge badge-green">
+                    AVAILABLE
+                </span>
+
+            </div>
+
+
+            <div class="status-row">
+
+                <strong>
+                    ⏰ Reminder
+                </strong>
+
+                <span class="badge ${
+                    reminder.available
+                    ? "badge-green"
+                    : "badge-yellow"
+                }">
+
+                    ${
+                        reminder.available
+                        ? "AVAILABLE"
+                        : "NOT YET AVAILABLE"
+                    }
+
+                </span>
+
+            </div>
+
+
+            <div class="status-row">
+
+                <strong>
+                    Event
+                </strong>
+
+                <span>
+
+                    ${
+                        days === 0
+                        ? "Today"
+                        : days > 0
+                        ? `${days} days remaining`
+                        : "Event completed"
+                    }
+
+                </span>
+
+            </div>
+
+
+        </div>
+    `;
+
+
+    document.getElementById(
+        "reminderAvailabilityText"
+    ).textContent =
+        reminderText;
+
+
+    const reminderButton =
+        document.getElementById(
+            "reminderActivityButton"
+        );
+
+
+    if(reminder.available){
+
+        reminderButton.classList.remove(
+            "disabled"
+        );
+
+    }
+    else{
+
+        reminderButton.classList.add(
+            "disabled"
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   ACTIVITY SELECTION
+========================================================= */
 
 async function selectActivity(activity){
 
@@ -1160,15 +2266,40 @@ async function selectActivity(activity){
     }
 
 
+    if(activity === "reminder"){
+
+        const availability =
+            getReminderAvailability();
+
+
+        if(!availability.available){
+
+            alert(
+                availability.reason
+            );
+
+            return;
+
+        }
+
+    }
+
+
     currentActivity =
         activity;
 
 
     document
-        .querySelectorAll(".activity-button")
-        .forEach(btn =>
-            btn.classList.remove("active")
+        .querySelectorAll(
+            ".activity-button"
+        )
+        .forEach(
+            btn =>
+                btn.classList.remove("active")
         );
+
+
+    hideModules();
 
 
     if(activity === "publicity"){
@@ -1185,13 +2316,6 @@ async function selectActivity(activity){
                 "publicityModule"
             )
             .classList.remove("hidden");
-
-
-        document
-            .getElementById(
-                "reminderModule"
-            )
-            .classList.add("hidden");
 
 
         await loadPublicity();
@@ -1215,13 +2339,6 @@ async function selectActivity(activity){
             .classList.remove("hidden");
 
 
-        document
-            .getElementById(
-                "publicityModule"
-            )
-            .classList.add("hidden");
-
-
         await loadReminder();
 
     }
@@ -1229,9 +2346,54 @@ async function selectActivity(activity){
 }
 
 
-// =========================================================
-// PUBLICITY
-// =========================================================
+
+/* =========================================================
+   HIDE MODULES
+========================================================= */
+
+function hideModules(){
+
+    document
+        .getElementById(
+            "publicityModule"
+        )
+        .classList.add("hidden");
+
+
+    document
+        .getElementById(
+            "reminderModule"
+        )
+        .classList.add("hidden");
+
+}
+
+
+function hideAllModules(){
+
+    document
+        .getElementById(
+            "activityCard"
+        )
+        .classList.add("hidden");
+
+
+    document
+        .getElementById(
+            "lifecycleCard"
+        )
+        .classList.add("hidden");
+
+
+    hideModules();
+
+}
+
+
+
+/* =========================================================
+   PUBLICITY
+========================================================= */
 
 async function loadPublicity(){
 
@@ -1253,11 +2415,26 @@ async function loadPublicity(){
     };
 
 
-    // Load saved publicity configuration
+    document.getElementById(
+        "publicityEventName"
+    ).textContent =
+        selectedEvent.eventName;
+
+
+    document.getElementById(
+        "publicityEventDate"
+    ).textContent =
+        "📅 " +
+        selectedEvent.eventDate;
+
+
+    /*
+        Load saved publicity configuration.
+    */
 
     try{
 
-        const configResponse =
+        const response =
             await API.post(
                 "getPublicityConfiguration",
                 {
@@ -1268,15 +2445,17 @@ async function loadPublicity(){
 
 
         if(
-            configResponse.success &&
-            configResponse.data
+            response.success &&
+            response.data
         ){
 
-            publicityConfig =
-                {
-                    ...publicityConfig,
-                    ...configResponse.data
-                };
+            publicityConfig = {
+
+                ...publicityConfig,
+
+                ...response.data
+
+            };
 
 
             document.getElementById(
@@ -1284,13 +2463,23 @@ async function loadPublicity(){
             ).value =
                 publicityConfig.message || "";
 
+
+            document.getElementById(
+                "attachmentName"
+            ).textContent =
+                publicityConfig.attachmentName
+                    ?
+                    `Saved poster: ${publicityConfig.attachmentName}`
+                    :
+                    "";
+
         }
 
     }
     catch(err){
 
         console.log(
-            "No previous publicity configuration"
+            "No previous publicity configuration."
         );
 
     }
@@ -1301,9 +2490,10 @@ async function loadPublicity(){
 }
 
 
-// =========================================================
-// LOAD PUBLICITY AUDIENCE
-// =========================================================
+
+/* =========================================================
+   LOAD PUBLICITY AUDIENCE
+========================================================= */
 
 async function loadPublicityAudience(){
 
@@ -1337,6 +2527,55 @@ async function loadPublicityAudience(){
             response.data || [];
 
 
+        /*
+            UNIQUE PERSON
+
+            Deduplicate by personId first,
+            then mobile as fallback.
+        */
+
+        const unique =
+            new Map();
+
+
+        publicityAudience.forEach(
+            p => {
+
+                const key =
+                    String(
+                        p.personId ||
+                        p.PersonID ||
+                        p.mobile ||
+                        p.email ||
+                        p.name ||
+                        ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                if(
+                    key &&
+                    !unique.has(key)
+                ){
+
+                    unique.set(
+                        key,
+                        p
+                    );
+
+                }
+
+            }
+        );
+
+
+        publicityAudience =
+            Array.from(
+                unique.values()
+            );
+
+
         renderPublicityAudience();
 
     }
@@ -1350,6 +2589,7 @@ async function loadPublicityAudience(){
         ).innerHTML =
         `
             <tr>
+
                 <td colspan="6">
 
                     <div class="empty">
@@ -1359,6 +2599,7 @@ async function loadPublicityAudience(){
                         <br><br>
 
                         Backend action required:
+
                         <strong>
                             getPublicityAudience
                         </strong>
@@ -1366,6 +2607,7 @@ async function loadPublicityAudience(){
                     </div>
 
                 </td>
+
             </tr>
         `;
 
@@ -1374,9 +2616,10 @@ async function loadPublicityAudience(){
 }
 
 
-// =========================================================
-// PUBLICITY TABLE
-// =========================================================
+
+/* =========================================================
+   RENDER PUBLICITY AUDIENCE
+========================================================= */
 
 function renderPublicityAudience(){
 
@@ -1389,15 +2632,38 @@ function renderPublicityAudience(){
     table.innerHTML = "";
 
 
+    /*
+        SORT A-Z
+    */
+
     publicityAudience.sort(
-        (a,b)=>
-            (a.name || "").localeCompare(
-                b.name || "",
+        (a,b) => {
+
+            const nameA =
+                String(
+                    a.name ||
+                    a.Name ||
+                    ""
+                );
+
+
+            const nameB =
+                String(
+                    b.name ||
+                    b.Name ||
+                    ""
+                );
+
+
+            return nameA.localeCompare(
+                nameB,
                 undefined,
                 {
                     sensitivity:"base"
                 }
-            )
+            );
+
+        }
     );
 
 
@@ -1411,29 +2677,30 @@ function renderPublicityAudience(){
     publicityAudience.forEach(
         p => {
 
-            if(
-                String(p.publicityStatus || "")
-                .toUpperCase()
-                ===
-                "SENT"
-            ){
+            const status =
+                String(
+                    p.publicityStatus ||
+                    "PENDING"
+                )
+                .toUpperCase();
 
+
+            if(status === "SENT")
                 sent++;
-
-            }
-            else{
-
+            else
                 pending++;
 
-            }
+
+            const engagement =
+                String(
+                    p.engagement ||
+                    ""
+                )
+                .toLowerCase();
 
 
             if(
-                p.engagement &&
-                String(
-                    p.engagement
-                ).toLowerCase()
-                ===
+                engagement ===
                 "registered"
             ){
 
@@ -1469,18 +2736,24 @@ function renderPublicityAudience(){
         registered;
 
 
-    if(publicityAudience.length === 0){
+    if(
+        publicityAudience.length === 0
+    ){
 
         table.innerHTML =
         `
             <tr>
+
                 <td colspan="6">
 
                     <div class="empty">
+
                         No publicity audience found.
+
                     </div>
 
                 </td>
+
             </tr>
         `;
 
@@ -1490,53 +2763,94 @@ function renderPublicityAudience(){
 
 
     publicityAudience.forEach(
-        (p,index)=>{
+        (p,index) => {
 
             const status =
                 String(
-                    p.publicityStatus || "PENDING"
-                ).toUpperCase();
+                    p.publicityStatus ||
+                    "PENDING"
+                )
+                .toUpperCase();
 
 
-            const statusClass =
-                status === "SENT"
-                    ? "sent"
-                    : status === "FAILED"
-                    ? "failed"
-                    : "pending";
+            let statusClass =
+                "badge-yellow";
+
+
+            if(status === "SENT")
+                statusClass =
+                    "badge-green";
+
+
+            if(status === "FAILED")
+                statusClass =
+                    "badge-red";
+
+
+            const name =
+                p.name ||
+                p.Name ||
+                "";
+
+
+            const mobile =
+                p.mobile ||
+                p.Mobile ||
+                "";
+
+
+            const engagement =
+                p.engagement ||
+                "Not Registered";
 
 
             table.innerHTML +=
             `
                 <tr>
 
+
                     <td>
 
                         <input
+
                             type="checkbox"
+
                             class="publicityCheck"
+
                             value="${index}"
-                            ${status === "SENT"
+
+                            ${
+                                status === "SENT"
                                 ? "disabled"
-                                : ""}>
+                                : ""
+                            }
+
+                        >
 
                     </td>
 
 
                     <td>
-                        ${escapeHtml(p.name || "")}
+
+                        ${escapeHtml(name)}
+
                     </td>
 
 
                     <td>
-                        ${escapeHtml(p.mobile || "")}
+
+                        ${escapeHtml(mobile)}
+
                     </td>
 
 
                     <td>
 
-                        <span class="badge ${statusClass}">
+                        <span
+                            class="badge ${statusClass}">
+
                             ${status}
+
                         </span>
 
                     </td>
@@ -1544,21 +2858,28 @@ function renderPublicityAudience(){
 
                     <td>
 
-                        <span class="badge">
+                        <span
+                            class="badge badge-blue">
+
                             ${escapeHtml(
-                                p.engagement ||
-                                "Not Registered"
+                                engagement
                             )}
+
                         </span>
 
                     </td>
 
 
                     <td>
+
 
                         <button
                             class="preview"
-                            onclick="previewPublicity(${index})">
+                            onclick="
+                                previewPublicityPerson(
+                                    ${index}
+                                )
+                            ">
 
                             Preview
 
@@ -1572,7 +2893,11 @@ function renderPublicityAudience(){
                             `
                             <button
                                 class="whatsapp"
-                                onclick="sendPublicity(${index})">
+                                onclick="
+                                    openManualPublicityWhatsApp(
+                                        ${index}
+                                    )
+                                ">
 
                                 WhatsApp
 
@@ -1584,7 +2909,9 @@ function renderPublicityAudience(){
                             ""
                         }
 
+
                     </td>
+
 
                 </tr>
             `;
@@ -1595,15 +2922,12 @@ function renderPublicityAudience(){
 }
 
 
-// =========================================================
-// PUBLICITY PREVIEW
-// =========================================================
 
-function previewPublicity(index){
+/* =========================================================
+   PUBLICITY PREVIEW
+========================================================= */
 
-    const p =
-        publicityAudience[index];
-
+function previewPublicityCampaign(){
 
     const message =
         document.getElementById(
@@ -1611,16 +2935,75 @@ function previewPublicity(index){
         ).value;
 
 
+    const poster =
+        document.getElementById(
+            "attachmentName"
+        ).textContent;
+
+
     alert(
-        `To: ${p.name}\n\n${message}`
+
+`PUBLICITY PREVIEW
+
+Event:
+${selectedEvent.eventName}
+
+Date:
+${selectedEvent.eventDate}
+
+Message:
+${message}
+
+Poster:
+${poster || "No poster selected"}`
     );
 
 }
 
 
-// =========================================================
-// SAVE PUBLICITY CONFIG
-// =========================================================
+
+function previewPublicityPerson(index){
+
+    const person =
+        publicityAudience[index];
+
+
+    if(!person)
+        return;
+
+
+    const baseMessage =
+        document.getElementById(
+            "publicityMessage"
+        ).value;
+
+
+    const message =
+        personaliseMessage(
+            baseMessage,
+            person
+        );
+
+
+    alert(
+`To: ${person.name || ""}
+
+${message}
+
+Poster:
+${
+    publicityConfig.attachmentName ||
+    "No poster selected"
+}`
+    );
+
+}
+
+
+
+/* =========================================================
+   SAVE PUBLICITY
+========================================================= */
 
 async function savePublicityConfiguration(){
 
@@ -1640,10 +3023,23 @@ async function savePublicityConfiguration(){
         ).files[0];
 
 
-    publicityConfig.attachmentName =
-        file
-            ? file.name
-            : "";
+    if(file){
+
+        publicityConfig.attachmentName =
+            file.name;
+
+
+        /*
+            We retain the file in the browser for the
+            current session.
+
+            Actual server upload can be connected later.
+        */
+
+        publicityConfig.attachmentMimeType =
+            file.type;
+
+    }
 
 
     try{
@@ -1658,7 +3054,8 @@ async function savePublicityConfiguration(){
         if(!response.success){
 
             throw new Error(
-                response.message
+                response.message ||
+                "Unable to save publicity"
             );
 
         }
@@ -1673,8 +3070,10 @@ async function savePublicityConfiguration(){
 
         console.error(err);
 
+
         alert(
-            "Unable to save publicity configuration."
+            "Unable to save publicity configuration.\n\n" +
+            err.message
         );
 
     }
@@ -1682,9 +3081,10 @@ async function savePublicityConfiguration(){
 }
 
 
-// =========================================================
-// REFRESH PUBLICITY AUDIENCE
-// =========================================================
+
+/* =========================================================
+   REFRESH PUBLICITY
+========================================================= */
 
 async function refreshPublicityAudience(){
 
@@ -1693,11 +3093,12 @@ async function refreshPublicityAudience(){
 }
 
 
-// =========================================================
-// SEND SINGLE PUBLICITY
-// =========================================================
 
-async function sendPublicity(index){
+/* =========================================================
+   MANUAL WHATSAPP PUBLICITY
+========================================================= */
+
+async function openManualPublicityWhatsApp(index){
 
     const person =
         publicityAudience[index];
@@ -1707,12 +3108,15 @@ async function sendPublicity(index){
         return;
 
 
-    if(
-        String(person.publicityStatus || "")
-        .toUpperCase()
-        ===
-        "SENT"
-    ){
+    const status =
+        String(
+            person.publicityStatus ||
+            ""
+        )
+        .toUpperCase();
+
+
+    if(status === "SENT"){
 
         alert(
             `${person.name} has already received publicity for this event.`
@@ -1723,75 +3127,104 @@ async function sendPublicity(index){
     }
 
 
-    const confirmed =
-        confirm(
-            `Send publicity to ${person.name}?`
+    const phone =
+        String(
+            person.mobile ||
+            ""
+        )
+        .replace(
+            /\D/g,
+            ""
         );
 
 
-    if(!confirmed)
+    if(!phone){
+
+        alert(
+            `${person.name} does not have a valid mobile number.`
+        );
+
+        return;
+
+    }
+
+
+    const baseMessage =
+        document.getElementById(
+            "publicityMessage"
+        ).value;
+
+
+    if(!baseMessage.trim()){
+
+        alert(
+            "Please prepare the publicity message first."
+        );
+
+        return;
+
+    }
+
+
+    const message =
+        personaliseMessage(
+            baseMessage,
+            person
+        );
+
+
+    const url =
+        "https://wa.me/" +
+        phone +
+        "?text=" +
+        encodeURIComponent(
+            message
+        );
+
+
+    window.open(
+        url,
+        "_blank"
+    );
+
+
+    /*
+        Opening WhatsApp does NOT mean the message
+        was sent.
+
+        Ask user to confirm.
+    */
+
+    const sent =
+        confirm(
+`
+WhatsApp has been opened for ${person.name}.
+
+Please attach the publicity poster in WhatsApp
+and press Send.
+
+Did you send the message?
+`
+        );
+
+
+    if(!sent)
         return;
 
 
-    try{
-
-        const payload =
-            await buildWhatsAppPayload(
-                person,
-                "PUBLICITY"
-            );
-
-
-        const response =
-            await API.post(
-                "sendPublicityWhatsApp",
-                payload
-            );
-
-
-        if(!response.success){
-
-            throw new Error(
-                response.message ||
-                "WhatsApp sending failed"
-            );
-
-        }
-
-
-        person.publicityStatus =
-            "SENT";
-
-
-        person.sentAt =
-            new Date().toISOString();
-
-
-        renderPublicityAudience();
-
-
-        alert(
-            `Publicity sent to ${person.name}.`
-        );
-
-    }
-    catch(err){
-
-        console.error(err);
-
-        alert(
-            "Unable to send publicity: " +
-            err.message
-        );
-
-    }
+    await recordCommunicationStatus(
+        person,
+        "PUBLICITY",
+        "SENT"
+    );
 
 }
 
 
-// =========================================================
-// SEND SELECTED PUBLICITY
-// =========================================================
+
+/* =========================================================
+   SEND SELECTED PUBLICITY
+========================================================= */
 
 async function sendSelectedPublicity(){
 
@@ -1814,13 +3247,23 @@ async function sendSelectedPublicity(){
 
     const confirmed =
         confirm(
-            `Send publicity to ${selected.length} selected people?`
+            `Open WhatsApp for ${selected.length} selected people?`
         );
 
 
     if(!confirmed)
         return;
 
+
+    /*
+        IMPORTANT:
+
+        We deliberately process one person at a time.
+
+        This is manual WhatsApp mode.
+
+        The browser cannot mass-send WhatsApp messages.
+    */
 
     for(
         const checkbox of selected
@@ -1832,207 +3275,176 @@ async function sendSelectedPublicity(){
             );
 
 
-        try{
-
-            const person =
-                publicityAudience[index];
-
-
-            const payload =
-                await buildWhatsAppPayload(
-                    person,
-                    "PUBLICITY"
-                );
-
-
-            const response =
-                await API.post(
-                    "sendPublicityWhatsApp",
-                    payload
-                );
-
-
-            if(
-                response.success
-            ){
-
-                person.publicityStatus =
-                    "SENT";
-
-                person.sentAt =
-                    new Date().toISOString();
-
-            }
-            else{
-
-                person.publicityStatus =
-                    "FAILED";
-
-            }
-
-        }
-        catch(err){
-
-            console.error(
-                "Publicity send error:",
-                err
-            );
-
-            publicityAudience[index]
-                .publicityStatus =
-                "FAILED";
-
-        }
-
-    }
-
-
-    renderPublicityAudience();
-
-
-    alert(
-        "Publicity sending process completed."
-    );
-
-}
-
-
-// =========================================================
-// BUILD WHATSAPP PAYLOAD
-// =========================================================
-
-async function buildWhatsAppPayload(
-    person,
-    communicationType
-){
-
-    const file =
-        document.getElementById(
-            "publicityAttachment"
-        ).files[0];
-
-
-    let attachment = null;
-
-
-    if(file){
-
-        attachment =
-        await fileToBase64(file);
-
-    }
-
-
-    return {
-
-        personId:
-            person.personId ||
-            person.PersonID ||
-            person.mobile,
-
-        eventId:
-            selectedEvent.spreadsheetId,
-
-        eventName:
-            selectedEvent.eventName,
-
-        mobile:
-            person.mobile,
-
-        name:
-            person.name,
-
-        message:
-            document.getElementById(
-                "publicityMessage"
-            ).value,
-
-        communicationType:
-            communicationType,
-
-        attachment:
-            attachment
-
-    };
-
-}
-
-
-// =========================================================
-// FILE TO BASE64
-// =========================================================
-
-function fileToBase64(file){
-
-    return new Promise(
-        (resolve,reject)=>{
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                () => {
-
-                    resolve({
-
-                        fileName:
-                            file.name,
-
-                        mimeType:
-                            file.type,
-
-                        base64:
-                            reader.result
-                                .split(",")[1]
-
-                    });
-
-                };
-
-
-            reader.onerror =
-                reject;
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-        }
-    );
-
-}
-
-
-// =========================================================
-// TOGGLE PUBLICITY
-// =========================================================
-
-function toggleAllPublicity(
-    checkbox
-){
-
-    document
-        .querySelectorAll(
-            ".publicityCheck:not(:disabled)"
-        )
-        .forEach(cb =>
-            cb.checked =
-                checkbox.checked
+        await openManualPublicityWhatsApp(
+            index
         );
 
+    }
+
+
+    await loadPublicityAudience();
+
 }
 
 
-// =========================================================
-// REMINDER
-// =========================================================
+
+/* =========================================================
+   RECORD COMMUNICATION STATUS
+========================================================= */
+
+/*
+    This function records the communication result.
+
+    It does NOT send WhatsApp.
+
+    The eventual WhatsApp API can replace only the
+    sending portion while retaining this tracking model.
+*/
+
+async function recordCommunicationStatus(
+    person,
+    communicationType,
+    status
+){
+
+    try{
+
+        const payload = {
+
+            eventId:
+                selectedEvent.spreadsheetId,
+
+            personId:
+                person.personId ||
+                person.PersonID ||
+                person.mobile,
+
+            name:
+                person.name ||
+                person.Name ||
+                "",
+
+            mobile:
+                person.mobile ||
+                person.Mobile ||
+                "",
+
+            communicationType:
+                communicationType,
+
+            reminderType:
+                communicationType === "REMINDER"
+                    ? reminderConfig.reminderType
+                    : "",
+
+            status:
+                status,
+
+            timestamp:
+                new Date().toISOString()
+
+        };
+
+
+        /*
+            This action is a lightweight tracking action.
+
+            It does NOT require WhatsApp API.
+        */
+
+        const response =
+            await API.post(
+                "recordCommunicationStatus",
+                payload
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "Unable to record communication"
+            );
+
+        }
+
+
+        /*
+            Update local state immediately.
+        */
+
+        if(
+            communicationType ===
+            "PUBLICITY"
+        ){
+
+            person.publicityStatus =
+                status;
+
+            person.sentAt =
+                new Date().toISOString();
+
+            renderPublicityAudience();
+
+        }
+
+
+        if(
+            communicationType ===
+            "REMINDER"
+        ){
+
+            person.reminderStatus =
+                status;
+
+            renderParticipants();
+
+        }
+
+    }
+    catch(err){
+
+        console.error(
+            "recordCommunicationStatus:",
+            err
+        );
+
+
+        alert(
+            "Message was marked as sent locally, but " +
+            "the communication record could not be saved.\n\n" +
+            err.message
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   REMINDER
+========================================================= */
 
 async function loadReminder(){
 
     if(!selectedEvent)
         return;
+
+
+    const availability =
+        getReminderAvailability();
+
+
+    if(!availability.available){
+
+        alert(
+            availability.reason
+        );
+
+        return;
+
+    }
 
 
     reminderConfig = {
@@ -2047,8 +3459,7 @@ async function loadReminder(){
             selectedEvent.eventDate,
 
         reminderType:
-            selectedEvent.reminderType ||
-            "T-7"
+            determineDefaultReminderStage()
 
     };
 
@@ -2059,6 +3470,22 @@ async function loadReminder(){
         reminderConfig.reminderType;
 
 
+    document.getElementById(
+        "reminderEventName"
+    ).textContent =
+        selectedEvent.eventName;
+
+
+    document.getElementById(
+        "reminderEventDate"
+    ).textContent =
+        "📅 " +
+        selectedEvent.eventDate;
+
+
+    updateReminderStageNotice();
+
+
     await loadReminderConfiguration();
 
     await loadParticipants();
@@ -2066,9 +3493,34 @@ async function loadReminder(){
 }
 
 
-// =========================================================
-// LOAD REMINDER CONFIGURATION
-// =========================================================
+
+/* =========================================================
+   DEFAULT REMINDER STAGE
+========================================================= */
+
+function determineDefaultReminderStage(){
+
+    const days =
+        getDaysRemaining();
+
+
+    if(days <= 1)
+        return "T-1";
+
+
+    if(days <= 3)
+        return "T-3";
+
+
+    return "T-7";
+
+}
+
+
+
+/* =========================================================
+   LOAD REMINDER CONFIG
+========================================================= */
 
 async function loadReminderConfiguration(){
 
@@ -2134,17 +3586,21 @@ async function loadReminderConfiguration(){
     catch(err){
 
         console.log(
-            "No previous reminder configuration"
+            "No previous reminder configuration."
         );
 
     }
 
+
+    updateReminderStageNotice();
+
 }
 
 
-// =========================================================
-// CHANGE REMINDER TYPE
-// =========================================================
+
+/* =========================================================
+   CHANGE REMINDER TYPE
+========================================================= */
 
 async function changeReminderType(){
 
@@ -2165,9 +3621,68 @@ async function changeReminderType(){
 }
 
 
-// =========================================================
-// SAVE REMINDER
-// =========================================================
+
+/* =========================================================
+   REMINDER STAGE NOTICE
+========================================================= */
+
+function updateReminderStageNotice(){
+
+    const stage =
+        reminderConfig.reminderType;
+
+
+    const days =
+        getDaysRemaining();
+
+
+    let text = "";
+
+
+    if(stage === "T-7"){
+
+        text =
+            "T-7 reminder. This reminder is intended for approximately one week before the event.";
+
+    }
+
+
+    if(stage === "T-3"){
+
+        text =
+            "T-3 reminder. This reminder is intended for approximately three days before the event.";
+
+    }
+
+
+    if(stage === "T-1"){
+
+        text =
+            "T-1 reminder. This reminder is intended for the day before the event.";
+
+    }
+
+
+    if(days !== null){
+
+        text +=
+            ` Current event timing: ${days} day(s) remaining.`;
+
+    }
+
+
+    document.getElementById(
+        "reminderStageNotice"
+    ).textContent =
+        text;
+
+}
+
+
+
+/* =========================================================
+   SAVE REMINDER CONFIG
+========================================================= */
 
 async function saveReminderConfig(){
 
@@ -2219,7 +3734,8 @@ async function saveReminderConfig(){
         if(!response.success){
 
             throw new Error(
-                response.message
+                response.message ||
+                "Unable to save reminder configuration"
             );
 
         }
@@ -2237,8 +3753,10 @@ async function saveReminderConfig(){
 
         console.error(err);
 
+
         alert(
-            "Unable to save reminder configuration."
+            "Unable to save reminder configuration.\n\n" +
+            err.message
         );
 
     }
@@ -2246,9 +3764,10 @@ async function saveReminderConfig(){
 }
 
 
-// =========================================================
-// LOAD PARTICIPANTS
-// =========================================================
+
+/* =========================================================
+   LOAD PARTICIPANTS
+========================================================= */
 
 async function loadParticipants(){
 
@@ -2274,7 +3793,8 @@ async function loadParticipants(){
         if(!response.success){
 
             throw new Error(
-                response.message
+                response.message ||
+                "Unable to load participants"
             );
 
         }
@@ -2284,6 +3804,52 @@ async function loadParticipants(){
             response.data || [];
 
 
+        /*
+            UNIQUE PARTICIPANTS
+        */
+
+        const unique =
+            new Map();
+
+
+        participants.forEach(
+            p => {
+
+                const key =
+                    String(
+                        p.personId ||
+                        p.PersonID ||
+                        p.mobile ||
+                        p.email ||
+                        p.name ||
+                        ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                if(
+                    key &&
+                    !unique.has(key)
+                ){
+
+                    unique.set(
+                        key,
+                        p
+                    );
+
+                }
+
+            }
+        );
+
+
+        participants =
+            Array.from(
+                unique.values()
+            );
+
+
         renderParticipants();
 
     }
@@ -2291,18 +3857,23 @@ async function loadParticipants(){
 
         console.error(err);
 
+
         document.getElementById(
             "participantTable"
         ).innerHTML =
         `
             <tr>
+
                 <td colspan="6">
 
                     <div class="empty">
+
                         Unable to load participants.
+
                     </div>
 
                 </td>
+
             </tr>
         `;
 
@@ -2311,9 +3882,10 @@ async function loadParticipants(){
 }
 
 
-// =========================================================
-// RENDER PARTICIPANTS
-// =========================================================
+
+/* =========================================================
+   RENDER PARTICIPANTS
+========================================================= */
 
 function renderParticipants(){
 
@@ -2326,10 +3898,23 @@ function renderParticipants(){
     table.innerHTML = "";
 
 
+    /*
+        SORT A-Z
+    */
+
     participants.sort(
-        (a,b)=>
-            (a.name || "").localeCompare(
-                b.name || "",
+        (a,b) =>
+            String(
+                a.name ||
+                a.Name ||
+                ""
+            )
+            .localeCompare(
+                String(
+                    b.name ||
+                    b.Name ||
+                    ""
+                ),
                 undefined,
                 {
                     sensitivity:"base"
@@ -2342,19 +3927,26 @@ function renderParticipants(){
 
     let pending = 0;
 
+    let failed = 0;
+
 
     participants.forEach(
-        p=>{
+        p => {
 
             const status =
                 String(
                     p.reminderStatus ||
                     "PENDING"
-                ).toUpperCase();
+                )
+                .toUpperCase();
 
 
             if(status === "SENT")
                 sent++;
+
+            else if(status === "FAILED")
+                failed++;
+
             else
                 pending++;
 
@@ -2380,7 +3972,15 @@ function renderParticipants(){
         pending;
 
 
-    if(participants.length === 0){
+    document.getElementById(
+        "reminderFailed"
+    ).textContent =
+        failed;
+
+
+    if(
+        participants.length === 0
+    ){
 
         table.innerHTML =
         `
@@ -2389,7 +3989,10 @@ function renderParticipants(){
                 <td colspan="6">
 
                     <div class="empty">
-                        No participants requiring this reminder.
+
+                        No registered participants
+                        requiring this reminder.
+
                     </div>
 
                 </td>
@@ -2403,56 +4006,87 @@ function renderParticipants(){
 
 
     participants.forEach(
-        (p,index)=>{
+        (p,index) => {
 
             const status =
                 String(
                     p.reminderStatus ||
                     "PENDING"
-                ).toUpperCase();
+                )
+                .toUpperCase();
 
 
-            const statusClass =
-                status === "SENT"
-                    ? "sent"
-                    : status === "FAILED"
-                    ? "failed"
-                    : "pending";
+            let statusClass =
+                "badge-yellow";
+
+
+            if(status === "SENT")
+                statusClass =
+                    "badge-green";
+
+
+            if(status === "FAILED")
+                statusClass =
+                    "badge-red";
 
 
             table.innerHTML +=
             `
                 <tr>
 
+
                     <td>
 
                         <input
+
                             type="checkbox"
+
                             class="personCheck"
+
                             value="${index}"
-                            ${status === "SENT"
+
+                            ${
+                                status === "SENT"
                                 ? "disabled"
-                                : ""}>
+                                : ""
+                            }
+
+                        >
 
                     </td>
 
 
                     <td>
-                        ${escapeHtml(p.name || "")}
+
+                        ${escapeHtml(
+                            p.name ||
+                            p.Name ||
+                            ""
+                        )}
+
                     </td>
 
 
                     <td>
-                        ${escapeHtml(p.mobile || "")}
+
+                        ${escapeHtml(
+                            p.mobile ||
+                            p.Mobile ||
+                            ""
+                        )}
+
                     </td>
 
 
                     <td>
 
-                        <span class="badge">
+                        <span
+                            class="badge badge-blue">
+
                             ${escapeHtml(
                                 reminderConfig.reminderType
                             )}
+
                         </span>
 
                     </td>
@@ -2460,8 +4094,11 @@ function renderParticipants(){
 
                     <td>
 
-                        <span class="badge ${statusClass}">
+                        <span
+                            class="badge ${statusClass}">
+
                             ${status}
+
                         </span>
 
                     </td>
@@ -2471,7 +4108,11 @@ function renderParticipants(){
 
                         <button
                             class="preview"
-                            onclick="previewReminder(${index})">
+                            onclick="
+                                previewReminder(
+                                    ${index}
+                                )
+                            ">
 
                             Preview
 
@@ -2485,7 +4126,11 @@ function renderParticipants(){
                             `
                             <button
                                 class="whatsapp"
-                                onclick="sendReminder(${index})">
+                                onclick="
+                                    openManualReminderWhatsApp(
+                                        ${index}
+                                    )
+                                ">
 
                                 WhatsApp
 
@@ -2497,7 +4142,9 @@ function renderParticipants(){
                             ""
                         }
 
+
                     </td>
+
 
                 </tr>
             `;
@@ -2508,11 +4155,18 @@ function renderParticipants(){
 }
 
 
-// =========================================================
-// REMINDER MESSAGE ENGINE
-// =========================================================
 
-function generateMessage(p){
+/* =========================================================
+   GENERATE REMINDER MESSAGE
+========================================================= */
+
+function generateReminderMessage(person){
+
+    const name =
+        person.name ||
+        person.Name ||
+        "";
+
 
     let intro = "";
 
@@ -2524,10 +4178,10 @@ function generateMessage(p){
         case "T-7":
 
             intro =
-`Hi ${p.name}! 👋
+`Hi ${name}! 👋
 
 Thank you for registering for *${reminderConfig.eventName}*.
-We are delighted that you'll be joining us! Over the coming week, we encourage you to prepare your heart as we look forward to a meaningful time together.`;
+We are delighted that you'll be joining us!`;
 
             break;
 
@@ -2535,10 +4189,10 @@ We are delighted that you'll be joining us! Over the coming week, we encourage y
         case "T-3":
 
             intro =
-`Hi ${p.name}! 😊
+`Hi ${name}! 😊
 
 Only *3 days to go* until *${reminderConfig.eventName}*!
-Our team has been praying and preparing, and we're excited to welcome you. Here's a quick reminder of the event details.`;
+Our team is preparing and we're excited to welcome you.`;
 
             break;
 
@@ -2546,10 +4200,10 @@ Our team has been praying and preparing, and we're excited to welcome you. Here'
         case "T-1":
 
             intro =
-`Hi ${p.name}! 👋
+`Hi ${name}! 👋
 
 Just a friendly reminder that *${reminderConfig.eventName}* is happening *tomorrow*!
-We're looking forward to seeing you. Here are the final details before the event.`;
+We're looking forward to seeing you.`;
 
             break;
 
@@ -2608,15 +4262,24 @@ Blessings,
 }
 
 
-// =========================================================
-// REMINDER PREVIEW
-// =========================================================
+
+/* =========================================================
+   PREVIEW REMINDER
+========================================================= */
 
 function previewReminder(index){
 
+    const person =
+        participants[index];
+
+
+    if(!person)
+        return;
+
+
     alert(
-        generateMessage(
-            participants[index]
+        generateReminderMessage(
+            person
         )
     );
 
@@ -2643,11 +4306,12 @@ function previewReminderForFirstPerson(){
 }
 
 
-// =========================================================
-// SEND SINGLE REMINDER
-// =========================================================
 
-async function sendReminder(index){
+/* =========================================================
+   OPEN MANUAL WHATSAPP REMINDER
+========================================================= */
+
+async function openManualReminderWhatsApp(index){
 
     const person =
         participants[index];
@@ -2657,13 +4321,15 @@ async function sendReminder(index){
         return;
 
 
-    if(
+    const status =
         String(
-            person.reminderStatus || ""
-        ).toUpperCase()
-        ===
-        "SENT"
-    ){
+            person.reminderStatus ||
+            ""
+        )
+        .toUpperCase();
+
+
+    if(status === "SENT"){
 
         alert(
             `${person.name} has already received this reminder.`
@@ -2674,88 +4340,78 @@ async function sendReminder(index){
     }
 
 
-    if(
-        !confirm(
-            `Send ${reminderConfig.reminderType} reminder to ${person.name}?`
+    const phone =
+        String(
+            person.mobile ||
+            ""
         )
-    ){
+        .replace(
+            /\D/g,
+            ""
+        );
+
+
+    if(!phone){
+
+        alert(
+            `${person.name} does not have a valid mobile number.`
+        );
 
         return;
 
     }
 
 
-    try{
-
-        const response =
-            await API.post(
-                "sendReminderWhatsApp",
-                {
-                    personId:
-                        person.personId ||
-                        person.PersonID ||
-                        person.mobile,
-
-                    eventId:
-                        selectedEvent.spreadsheetId,
-
-                    eventName:
-                        selectedEvent.eventName,
-
-                    mobile:
-                        person.mobile,
-
-                    name:
-                        person.name,
-
-                    reminderType:
-                        reminderConfig.reminderType,
-
-                    message:
-                        generateMessage(person)
-                }
-            );
-
-
-        if(!response.success){
-
-            throw new Error(
-                response.message ||
-                "WhatsApp sending failed"
-            );
-
-        }
-
-
-        person.reminderStatus =
-            "SENT";
-
-
-        renderParticipants();
-
-
-        alert(
-            `Reminder sent to ${person.name}.`
+    const message =
+        generateReminderMessage(
+            person
         );
 
-    }
-    catch(err){
 
-        console.error(err);
-
-        alert(
-            "Unable to send reminder: " +
-            err.message
+    const url =
+        "https://wa.me/" +
+        phone +
+        "?text=" +
+        encodeURIComponent(
+            message
         );
 
-    }
+
+    window.open(
+        url,
+        "_blank"
+    );
+
+
+    const sent =
+        confirm(
+`
+WhatsApp has been opened for ${person.name}.
+
+Please check the message and press Send.
+
+Did you send the reminder?
+`
+    );
+
+
+    if(!sent)
+        return;
+
+
+    await recordCommunicationStatus(
+        person,
+        "REMINDER",
+        "SENT"
+    );
 
 }
 
 
-// =========================================================
-// SEND SELECTED REMINDER
-// =========================================================
+
+/* =========================================================
+   SEND SELECTED REMINDER
+========================================================= */
 
 async function sendSelectedReminder(){
 
@@ -2776,15 +4432,14 @@ async function sendSelectedReminder(){
     }
 
 
-    if(
-        !confirm(
-            `Send ${reminderConfig.reminderType} reminder to ${selected.length} selected people?`
-        )
-    ){
+    const confirmed =
+        confirm(
+            `Open WhatsApp for ${selected.length} selected people?`
+        );
 
+
+    if(!confirmed)
         return;
-
-    }
 
 
     for(
@@ -2797,81 +4452,44 @@ async function sendSelectedReminder(){
             );
 
 
-        const person =
-            participants[index];
-
-
-        try{
-
-            const response =
-                await API.post(
-                    "sendReminderWhatsApp",
-                    {
-                        personId:
-                            person.personId ||
-                            person.PersonID ||
-                            person.mobile,
-
-                        eventId:
-                            selectedEvent.spreadsheetId,
-
-                        eventName:
-                            selectedEvent.eventName,
-
-                        mobile:
-                            person.mobile,
-
-                        name:
-                            person.name,
-
-                        reminderType:
-                            reminderConfig.reminderType,
-
-                        message:
-                            generateMessage(person)
-                    }
-                );
-
-
-            if(response.success){
-
-                person.reminderStatus =
-                    "SENT";
-
-            }
-            else{
-
-                person.reminderStatus =
-                    "FAILED";
-
-            }
-
-        }
-        catch(err){
-
-            console.error(err);
-
-            person.reminderStatus =
-                "FAILED";
-
-        }
+        await openManualReminderWhatsApp(
+            index
+        );
 
     }
 
 
-    renderParticipants();
-
-
-    alert(
-        "Reminder sending process completed."
-    );
+    await loadParticipants();
 
 }
 
 
-// =========================================================
-// SELECT ALL REMINDERS
-// =========================================================
+
+/* =========================================================
+   SELECT ALL PUBLICITY
+========================================================= */
+
+function toggleAllPublicity(
+    checkbox
+){
+
+    document
+        .querySelectorAll(
+            ".publicityCheck:not(:disabled)"
+        )
+        .forEach(
+            cb =>
+                cb.checked =
+                    checkbox.checked
+        );
+
+}
+
+
+
+/* =========================================================
+   SELECT ALL REMINDERS
+========================================================= */
 
 function toggleAllReminder(
     checkbox
@@ -2890,9 +4508,10 @@ function toggleAllReminder(
 }
 
 
-// =========================================================
-// FILE NAME DISPLAY
-// =========================================================
+
+/* =========================================================
+   FILE SELECTION
+========================================================= */
 
 document
     .getElementById(
@@ -2906,20 +4525,133 @@ document
                 this.files[0];
 
 
-            document.getElementById(
-                "attachmentName"
-            ).textContent =
-                file
-                    ? `Selected: ${file.name}`
-                    : "";
+            const name =
+                document.getElementById(
+                    "attachmentName"
+                );
+
+
+            const image =
+                document.getElementById(
+                    "posterPreview"
+                );
+
+
+            const pdf =
+                document.getElementById(
+                    "pdfPreview"
+                );
+
+
+            image.style.display =
+                "none";
+
+
+            pdf.style.display =
+                "none";
+
+
+            image.src =
+                "";
+
+
+            if(!file){
+
+                name.textContent =
+                    "";
+
+                return;
+
+            }
+
+
+            name.textContent =
+                `Selected: ${file.name}`;
+
+
+            /*
+                IMAGE PREVIEW
+            */
+
+            if(
+                file.type.startsWith(
+                    "image/"
+                )
+            ){
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function(e){
+
+                        image.src =
+                            e.target.result;
+
+
+                        image.style.display =
+                            "block";
+
+                    };
+
+
+                reader.readAsDataURL(
+                    file
+                );
+
+            }
+
+
+            /*
+                PDF PREVIEW
+            */
+
+            else if(
+                file.type ===
+                "application/pdf"
+            ){
+
+                pdf.style.display =
+                    "block";
+
+            }
 
         }
     );
 
 
-// =========================================================
-// ESCAPE HTML
-// =========================================================
+
+/* =========================================================
+   PERSONALISED MESSAGE
+========================================================= */
+
+function personaliseMessage(
+    message,
+    person
+){
+
+    const name =
+        person.name ||
+        person.Name ||
+        "";
+
+
+    return String(
+        message || ""
+    )
+    .replace(
+        /\{name\}/gi,
+        name
+    );
+
+}
+
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function escapeHtml(value){
 
@@ -2950,9 +4682,10 @@ function escapeHtml(value){
 }
 
 
-// =========================================================
-// BACK
-// =========================================================
+
+/* =========================================================
+   BACK
+========================================================= */
 
 function goBack(){
 
@@ -2962,9 +4695,10 @@ function goBack(){
 }
 
 
-// =========================================================
-// START
-// =========================================================
+
+/* =========================================================
+   START
+========================================================= */
 
 window.onload =
     async function(){
@@ -2973,8 +4707,9 @@ window.onload =
 
     };
 
-
 </script>
 
+
 </body>
+
 </html>
