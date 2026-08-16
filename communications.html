@@ -1613,7 +1613,6 @@ let reminderConfig = {};
 let publicityConfig = {};
 
 
-
 /* =========================================================
    URL PARAMETERS
 ========================================================= */
@@ -1627,24 +1626,9 @@ const presetEvent =
     params.get("event");
 
 
-
 /* =========================================================
    LOAD EVENTS
 ========================================================= */
-
-/*
-    IMPORTANT:
-
-    We deliberately use getEventList()
-
-    rather than getActiveEventsForReminder()
-
-    because PUBLICITY must be available immediately
-    after an event is created/imported.
-
-    Reminder availability is calculated separately
-    from the event date.
-*/
 
 async function loadEvents(){
 
@@ -1656,7 +1640,6 @@ async function loadEvents(){
                 {}
             );
 
-
         if(!response.success){
 
             throw new Error(
@@ -1666,18 +1649,14 @@ async function loadEvents(){
 
         }
 
-
         events =
             response.data ||
             response.result ||
             [];
 
-
         /*
-            Only ACTIVE events are available
-            for communication.
-
-            CLOSED events remain excluded.
+            Communications Centre only works
+            with ACTIVE events.
         */
 
         events =
@@ -1693,9 +1672,7 @@ async function loadEvents(){
                     "ACTIVE"
             );
 
-
         populateEventDropdown();
-
 
         if(events.length === 0){
 
@@ -1721,7 +1698,6 @@ async function loadEvents(){
             err
         );
 
-
         document.getElementById(
             "selectedEventInfo"
         ).innerHTML =
@@ -1744,7 +1720,6 @@ async function loadEvents(){
 }
 
 
-
 /* =========================================================
    POPULATE EVENT DROPDOWN
 ========================================================= */
@@ -1756,14 +1731,12 @@ function populateEventDropdown(){
             "eventFilter"
         );
 
-
     select.innerHTML =
     `
         <option value="">
             Select Event
         </option>
     `;
-
 
     events.forEach(
         e => {
@@ -1774,13 +1747,11 @@ function populateEventDropdown(){
                 e.id ||
                 e.eventId;
 
-
             const name =
                 e.eventName ||
                 e.EventName ||
                 e.name ||
                 "";
-
 
             const date =
                 e.eventDate ||
@@ -1788,22 +1759,22 @@ function populateEventDropdown(){
                 e.date ||
                 "";
 
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-            select.innerHTML +=
-            `
-                <option
-                    value="${escapeHtml(id)}">
+            option.value = id;
 
-                    ${escapeHtml(name)}
-                    -
-                    ${escapeHtml(date)}
+            option.textContent =
+                `${name} - ${date}`;
 
-                </option>
-            `;
+            select.appendChild(
+                option
+            );
 
         }
     );
-
 
     if(presetEvent){
 
@@ -1817,7 +1788,6 @@ function populateEventDropdown(){
 }
 
 
-
 /* =========================================================
    SELECT EVENT
 ========================================================= */
@@ -1828,7 +1798,6 @@ async function selectEvent(){
         document.getElementById(
             "eventFilter"
         ).value;
-
 
     if(!eventId){
 
@@ -1841,7 +1810,6 @@ async function selectEvent(){
         return;
 
     }
-
 
     selectedEvent =
         events.find(
@@ -1856,13 +1824,12 @@ async function selectEvent(){
                 String(eventId)
         );
 
-
     if(!selectedEvent)
         return;
 
 
     /*
-        Normalise event properties.
+        NORMALISE EVENT
     */
 
     selectedEvent.spreadsheetId =
@@ -1871,20 +1838,17 @@ async function selectEvent(){
         selectedEvent.id ||
         selectedEvent.eventId;
 
-
     selectedEvent.eventName =
         selectedEvent.eventName ||
         selectedEvent.EventName ||
         selectedEvent.name ||
         "";
 
-
     selectedEvent.eventDate =
         selectedEvent.eventDate ||
         selectedEvent.EventDate ||
         selectedEvent.date ||
         "";
-
 
     selectedEvent.status =
         selectedEvent.status ||
@@ -1893,13 +1857,12 @@ async function selectEvent(){
 
 
     /*
-        Display event.
+        DISPLAY EVENT
     */
 
     document.getElementById(
         "selectedEventInfo"
     ).classList.remove("hidden");
-
 
     document.getElementById(
         "selectedEventInfo"
@@ -1925,6 +1888,7 @@ async function selectEvent(){
             <br>
 
             📌 Status:
+
             <span class="badge badge-green">
                 ACTIVE
             </span>
@@ -1937,7 +1901,6 @@ async function selectEvent(){
         "activityCard"
     ).classList.remove("hidden");
 
-
     document.getElementById(
         "lifecycleCard"
     ).classList.remove("hidden");
@@ -1947,7 +1910,9 @@ async function selectEvent(){
 
 
     document
-        .querySelectorAll(".activity-button")
+        .querySelectorAll(
+            ".activity-button"
+        )
         .forEach(
             btn =>
                 btn.classList.remove("active")
@@ -1956,15 +1921,13 @@ async function selectEvent(){
 
     hideModules();
 
-
     updateLifecycleStatus();
 
 }
 
 
-
 /* =========================================================
-   EVENT DATE CALCULATION
+   EVENT DATE
 ========================================================= */
 
 function getDaysRemaining(){
@@ -1974,12 +1937,12 @@ function getDaysRemaining(){
 
 
     const eventDate =
-        new Date(
+        parseEventDate(
             selectedEvent.eventDate
         );
 
 
-    if(isNaN(eventDate.getTime()))
+    if(!eventDate)
         return null;
 
 
@@ -1990,7 +1953,6 @@ function getDaysRemaining(){
 
     const today =
         new Date();
-
 
     today.setHours(
         0,0,0,0
@@ -2014,26 +1976,80 @@ function getDaysRemaining(){
 }
 
 
+/* =========================================================
+   EVENT DATE PARSER
+========================================================= */
+
+function parseEventDate(value){
+
+    if(!value)
+        return null;
+
+
+    if(
+        Object.prototype.toString.call(value)
+        ===
+        "[object Date]"
+    ){
+
+        return new Date(
+            value.getTime()
+        );
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if(!isNaN(date.getTime()))
+        return date;
+
+
+    /*
+        Handle DD/MM/YYYY if required.
+    */
+
+    const match =
+        String(value)
+        .match(
+            /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/
+        );
+
+
+    if(match){
+
+        const day =
+            Number(match[1]);
+
+        const month =
+            Number(match[2]) - 1;
+
+        const year =
+            Number(match[3]);
+
+        const parsed =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+        if(!isNaN(parsed.getTime()))
+            return parsed;
+
+    }
+
+
+    return null;
+
+}
+
 
 /* =========================================================
    REMINDER AVAILABILITY
 ========================================================= */
-
-/*
-    Publicity:
-        ACTIVE event
-        Available immediately.
-
-    Reminder:
-        Available once event is within 7 days.
-
-    This deliberately does NOT hide reminder after
-    T-7. Once the event enters the reminder window,
-    the reminder activity remains available so that
-    the user can see the communication history.
-
-    The user can select T-7 / T-3 / T-1 separately.
-*/
 
 function getReminderAvailability(){
 
@@ -2041,18 +2057,29 @@ function getReminderAvailability(){
         getDaysRemaining();
 
 
-    if(days === null)
+    if(days === null){
+
         return {
+
             available:false,
-            reason:"Event date unavailable."
+
+            reason:
+                "Event date unavailable."
+
         };
+
+    }
 
 
     if(days < 0){
 
         return {
+
             available:false,
-            reason:"Event has already taken place."
+
+            reason:
+                "Event has already taken place."
+
         };
 
     }
@@ -2061,26 +2088,31 @@ function getReminderAvailability(){
     if(days <= 7){
 
         return {
+
             available:true,
+
             reason:
                 "Reminder communication is available."
+
         };
 
     }
 
 
     return {
+
         available:false,
+
         reason:
             `Reminder will become available when the event is within 7 days. ${days} days remaining.`
+
     };
 
 }
 
 
-
 /* =========================================================
-   UPDATE LIFECYCLE STATUS
+   LIFECYCLE STATUS
 ========================================================= */
 
 function updateLifecycleStatus(){
@@ -2156,7 +2188,6 @@ function updateLifecycleStatus(){
     `
         <div class="status-panel">
 
-
             <div class="status-row">
 
                 <strong>
@@ -2213,7 +2244,6 @@ function updateLifecycleStatus(){
 
             </div>
 
-
         </div>
     `;
 
@@ -2248,9 +2278,8 @@ function updateLifecycleStatus(){
 }
 
 
-
 /* =========================================================
-   ACTIVITY SELECTION
+   ACTIVITY
 ========================================================= */
 
 async function selectActivity(activity){
@@ -2346,7 +2375,6 @@ async function selectActivity(activity){
 }
 
 
-
 /* =========================================================
    HIDE MODULES
 ========================================================= */
@@ -2390,7 +2418,6 @@ function hideAllModules(){
 }
 
 
-
 /* =========================================================
    PUBLICITY
 ========================================================= */
@@ -2410,7 +2437,10 @@ async function loadPublicity(){
             selectedEvent.eventName,
 
         eventDate:
-            selectedEvent.eventDate
+            selectedEvent.eventDate,
+
+        message:
+            ""
 
     };
 
@@ -2429,7 +2459,13 @@ async function loadPublicity(){
 
 
     /*
-        Load saved publicity configuration.
+        IMPORTANT:
+
+        GS expects:
+
+        e.parameter.data
+
+        containing JSON.
     */
 
     try{
@@ -2438,8 +2474,13 @@ async function loadPublicity(){
             await API.post(
                 "getPublicityConfiguration",
                 {
-                    spreadsheetId:
-                        selectedEvent.spreadsheetId
+                    data:
+                        JSON.stringify({
+
+                            spreadsheetId:
+                                selectedEvent.spreadsheetId
+
+                        })
                 }
             );
 
@@ -2478,8 +2519,9 @@ async function loadPublicity(){
     }
     catch(err){
 
-        console.log(
-            "No previous publicity configuration."
+        console.warn(
+            "Unable to load publicity configuration:",
+            err
         );
 
     }
@@ -2490,9 +2532,8 @@ async function loadPublicity(){
 }
 
 
-
 /* =========================================================
-   LOAD PUBLICITY AUDIENCE
+   PUBLICITY AUDIENCE
 ========================================================= */
 
 async function loadPublicityAudience(){
@@ -2527,52 +2568,9 @@ async function loadPublicityAudience(){
             response.data || [];
 
 
-        /*
-            UNIQUE PERSON
-
-            Deduplicate by personId first,
-            then mobile as fallback.
-        */
-
-        const unique =
-            new Map();
-
-
-        publicityAudience.forEach(
-            p => {
-
-                const key =
-                    String(
-                        p.personId ||
-                        p.PersonID ||
-                        p.mobile ||
-                        p.email ||
-                        p.name ||
-                        ""
-                    )
-                    .trim()
-                    .toLowerCase();
-
-
-                if(
-                    key &&
-                    !unique.has(key)
-                ){
-
-                    unique.set(
-                        key,
-                        p
-                    );
-
-                }
-
-            }
-        );
-
-
         publicityAudience =
-            Array.from(
-                unique.values()
+            deduplicatePeople(
+                publicityAudience
             );
 
 
@@ -2598,11 +2596,9 @@ async function loadPublicityAudience(){
 
                         <br><br>
 
-                        Backend action required:
-
-                        <strong>
-                            getPublicityAudience
-                        </strong>
+                        ${escapeHtml(
+                            err.message || ""
+                        )}
 
                     </div>
 
@@ -2616,9 +2612,8 @@ async function loadPublicityAudience(){
 }
 
 
-
 /* =========================================================
-   RENDER PUBLICITY AUDIENCE
+   RENDER PUBLICITY
 ========================================================= */
 
 function renderPublicityAudience(){
@@ -2632,38 +2627,8 @@ function renderPublicityAudience(){
     table.innerHTML = "";
 
 
-    /*
-        SORT A-Z
-    */
-
     publicityAudience.sort(
-        (a,b) => {
-
-            const nameA =
-                String(
-                    a.name ||
-                    a.Name ||
-                    ""
-                );
-
-
-            const nameB =
-                String(
-                    b.name ||
-                    b.Name ||
-                    ""
-                );
-
-
-            return nameA.localeCompare(
-                nameB,
-                undefined,
-                {
-                    sensitivity:"base"
-                }
-            );
-
-        }
+        sortByName
     );
 
 
@@ -2680,6 +2645,7 @@ function renderPublicityAudience(){
             const status =
                 String(
                     p.publicityStatus ||
+                    p.PublicityStatus ||
                     "PENDING"
                 )
                 .toUpperCase();
@@ -2687,6 +2653,7 @@ function renderPublicityAudience(){
 
             if(status === "SENT")
                 sent++;
+
             else
                 pending++;
 
@@ -2694,14 +2661,14 @@ function renderPublicityAudience(){
             const engagement =
                 String(
                     p.engagement ||
+                    p.Engagement ||
                     ""
                 )
                 .toLowerCase();
 
 
             if(
-                engagement ===
-                "registered"
+                engagement === "registered"
             ){
 
                 registered++;
@@ -2768,6 +2735,7 @@ function renderPublicityAudience(){
             const status =
                 String(
                     p.publicityStatus ||
+                    p.PublicityStatus ||
                     "PENDING"
                 )
                 .toUpperCase();
@@ -2788,19 +2756,16 @@ function renderPublicityAudience(){
 
 
             const name =
-                p.name ||
-                p.Name ||
-                "";
+                getPersonName(p);
 
 
             const mobile =
-                p.mobile ||
-                p.Mobile ||
-                "";
+                getPersonMobile(p);
 
 
             const engagement =
                 p.engagement ||
+                p.Engagement ||
                 "Not Registered";
 
 
@@ -2808,49 +2773,36 @@ function renderPublicityAudience(){
             `
                 <tr>
 
-
                     <td>
 
                         <input
-
                             type="checkbox"
-
                             class="publicityCheck"
-
                             value="${index}"
-
                             ${
                                 status === "SENT"
                                 ? "disabled"
                                 : ""
                             }
-
                         >
 
                     </td>
 
 
                     <td>
-
                         ${escapeHtml(name)}
-
                     </td>
 
 
                     <td>
-
                         ${escapeHtml(mobile)}
-
                     </td>
 
 
                     <td>
 
-                        <span
-                            class="badge ${statusClass}">
-
-                            ${status}
-
+                        <span class="badge ${statusClass}">
+                            ${escapeHtml(status)}
                         </span>
 
                     </td>
@@ -2858,28 +2810,18 @@ function renderPublicityAudience(){
 
                     <td>
 
-                        <span
-                            class="badge badge-blue">
-
-                            ${escapeHtml(
-                                engagement
-                            )}
-
+                        <span class="badge badge-blue">
+                            ${escapeHtml(engagement)}
                         </span>
 
                     </td>
 
 
                     <td>
-
 
                         <button
                             class="preview"
-                            onclick="
-                                previewPublicityPerson(
-                                    ${index}
-                                )
-                            ">
+                            onclick="previewPublicityPerson(${index})">
 
                             Preview
 
@@ -2888,16 +2830,13 @@ function renderPublicityAudience(){
 
                         ${
                             status !== "SENT"
+
                             ?
 
                             `
                             <button
                                 class="whatsapp"
-                                onclick="
-                                    openManualPublicityWhatsApp(
-                                        ${index}
-                                    )
-                                ">
+                                onclick="openManualPublicityWhatsApp(${index})">
 
                                 WhatsApp
 
@@ -2909,9 +2848,7 @@ function renderPublicityAudience(){
                             ""
                         }
 
-
                     </td>
-
 
                 </tr>
             `;
@@ -2922,12 +2859,15 @@ function renderPublicityAudience(){
 }
 
 
-
 /* =========================================================
    PUBLICITY PREVIEW
 ========================================================= */
 
 function previewPublicityCampaign(){
+
+    if(!selectedEvent)
+        return;
+
 
     const message =
         document.getElementById(
@@ -2961,7 +2901,6 @@ ${poster || "No poster selected"}`
 }
 
 
-
 function previewPublicityPerson(index){
 
     const person =
@@ -2986,7 +2925,7 @@ function previewPublicityPerson(index){
 
 
     alert(
-`To: ${person.name || ""}
+`To: ${getPersonName(person)}
 
 ${message}
 
@@ -3000,7 +2939,6 @@ ${
 }
 
 
-
 /* =========================================================
    SAVE PUBLICITY
 ========================================================= */
@@ -3011,10 +2949,25 @@ async function savePublicityConfiguration(){
         return;
 
 
-    publicityConfig.message =
+    const message =
         document.getElementById(
             "publicityMessage"
         ).value;
+
+
+    if(!message.trim()){
+
+        alert(
+            "Please enter a publicity message first."
+        );
+
+        return;
+
+    }
+
+
+    publicityConfig.message =
+        message;
 
 
     const file =
@@ -3028,26 +2981,41 @@ async function savePublicityConfiguration(){
         publicityConfig.attachmentName =
             file.name;
 
-
-        /*
-            We retain the file in the browser for the
-            current session.
-
-            Actual server upload can be connected later.
-        */
-
         publicityConfig.attachmentMimeType =
             file.type;
 
     }
 
 
+    /*
+        GS only receives attachmentName.
+
+        The actual file is NOT uploaded by
+        the current GS router.
+    */
+
     try{
 
         const response =
             await API.post(
                 "savePublicityConfiguration",
-                publicityConfig
+                {
+                    spreadsheetId:
+                        selectedEvent.spreadsheetId,
+
+                    eventName:
+                        selectedEvent.eventName,
+
+                    eventDate:
+                        selectedEvent.eventDate,
+
+                    message:
+                        publicityConfig.message,
+
+                    attachmentName:
+                        publicityConfig.attachmentName ||
+                        ""
+                }
             );
 
 
@@ -3081,7 +3049,6 @@ async function savePublicityConfiguration(){
 }
 
 
-
 /* =========================================================
    REFRESH PUBLICITY
 ========================================================= */
@@ -3092,6 +3059,75 @@ async function refreshPublicityAudience(){
 
 }
 
+
+/* =========================================================
+   PREPARE PUBLICITY WHATSAPP
+========================================================= */
+
+async function preparePublicityWhatsApp(
+    person,
+    message
+){
+
+    try{
+
+        const response =
+            await API.post(
+                "preparePublicityWhatsApp",
+                {
+
+                    personId:
+                        getPersonId(person),
+
+                    eventId:
+                        selectedEvent.spreadsheetId,
+
+                    eventName:
+                        selectedEvent.eventName,
+
+                    mobile:
+                        getPersonMobile(person),
+
+                    name:
+                        getPersonName(person),
+
+                    message:
+                        message
+
+                }
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "Unable to prepare WhatsApp message"
+            );
+
+        }
+
+
+        return response;
+
+    }
+    catch(err){
+
+        console.warn(
+            "preparePublicityWhatsApp:",
+            err
+        );
+
+        /*
+            The browser can still open WhatsApp
+            directly if preparation is unavailable.
+        */
+
+        return null;
+
+    }
+
+}
 
 
 /* =========================================================
@@ -3111,6 +3147,7 @@ async function openManualPublicityWhatsApp(index){
     const status =
         String(
             person.publicityStatus ||
+            person.PublicityStatus ||
             ""
         )
         .toUpperCase();
@@ -3119,7 +3156,7 @@ async function openManualPublicityWhatsApp(index){
     if(status === "SENT"){
 
         alert(
-            `${person.name} has already received publicity for this event.`
+            `${getPersonName(person)} has already received publicity for this event.`
         );
 
         return;
@@ -3128,20 +3165,15 @@ async function openManualPublicityWhatsApp(index){
 
 
     const phone =
-        String(
-            person.mobile ||
-            ""
-        )
-        .replace(
-            /\D/g,
-            ""
+        normalisePhone(
+            getPersonMobile(person)
         );
 
 
     if(!phone){
 
         alert(
-            `${person.name} does not have a valid mobile number.`
+            `${getPersonName(person)} does not have a valid mobile number.`
         );
 
         return;
@@ -3173,6 +3205,17 @@ async function openManualPublicityWhatsApp(index){
         );
 
 
+    /*
+        Notify backend that this WhatsApp
+        communication is being prepared.
+    */
+
+    await preparePublicityWhatsApp(
+        person,
+        message
+    );
+
+
     const url =
         "https://wa.me/" +
         phone +
@@ -3189,18 +3232,18 @@ async function openManualPublicityWhatsApp(index){
 
 
     /*
-        Opening WhatsApp does NOT mean the message
-        was sent.
+        Opening WhatsApp does NOT mean SENT.
 
-        Ask user to confirm.
+        User must confirm after manually
+        pressing Send.
     */
 
     const sent =
         confirm(
 `
-WhatsApp has been opened for ${person.name}.
+WhatsApp has been opened for ${getPersonName(person)}.
 
-Please attach the publicity poster in WhatsApp
+Please attach the publicity poster if required
 and press Send.
 
 Did you send the message?
@@ -3212,18 +3255,18 @@ Did you send the message?
         return;
 
 
-    await recordCommunicationStatus(
+    await markCommunicationSent(
         person,
         "PUBLICITY",
-        "SENT"
+        "",
+        message
     );
 
 }
 
 
-
 /* =========================================================
-   SEND SELECTED PUBLICITY
+   SELECTED PUBLICITY
 ========================================================= */
 
 async function sendSelectedPublicity(){
@@ -3255,16 +3298,6 @@ async function sendSelectedPublicity(){
         return;
 
 
-    /*
-        IMPORTANT:
-
-        We deliberately process one person at a time.
-
-        This is manual WhatsApp mode.
-
-        The browser cannot mass-send WhatsApp messages.
-    */
-
     for(
         const checkbox of selected
     ){
@@ -3285,141 +3318,6 @@ async function sendSelectedPublicity(){
     await loadPublicityAudience();
 
 }
-
-
-
-/* =========================================================
-   RECORD COMMUNICATION STATUS
-========================================================= */
-
-/*
-    This function records the communication result.
-
-    It does NOT send WhatsApp.
-
-    The eventual WhatsApp API can replace only the
-    sending portion while retaining this tracking model.
-*/
-
-async function recordCommunicationStatus(
-    person,
-    communicationType,
-    status
-){
-
-    try{
-
-        const payload = {
-
-            eventId:
-                selectedEvent.spreadsheetId,
-
-            personId:
-                person.personId ||
-                person.PersonID ||
-                person.mobile,
-
-            name:
-                person.name ||
-                person.Name ||
-                "",
-
-            mobile:
-                person.mobile ||
-                person.Mobile ||
-                "",
-
-            communicationType:
-                communicationType,
-
-            reminderType:
-                communicationType === "REMINDER"
-                    ? reminderConfig.reminderType
-                    : "",
-
-            status:
-                status,
-
-            timestamp:
-                new Date().toISOString()
-
-        };
-
-
-        /*
-            This action is a lightweight tracking action.
-
-            It does NOT require WhatsApp API.
-        */
-
-        const response =
-            await API.post(
-                "recordCommunicationStatus",
-                payload
-            );
-
-
-        if(!response.success){
-
-            throw new Error(
-                response.message ||
-                "Unable to record communication"
-            );
-
-        }
-
-
-        /*
-            Update local state immediately.
-        */
-
-        if(
-            communicationType ===
-            "PUBLICITY"
-        ){
-
-            person.publicityStatus =
-                status;
-
-            person.sentAt =
-                new Date().toISOString();
-
-            renderPublicityAudience();
-
-        }
-
-
-        if(
-            communicationType ===
-            "REMINDER"
-        ){
-
-            person.reminderStatus =
-                status;
-
-            renderParticipants();
-
-        }
-
-    }
-    catch(err){
-
-        console.error(
-            "recordCommunicationStatus:",
-            err
-        );
-
-
-        alert(
-            "Message was marked as sent locally, but " +
-            "the communication record could not be saved.\n\n" +
-            err.message
-        );
-
-    }
-
-}
-
 
 
 /* =========================================================
@@ -3493,7 +3391,6 @@ async function loadReminder(){
 }
 
 
-
 /* =========================================================
    DEFAULT REMINDER STAGE
 ========================================================= */
@@ -3517,26 +3414,52 @@ function determineDefaultReminderStage(){
 }
 
 
-
 /* =========================================================
-   LOAD REMINDER CONFIG
+   LOAD REMINDER CONFIGURATION
 ========================================================= */
 
 async function loadReminderConfiguration(){
 
+    if(!selectedEvent)
+        return;
+
+
     try{
+
+        /*
+            IMPORTANT:
+
+            GS expects:
+
+            JSON.parse(e.parameter.data)
+        */
 
         const response =
             await API.post(
                 "getReminderConfiguration",
                 {
-                    spreadsheetId:
-                        selectedEvent.spreadsheetId,
+                    data:
+                        JSON.stringify({
 
-                    reminderType:
-                        reminderConfig.reminderType
+                            spreadsheetId:
+                                selectedEvent.spreadsheetId,
+
+                            reminderType:
+                                reminderConfig.reminderType
+
+                        })
                 }
             );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "Unable to load reminder configuration"
+            );
+
+        }
 
 
         const saved =
@@ -3585,8 +3508,9 @@ async function loadReminderConfiguration(){
     }
     catch(err){
 
-        console.log(
-            "No previous reminder configuration."
+        console.warn(
+            "Unable to load reminder configuration:",
+            err
         );
 
     }
@@ -3595,7 +3519,6 @@ async function loadReminderConfiguration(){
     updateReminderStageNotice();
 
 }
-
 
 
 /* =========================================================
@@ -3619,7 +3542,6 @@ async function changeReminderType(){
     await loadParticipants();
 
 }
-
 
 
 /* =========================================================
@@ -3679,12 +3601,15 @@ function updateReminderStageNotice(){
 }
 
 
-
 /* =========================================================
-   SAVE REMINDER CONFIG
+   SAVE REMINDER CONFIGURATION
 ========================================================= */
 
 async function saveReminderConfig(){
+
+    if(!selectedEvent)
+        return;
+
 
     reminderConfig.reportingTime =
         document.getElementById(
@@ -3764,7 +3689,6 @@ async function saveReminderConfig(){
 }
 
 
-
 /* =========================================================
    LOAD PARTICIPANTS
 ========================================================= */
@@ -3781,11 +3705,13 @@ async function loadParticipants(){
             await API.post(
                 "getReminderParticipants",
                 {
+
                     spreadsheetId:
                         selectedEvent.spreadsheetId,
 
                     reminderType:
                         reminderConfig.reminderType
+
                 }
             );
 
@@ -3804,49 +3730,9 @@ async function loadParticipants(){
             response.data || [];
 
 
-        /*
-            UNIQUE PARTICIPANTS
-        */
-
-        const unique =
-            new Map();
-
-
-        participants.forEach(
-            p => {
-
-                const key =
-                    String(
-                        p.personId ||
-                        p.PersonID ||
-                        p.mobile ||
-                        p.email ||
-                        p.name ||
-                        ""
-                    )
-                    .trim()
-                    .toLowerCase();
-
-
-                if(
-                    key &&
-                    !unique.has(key)
-                ){
-
-                    unique.set(
-                        key,
-                        p
-                    );
-
-                }
-
-            }
-        );
-
-
         participants =
-            Array.from(
-                unique.values()
+            deduplicatePeople(
+                participants
             );
 
 
@@ -3870,6 +3756,12 @@ async function loadParticipants(){
 
                         Unable to load participants.
 
+                        <br><br>
+
+                        ${escapeHtml(
+                            err.message || ""
+                        )}
+
                     </div>
 
                 </td>
@@ -3880,7 +3772,6 @@ async function loadParticipants(){
     }
 
 }
-
 
 
 /* =========================================================
@@ -3898,28 +3789,8 @@ function renderParticipants(){
     table.innerHTML = "";
 
 
-    /*
-        SORT A-Z
-    */
-
     participants.sort(
-        (a,b) =>
-            String(
-                a.name ||
-                a.Name ||
-                ""
-            )
-            .localeCompare(
-                String(
-                    b.name ||
-                    b.Name ||
-                    ""
-                ),
-                undefined,
-                {
-                    sensitivity:"base"
-                }
-            )
+        sortByName
     );
 
 
@@ -3936,6 +3807,7 @@ function renderParticipants(){
             const status =
                 String(
                     p.reminderStatus ||
+                    p.ReminderStatus ||
                     "PENDING"
                 )
                 .toUpperCase();
@@ -4011,6 +3883,7 @@ function renderParticipants(){
             const status =
                 String(
                     p.reminderStatus ||
+                    p.ReminderStatus ||
                     "PENDING"
                 )
                 .toUpperCase();
@@ -4034,23 +3907,17 @@ function renderParticipants(){
             `
                 <tr>
 
-
                     <td>
 
                         <input
-
                             type="checkbox"
-
                             class="personCheck"
-
                             value="${index}"
-
                             ${
                                 status === "SENT"
                                 ? "disabled"
                                 : ""
                             }
-
                         >
 
                     </td>
@@ -4059,9 +3926,7 @@ function renderParticipants(){
                     <td>
 
                         ${escapeHtml(
-                            p.name ||
-                            p.Name ||
-                            ""
+                            getPersonName(p)
                         )}
 
                     </td>
@@ -4070,9 +3935,7 @@ function renderParticipants(){
                     <td>
 
                         ${escapeHtml(
-                            p.mobile ||
-                            p.Mobile ||
-                            ""
+                            getPersonMobile(p)
                         )}
 
                     </td>
@@ -4080,8 +3943,7 @@ function renderParticipants(){
 
                     <td>
 
-                        <span
-                            class="badge badge-blue">
+                        <span class="badge badge-blue">
 
                             ${escapeHtml(
                                 reminderConfig.reminderType
@@ -4094,10 +3956,9 @@ function renderParticipants(){
 
                     <td>
 
-                        <span
-                            class="badge ${statusClass}">
+                        <span class="badge ${statusClass}">
 
-                            ${status}
+                            ${escapeHtml(status)}
 
                         </span>
 
@@ -4108,11 +3969,7 @@ function renderParticipants(){
 
                         <button
                             class="preview"
-                            onclick="
-                                previewReminder(
-                                    ${index}
-                                )
-                            ">
+                            onclick="previewReminder(${index})">
 
                             Preview
 
@@ -4121,16 +3978,13 @@ function renderParticipants(){
 
                         ${
                             status !== "SENT"
+
                             ?
 
                             `
                             <button
                                 class="whatsapp"
-                                onclick="
-                                    openManualReminderWhatsApp(
-                                        ${index}
-                                    )
-                                ">
+                                onclick="openManualReminderWhatsApp(${index})">
 
                                 WhatsApp
 
@@ -4142,9 +3996,7 @@ function renderParticipants(){
                             ""
                         }
 
-
                     </td>
-
 
                 </tr>
             `;
@@ -4155,7 +4007,6 @@ function renderParticipants(){
 }
 
 
-
 /* =========================================================
    GENERATE REMINDER MESSAGE
 ========================================================= */
@@ -4163,9 +4014,7 @@ function renderParticipants(){
 function generateReminderMessage(person){
 
     const name =
-        person.name ||
-        person.Name ||
-        "";
+        getPersonName(person);
 
 
     let intro = "";
@@ -4214,10 +4063,10 @@ We're looking forward to seeing you.`;
 `${intro}
 
 📅 *Date*: ${reminderConfig.eventDate}
-🕒 *Reporting Time*: ${reminderConfig.reportingTime}
-⏰ *Programme Starts*: ${reminderConfig.eventTime}
-📍 *Venue*: ${reminderConfig.venue}
-📌 *Location*: ${reminderConfig.location}
+🕒 *Reporting Time*: ${reminderConfig.reportingTime || ""}
+⏰ *Programme Starts*: ${reminderConfig.eventTime || ""}
+📍 *Venue*: ${reminderConfig.venue || ""}
+📌 *Location*: ${reminderConfig.location || ""}
 
 `;
 
@@ -4260,7 +4109,6 @@ Blessings,
     return message;
 
 }
-
 
 
 /* =========================================================
@@ -4306,9 +4154,76 @@ function previewReminderForFirstPerson(){
 }
 
 
+/* =========================================================
+   PREPARE REMINDER WHATSAPP
+========================================================= */
+
+async function prepareReminderWhatsApp(
+    person,
+    message
+){
+
+    try{
+
+        const response =
+            await API.post(
+                "prepareReminderWhatsApp",
+                {
+
+                    personId:
+                        getPersonId(person),
+
+                    eventId:
+                        selectedEvent.spreadsheetId,
+
+                    eventName:
+                        selectedEvent.eventName,
+
+                    mobile:
+                        getPersonMobile(person),
+
+                    name:
+                        getPersonName(person),
+
+                    reminderType:
+                        reminderConfig.reminderType,
+
+                    message:
+                        message
+
+                }
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "Unable to prepare reminder"
+            );
+
+        }
+
+
+        return response;
+
+    }
+    catch(err){
+
+        console.warn(
+            "prepareReminderWhatsApp:",
+            err
+        );
+
+        return null;
+
+    }
+
+}
+
 
 /* =========================================================
-   OPEN MANUAL WHATSAPP REMINDER
+   MANUAL WHATSAPP REMINDER
 ========================================================= */
 
 async function openManualReminderWhatsApp(index){
@@ -4324,6 +4239,7 @@ async function openManualReminderWhatsApp(index){
     const status =
         String(
             person.reminderStatus ||
+            person.ReminderStatus ||
             ""
         )
         .toUpperCase();
@@ -4332,7 +4248,7 @@ async function openManualReminderWhatsApp(index){
     if(status === "SENT"){
 
         alert(
-            `${person.name} has already received this reminder.`
+            `${getPersonName(person)} has already received this reminder.`
         );
 
         return;
@@ -4341,20 +4257,15 @@ async function openManualReminderWhatsApp(index){
 
 
     const phone =
-        String(
-            person.mobile ||
-            ""
-        )
-        .replace(
-            /\D/g,
-            ""
+        normalisePhone(
+            getPersonMobile(person)
         );
 
 
     if(!phone){
 
         alert(
-            `${person.name} does not have a valid mobile number.`
+            `${getPersonName(person)} does not have a valid mobile number.`
         );
 
         return;
@@ -4366,6 +4277,12 @@ async function openManualReminderWhatsApp(index){
         generateReminderMessage(
             person
         );
+
+
+    await prepareReminderWhatsApp(
+        person,
+        message
+    );
 
 
     const url =
@@ -4386,7 +4303,7 @@ async function openManualReminderWhatsApp(index){
     const sent =
         confirm(
 `
-WhatsApp has been opened for ${person.name}.
+WhatsApp has been opened for ${getPersonName(person)}.
 
 Please check the message and press Send.
 
@@ -4399,18 +4316,18 @@ Did you send the reminder?
         return;
 
 
-    await recordCommunicationStatus(
+    await markCommunicationSent(
         person,
         "REMINDER",
-        "SENT"
+        reminderConfig.reminderType,
+        message
     );
 
 }
 
 
-
 /* =========================================================
-   SEND SELECTED REMINDER
+   SELECTED REMINDER
 ========================================================= */
 
 async function sendSelectedReminder(){
@@ -4464,6 +4381,135 @@ async function sendSelectedReminder(){
 }
 
 
+/* =========================================================
+   MARK COMMUNICATION SENT
+========================================================= */
+
+/*
+    THIS REPLACES THE OLD:
+
+        recordCommunicationStatus()
+
+    The GS router exposes:
+
+        markCommunicationSent
+*/
+
+async function markCommunicationSent(
+    person,
+    type,
+    stage,
+    message
+){
+
+    try{
+
+        const payload = {
+
+            personId:
+                getPersonId(person),
+
+            eventId:
+                selectedEvent.spreadsheetId,
+
+            eventName:
+                selectedEvent.eventName,
+
+            name:
+                getPersonName(person),
+
+            mobile:
+                getPersonMobile(person),
+
+            type:
+                type,
+
+            stage:
+                stage || "",
+
+            message:
+                message || ""
+
+        };
+
+
+        const response =
+            await API.post(
+                "markCommunicationSent",
+                payload
+            );
+
+
+        if(!response.success){
+
+            throw new Error(
+                response.message ||
+                "Unable to mark communication as sent"
+            );
+
+        }
+
+
+        /*
+            Update local state immediately.
+        */
+
+        if(type === "PUBLICITY"){
+
+            person.publicityStatus =
+                "SENT";
+
+            person.PublicityStatus =
+                "SENT";
+
+            person.sentAt =
+                new Date().toISOString();
+
+            renderPublicityAudience();
+
+        }
+
+
+        if(type === "REMINDER"){
+
+            person.reminderStatus =
+                "SENT";
+
+            person.ReminderStatus =
+                "SENT";
+
+            person.sentAt =
+                new Date().toISOString();
+
+            renderParticipants();
+
+        }
+
+
+        return true;
+
+    }
+    catch(err){
+
+        console.error(
+            "markCommunicationSent:",
+            err
+        );
+
+
+        alert(
+            "The message was sent/opened, but the " +
+            "communication record could not be saved.\n\n" +
+            err.message
+        );
+
+
+        return false;
+
+    }
+
+}
+
 
 /* =========================================================
    SELECT ALL PUBLICITY
@@ -4486,7 +4532,6 @@ function toggleAllPublicity(
 }
 
 
-
 /* =========================================================
    SELECT ALL REMINDERS
 ========================================================= */
@@ -4506,7 +4551,6 @@ function toggleAllReminder(
         );
 
 }
-
 
 
 /* =========================================================
@@ -4569,10 +4613,6 @@ document
                 `Selected: ${file.name}`;
 
 
-            /*
-                IMAGE PREVIEW
-            */
-
             if(
                 file.type.startsWith(
                     "image/"
@@ -4603,10 +4643,6 @@ document
             }
 
 
-            /*
-                PDF PREVIEW
-            */
-
             else if(
                 file.type ===
                 "application/pdf"
@@ -4621,7 +4657,6 @@ document
     );
 
 
-
 /* =========================================================
    PERSONALISED MESSAGE
 ========================================================= */
@@ -4632,9 +4667,7 @@ function personaliseMessage(
 ){
 
     const name =
-        person.name ||
-        person.Name ||
-        "";
+        getPersonName(person);
 
 
     return String(
@@ -4648,12 +4681,142 @@ function personaliseMessage(
 }
 
 
+/* =========================================================
+   PERSON HELPERS
+========================================================= */
+
+function getPersonName(person){
+
+    return String(
+        person?.name ||
+        person?.Name ||
+        person?.personName ||
+        person?.PersonName ||
+        ""
+    ).trim();
+
+}
+
+
+function getPersonMobile(person){
+
+    return String(
+        person?.mobile ||
+        person?.Mobile ||
+        person?.phone ||
+        person?.Phone ||
+        ""
+    ).trim();
+
+}
+
+
+function getPersonId(person){
+
+    return String(
+        person?.personId ||
+        person?.PersonID ||
+        person?.personID ||
+        getPersonMobile(person) ||
+        person?.email ||
+        person?.Email ||
+        getPersonName(person) ||
+        ""
+    ).trim();
+
+}
+
+
+function normalisePhone(
+    phone
+){
+
+    return String(
+        phone || ""
+    )
+    .replace(
+        /\D/g,
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   DEDUPLICATE PEOPLE
+========================================================= */
+
+function deduplicatePeople(
+    people
+){
+
+    const unique =
+        new Map();
+
+
+    people.forEach(
+        person => {
+
+            const key =
+                String(
+                    getPersonId(person)
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if(
+                key &&
+                !unique.has(key)
+            ){
+
+                unique.set(
+                    key,
+                    person
+                );
+
+            }
+
+        }
+    );
+
+
+    return Array.from(
+        unique.values()
+    );
+
+}
+
+
+/* =========================================================
+   SORT
+========================================================= */
+
+function sortByName(
+    a,
+    b
+){
+
+    return getPersonName(a)
+        .localeCompare(
+            getPersonName(b),
+            undefined,
+            {
+                sensitivity:
+                    "base"
+            }
+        );
+
+}
+
 
 /* =========================================================
    ESCAPE HTML
 ========================================================= */
 
-function escapeHtml(value){
+function escapeHtml(
+    value
+){
 
     return String(
         value ?? ""
@@ -4682,7 +4845,6 @@ function escapeHtml(value){
 }
 
 
-
 /* =========================================================
    BACK
 ========================================================= */
@@ -4695,17 +4857,18 @@ function goBack(){
 }
 
 
-
 /* =========================================================
    START
 ========================================================= */
 
-window.onload =
+window.addEventListener(
+    "load",
     async function(){
 
         await loadEvents();
 
-    };
+    }
+);
 
 </script>
 
