@@ -5244,12 +5244,23 @@ function renderMissionTripLocationSummary() {
     tbody.innerHTML = "";
 
 
+    /*
+     * ------------------------------------------------------
+     * GET LOCATION SUMMARY
+     * ------------------------------------------------------
+     */
+
     const summary =
         Dashboard.data
-            ?.missionTrips
-            ?.tripSummary ||
+            ?.missionTripLocationSummary ||
         [];
 
+
+    /*
+     * ------------------------------------------------------
+     * EMPTY STATE
+     * ------------------------------------------------------
+     */
 
     if (!summary.length) {
 
@@ -5263,6 +5274,12 @@ function renderMissionTripLocationSummary() {
 
     }
 
+
+    /*
+     * ------------------------------------------------------
+     * RENDER ROWS
+     * ------------------------------------------------------
+     */
 
     summary.forEach(
         location => {
@@ -5284,7 +5301,7 @@ function renderMissionTripLocationSummary() {
 
                 <td>
                     ${formatNumber(
-                        location.totalTeams ||
+                        location.trips ||
                         0
                     )}
                 </td>
