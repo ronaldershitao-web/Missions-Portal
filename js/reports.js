@@ -6805,7 +6805,12 @@ function showDashboardError(
 
 }
 
-   function renderMissionTripSummary() {
+   
+
+
+}
+
+function renderMissionTripSummary() {
     const tbody = document.getElementById("missionTripSummaryTable");
 
     if (!tbody) return;
@@ -6826,7 +6831,4 @@ function showDashboardError(
 
         tbody.appendChild(tr);
     });
-}
-
-
 }
