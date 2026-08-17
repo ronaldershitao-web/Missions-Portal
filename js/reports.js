@@ -5231,47 +5231,21 @@ function renderMissionTripLocationSummary() {
    EVENT TOP LINES BY EVENT TYPE
 ========================================================== */
 
+/* ==========================================================
+   EVENT TOP LINES
+========================================================== */
+
 function renderEventTopLines() {
 
-    console.log("=== RENDER EVENT TOP LINES ===");
-
-console.log(
-    "EVENT DATA KEYS:",
-    Object.keys(
-        Dashboard.data?.events || {}
-    )
-);
-
-console.log(
-    "EVENT DATA FULL:",
-    Dashboard.data?.events
-);
-   
     console.log(
-        "Dashboard.data:",
-        Dashboard.data
+        "=== RENDER EVENT TOP LINES ==="
     );
 
-    console.log(
-        "Event Summary:",
-        Dashboard.data?.tables?.eventSummary
-    );
-
-   console.log(
-    "EVENT DATA:",
-    Dashboard.data?.events
-);
-   
 
     const tbody =
         document.getElementById(
             "eventTopLinesTable"
         );
-
-    console.log(
-        "Event Top Lines TBODY:",
-        tbody
-    );
 
 
     if (!tbody)
@@ -5281,116 +5255,33 @@ console.log(
     tbody.innerHTML = "";
 
 
-    const events =
+    /*
+       REPORTS.GS already provides
+       the Event Top Lines here:
+
+       Dashboard.data.events.topLines
+    */
+
+    const topLines =
         Dashboard.data
-            ?.tables
-            ?.eventSummary ||
+            ?.events
+            ?.topLines ||
         [];
 
 
-    if (!events.length) {
-
-        renderEmptyRow(
-            tbody,
-            3,
-            "No event data available."
-        );
-
-        return;
-
-    }
-
-
-    /*
-       ------------------------------------------------------
-       GROUP EVENTS BY EVENT TYPE
-       ------------------------------------------------------
-    */
-
-    const summary = {};
-
-
-    events.forEach(
-        event => {
-
-            const eventType =
-                String(
-                    event.type ||
-                    event.eventType ||
-                    "Unknown"
-                ).trim();
-
-
-            if (!summary[eventType]) {
-
-                summary[eventType] = {
-
-                    eventType:
-                        eventType,
-
-                    registered:
-                        0,
-
-                    attended:
-                        0
-
-                };
-
-            }
-
-
-            summary[eventType].registered +=
-                Number(
-                    event.registered ||
-                    0
-                );
-
-
-            summary[eventType].attended +=
-                Number(
-                    event.attended ||
-                    0
-                );
-
-        }
+    console.log(
+        "EVENT TOP LINES DATA:",
+        topLines
     );
 
 
     /*
        ------------------------------------------------------
-       CONVERT TO ARRAY
+       EMPTY STATE
        ------------------------------------------------------
     */
 
-    const rows =
-        Object.values(
-            summary
-        )
-        .sort(
-            (a, b) =>
-                String(
-                    a.eventType
-                )
-                .localeCompare(
-                    String(
-                        b.eventType
-                    ),
-                    undefined,
-                    {
-                        sensitivity:
-                            "base"
-                    }
-                )
-        );
-
-
-    /*
-       ------------------------------------------------------
-       EMPTY RESULT
-       ------------------------------------------------------
-    */
-
-    if (!rows.length) {
+    if (!topLines.length) {
 
         renderEmptyRow(
             tbody,
@@ -5409,7 +5300,7 @@ console.log(
        ------------------------------------------------------
     */
 
-    rows.forEach(
+    topLines.forEach(
         event => {
 
             const tr =
@@ -5422,19 +5313,25 @@ console.log(
 
                 <td>
                     ${escapeHtml(
-                        event.eventType
+                        event.eventType ||
+                        event.type ||
+                        "-"
                     )}
                 </td>
 
                 <td>
                     ${formatNumber(
-                        event.registered
+                        event.registered ||
+                        event.totalRegistered ||
+                        0
                     )}
                 </td>
 
                 <td>
                     ${formatNumber(
-                        event.attended
+                        event.attended ||
+                        event.totalAttended ||
+                        0
                     )}
                 </td>
 
