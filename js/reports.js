@@ -5433,3 +5433,101 @@ function renderEventTopLines() {
     );
 
 }
+
+/* ==========================================================
+   LOAD UNIQUE PARTICIPANTS
+   ========================================================== */
+
+async function loadUnifiedParticipants() {
+
+    try {
+
+        console.log(
+            "Loading unified participants..."
+        );
+
+
+        const result =
+            await API.post(
+                "getUnifiedParticipants",
+                {}
+            );
+
+
+        console.log(
+            "Unified participants result:",
+            result
+        );
+
+
+        if (
+            !result ||
+            !result.success
+        ) {
+
+            console.error(
+                "Failed to load unified participants:",
+                result
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Backend returns:
+         *
+         * {
+         *   success: true,
+         *   data: [...]
+         * }
+         */
+
+        const participants =
+            result.data || [];
+
+
+        /*
+         * Store in dashboard state
+         */
+
+        Dashboard.data =
+            Dashboard.data || {};
+
+        Dashboard.data.participants =
+            participants;
+
+
+        console.log(
+            "Unique participants:",
+            participants.length
+        );
+
+
+        console.table(
+            participants
+        );
+
+
+        /*
+         * Render later
+         *
+         * For now this only loads the data.
+         */
+
+        return participants;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading unified participants:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
