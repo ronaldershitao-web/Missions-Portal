@@ -5246,13 +5246,24 @@ function renderMissionTripLocationSummary() {
 
     /*
      * ------------------------------------------------------
-     * GET LOCATION SUMMARY
+     * GET MISSION TRIP LOCATION SUMMARY
+     * ------------------------------------------------------
+     *
+     * Actual dashboard structure:
+     *
+     * Dashboard.data
+     *     .missionTrips
+     *     .summary
+     *     .locations
+     *
      * ------------------------------------------------------
      */
 
     const summary =
         Dashboard.data
-            ?.missionTripLocationSummary ||
+            ?.missionTrips
+            ?.summary
+            ?.locations ||
         [];
 
 
@@ -5277,7 +5288,7 @@ function renderMissionTripLocationSummary() {
 
     /*
      * ------------------------------------------------------
-     * RENDER ROWS
+     * RENDER LOCATION ROWS
      * ------------------------------------------------------
      */
 
@@ -5302,6 +5313,7 @@ function renderMissionTripLocationSummary() {
                 <td>
                     ${formatNumber(
                         location.trips ||
+                        location.totalTeams ||
                         0
                     )}
                 </td>
@@ -5324,4 +5336,3 @@ function renderMissionTripLocationSummary() {
     );
 
 }
-
