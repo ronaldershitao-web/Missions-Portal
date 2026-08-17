@@ -159,7 +159,7 @@ async function loadDashboard() {
             "getMissionDashboard",
             Dashboard.filters
         );
-
+console.log("FULL DASHBOARD RESPONSE:", response);
 
     if (
         !result ||
