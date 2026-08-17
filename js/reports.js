@@ -5244,43 +5244,13 @@ function renderMissionTripLocationSummary() {
     tbody.innerHTML = "";
 
 
-    /*
-     * ------------------------------------------------------
-     * GET MISSION TRIP LOCATION SUMMARY
-     * ------------------------------------------------------
-     *
-     * Actual dashboard structure:
-     *
-     * Dashboard.data
-     *     .missionTrips
-     *     .summary
-     *     .locations
-     *
-     * ------------------------------------------------------
-     */
-
     const summary =
         Dashboard.data
             ?.missionTrips
             ?.summary
-            ?.locations ||
+            ?.locationSummary ||
         [];
 
-   console.log(
-    "MISSION LOCATIONS:",
-    JSON.stringify(
-        summary,
-        null,
-        2
-    )
-);
-
-
-    /*
-     * ------------------------------------------------------
-     * EMPTY STATE
-     * ------------------------------------------------------
-     */
 
     if (!summary.length) {
 
@@ -5294,12 +5264,6 @@ function renderMissionTripLocationSummary() {
 
     }
 
-
-    /*
-     * ------------------------------------------------------
-     * RENDER LOCATION ROWS
-     * ------------------------------------------------------
-     */
 
     summary.forEach(
         location => {
@@ -5322,7 +5286,6 @@ function renderMissionTripLocationSummary() {
                 <td>
                     ${formatNumber(
                         location.trips ||
-                        location.totalTeams ||
                         0
                     )}
                 </td>
