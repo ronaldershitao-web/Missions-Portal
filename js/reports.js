@@ -554,7 +554,7 @@ function renderKPIs() {
     */
 
     const mission =
-        Dashboard.data?.missionTrips;
+        Dashboard.data?.missionTrips?.summary;
 
 
     if (mission) {
