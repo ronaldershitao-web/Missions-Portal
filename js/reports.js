@@ -968,7 +968,46 @@ function getParticipantRows() {
 
 }
 
+/* ==========================================================
+   PARTICIPANTS RENDERING
+========================================================== */
 
+function renderParticipants() {
+
+    /*
+       Compatibility wrapper.
+
+       Participant directory rendering is handled by
+       renderParticipantDirectory().
+
+       Participant charts are handled separately by
+       renderAllCharts().
+    */
+
+    /*
+       Keep the filtered participant collection
+       synchronised with the current dashboard data.
+    */
+
+    if (
+        !Array.isArray(
+            Dashboard.filteredParticipants
+        ) ||
+        Dashboard.filteredParticipants.length === 0
+    ) {
+
+        Dashboard.filteredParticipants =
+            getParticipantRows();
+
+    }
+
+    /*
+       Update participant result count.
+    */
+
+    updateFilterResultCount();
+
+}
 /* ==========================================================
    PARTICIPANT DIRECTORY
 ========================================================== */
