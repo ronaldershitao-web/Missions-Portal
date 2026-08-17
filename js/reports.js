@@ -9,7 +9,7 @@ console.log("Missions Intelligence Dashboard");
 const Dashboard = {
     data: null,
     missionData: null,
-    charts: {},
+    s: {},
     filters: {
         year: "",
         startDate: "",
@@ -473,25 +473,18 @@ function renderDashboard() {
        PARTICIPANT SECTION
     ------------------------------------------------------ */
 
-    renderParticipantAnalytics(
+    renderParticipant(
         dashboard.participants
     );
 
 
-    /* ------------------------------------------------------
-       CHURCH SECTION
-    ------------------------------------------------------ */
-
-    renderChurchAnalytics(
-        dashboard.churches
-    );
-
+   
 
     /* ------------------------------------------------------
        EVENT SECTION
     ------------------------------------------------------ */
 
-    renderEventAnalytics(
+    renderEvent(
         dashboard.events
     );
 
@@ -500,7 +493,7 @@ function renderDashboard() {
        LEADERSHIP SECTION
     ------------------------------------------------------ */
 
-    renderLeadershipAnalytics(
+    renderLeadership(
         dashboard.leadership
     );
 
@@ -794,58 +787,6 @@ function renderInsightGroup(
 }
 
 
-/* ==========================================================
-   PARTICIPANT ANALYTICS
-========================================================== */
-
-function renderParticipantAnalytics(
-    participants
-) {
-
-    if (!participants)
-        return;
-
-
-    renderChart(
-        "firstTimeReturningChart",
-        "doughnut",
-        participants.firstTimeVsReturning
-    );
-
-
-    renderChart(
-        "ageDistributionChart",
-        "bar",
-        participants.ageDistribution
-    );
-
-
-    renderChart(
-        "churchDistributionChart",
-        "bar",
-        participants.churchDistribution
-    );
-
-
-    renderChart(
-        "referralDistributionChart",
-        "doughnut",
-        participants.referralDistribution
-    );
-
-
-    renderChart(
-        "attendanceDistributionChart",
-        "doughnut",
-        participants.attendanceDistribution
-    );
-
-
-    renderParticipantDirectory(
-        participants
-    );
-
-}
 
 
 /* ==========================================================
@@ -1473,158 +1414,13 @@ function renderEventJourneyTable(
 }
 
 
-/* ==========================================================
-   CHURCH ANALYTICS
-========================================================== */
-
-function renderChurchAnalytics(
-    churches
-) {
-
-    if (!churches)
-        return;
-
-
-    renderChart(
-        "churchParticipationChart",
-        "bar",
-        churches.participation
-    );
-
-
-    renderChart(
-        "churchAttendanceChart",
-        "bar",
-        churches.attendance
-    );
-
-
-    renderChart(
-        "churchRetentionChart",
-        "bar",
-        churches.retention
-    );
-
-
-    renderChurchHealth(
-        churches.health
-    );
-
-
-    renderTopChurches(
-        churches.topChurches
-    );
-
-}
 
 
 /* ==========================================================
-   CHURCH HEALTH
+   EVENT 
 ========================================================== */
 
-function renderChurchHealth(
-    health
-) {
-
-    const body =
-        document.getElementById(
-            "churchHealthTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (health || []).forEach(item => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    item.church || ""
-                )}
-            </td>
-
-            <td>
-                ${item.score || 0}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-/* ==========================================================
-   TOP CHURCHES
-========================================================== */
-
-function renderTopChurches(
-    churches
-) {
-
-    const body =
-        document.getElementById(
-            "topChurchesTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (churches || []).forEach(item => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    item.church || ""
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    item.participants
-                )}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-/* ==========================================================
-   EVENT ANALYTICS
-========================================================== */
-
-function renderEventAnalytics(
+function renderEvent(
     events
 ) {
 
@@ -1632,29 +1428,29 @@ function renderEventAnalytics(
         return;
 
 
-    renderChart(
-        "eventPopularityChart",
+    render(
+        "eventPopularity",
         "bar",
         events.popularity
     );
 
 
-    renderChart(
-        "eventAttendanceChart",
+    render(
+        "eventAttendance",
         "bar",
         events.attendance
     );
 
 
-    renderChart(
-        "eventTypeChart",
+    render(
+        "eventType",
         "doughnut",
         events.eventTypes
     );
 
 
-    renderChart(
-        "monthlyTrendChart",
+    render(
+        "monthlyTrend",
         "line",
         events.monthlyTrend
     );
@@ -1670,159 +1466,6 @@ function renderEventAnalytics(
     renderEventEffectiveness(
         events.effectiveness
     );
-
-}
-
-
-/* ==========================================================
-   EVENT EFFECTIVENESS
-========================================================== */
-
-function renderEventEffectiveness(
-    effectiveness
-) {
-
-    const body =
-        document.getElementById(
-            "eventEffectivenessTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (effectiveness || []).forEach(item => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    item.event || ""
-                )}
-            </td>
-
-            <td>
-                ${item.score || 0}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-/* ==========================================================
-   LEADERSHIP ANALYTICS
-========================================================== */
-
-function renderLeadershipAnalytics(
-    leadership
-) {
-
-    if (!leadership)
-        return;
-
-
-    renderChart(
-        "leadershipPipelineChart",
-        "bar",
-        leadership.pipeline
-    );
-
-
-    renderChart(
-        "experienceLevelsChart",
-        "doughnut",
-        leadership.experience
-    );
-
-
-    renderLeaderCandidates(
-        leadership.leaderCandidates
-    );
-
-
-    renderRepeatMissionaries(
-        leadership.repeatMissionaries
-    );
-
-
-    renderMobilisation(
-        leadership.mobilization
-    );
-
-}
-
-
-/* ==========================================================
-   LEADER CANDIDATES
-========================================================== */
-
-function renderLeaderCandidates(
-    candidates
-) {
-
-    const body =
-        document.getElementById(
-            "leaderCandidatesTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (candidates || []).forEach(person => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    person.name || ""
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.church || ""
-                )}
-            </td>
-
-            <td>
-                ${person.events || 0}
-            </td>
-
-            <td>
-                ${person.attendanceRate || 0}%
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
 
 }
 
@@ -1887,68 +1530,6 @@ function renderRepeatMissionaries(
 }
 
 
-/* ==========================================================
-   MOBILISATION
-========================================================== */
-
-function renderMobilisation(
-    people
-) {
-
-    const body =
-        document.getElementById(
-            "mobilisationTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (people || []).forEach(person => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    person.name || ""
-                )}
-            </td>
-
-            <td>
-                ${person.events || 0}
-            </td>
-
-            <td>
-                ${person.attendanceRate || 0}%
-            </td>
-
-            <td>
-                ${person.score || 0}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-/* ==========================================================
-   Missions Intelligence Dashboard
-   reports.js
-   Part 3 - Tables, Filters, Charts & UI Helpers
-========================================================== */
 
 
 /* ==========================================================
@@ -1995,18 +1576,6 @@ function renderTables(tables) {
        TOP CHURCHES
     ------------------------------------------------------ */
 
-    renderTopChurches(
-        tables.topChurches
-    );
-
-
-    /* ------------------------------------------------------
-       TOP EVENTS
-    ------------------------------------------------------ */
-
-    renderTopEvents(
-        tables.topEvents
-    );
 
 }
 
@@ -2116,166 +1685,6 @@ function renderEventSummaryTable(rows) {
    TOP MISSIONARIES
 ========================================================== */
 
-function renderTopMissionaries(rows) {
-
-    const body =
-        document.getElementById(
-            "topMissionariesTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (rows || []).forEach(person => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    person.name || ""
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.church || ""
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    person.events
-                )}
-            </td>
-
-            <td>
-                ${person.attendance || 0}%
-            </td>
-
-            <td>
-                ${person.score || 0}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-/* ==========================================================
-   TOP CHURCHES
-========================================================== */
-
-function renderTopChurchesTable(
-    rows
-) {
-
-    const body =
-        document.getElementById(
-            "topChurchesTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (rows || []).forEach(item => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    item.church || ""
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    item.participants
-                )}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-/* ==========================================================
-   TOP EVENTS
-========================================================== */
-
-function renderTopEvents(rows) {
-
-    const body =
-        document.getElementById(
-            "topEventsTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (rows || []).forEach(item => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    item.event || ""
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    item.participants
-                )}
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
 
 
 /* ==========================================================
@@ -2788,10 +2197,10 @@ function getFilterValue(id) {
 
 
 /* ==========================================================
-   CHART ENGINE
+    ENGINE
 ========================================================== */
 
-function renderChart(
+function render(
     canvasId,
     type,
     dataset
@@ -2822,28 +2231,28 @@ function renderChart(
         return;
 
 
-    Dashboard.charts =
-        Dashboard.charts || {};
+    Dashboard.s =
+        Dashboard.s || {};
 
 
     /* ------------------------------------------------------
-       DESTROY EXISTING CHART
+       DESTROY EXISTING 
     ------------------------------------------------------ */
 
     if (
-        Dashboard.charts[canvasId]
+        Dashboard.s[canvasId]
     ) {
 
         try {
 
-            Dashboard.charts[
+            Dashboard.s[
                 canvasId
             ].destroy();
 
         } catch (error) {
 
             console.warn(
-                "Unable to destroy chart:",
+                "Unable to destroy :",
                 canvasId,
                 error
             );
@@ -2854,16 +2263,16 @@ function renderChart(
 
 
     /* ------------------------------------------------------
-       CREATE CHART
+       CREATE 
     ------------------------------------------------------ */
 
     if (
-        typeof Chart ===
+        typeof  ===
         "undefined"
     ) {
 
         console.error(
-            "Chart.js is not loaded."
+            ".js is not loaded."
         );
 
         return;
@@ -2871,8 +2280,8 @@ function renderChart(
     }
 
 
-    Dashboard.charts[canvasId] =
-        new Chart(
+    Dashboard.s[canvasId] =
+        new (
             canvas,
             {
 
@@ -3009,37 +2418,6 @@ function updateMissionHealthClass(
 }
 
 
-/* ==========================================================
-   STATUS CLASS
-========================================================== */
-
-function getStatusClass(
-    status
-) {
-
-    switch(status) {
-
-        case "Excellent":
-            return "status-excellent";
-
-        case "Healthy":
-            return "status-healthy";
-
-        case "Growing":
-            return "status-growing";
-
-        case "Needs Attention":
-            return "status-attention";
-
-        case "Critical":
-            return "status-critical";
-
-        default:
-            return "";
-
-    }
-
-}
 
 
 /* ==========================================================
@@ -4778,44 +4156,44 @@ function formatDate(
 
    /* ==========================================================
    PART 5
-   CHARTS + FILTERS + DASHBOARD REFRESH
+   S + FILTERS + DASHBOARD REFRESH
 ========================================================== */
 
 
 /* ==========================================================
-   CHART REGISTRY
+    REGISTRY
 ========================================================== */
 
-function destroyChart(name) {
+function destroy(name) {
 
     if (
-        Dashboard.charts &&
-        Dashboard.charts[name]
+        Dashboard.s &&
+        Dashboard.s[name]
     ) {
 
         try {
 
-            Dashboard.charts[name].destroy();
+            Dashboard.s[name].destroy();
 
         }
         catch (error) {
 
             console.warn(
-                "Unable to destroy chart:",
+                "Unable to destroy :",
                 name,
                 error
             );
 
         }
 
-        delete Dashboard.charts[name];
+        delete Dashboard.s[name];
 
     }
 
 }
 
 
-function createChart(
+function create(
     name,
     canvasId,
     config
@@ -4830,15 +4208,15 @@ function createChart(
         return null;
 
 
-    destroyChart(name);
+    destroy(name);
 
 
     if (
-        typeof Chart === "undefined"
+        typeof  === "undefined"
     ) {
 
         console.error(
-            "Chart.js is not available."
+            ".js is not available."
         );
 
         return null;
@@ -4846,23 +4224,23 @@ function createChart(
     }
 
 
-    Dashboard.charts[name] =
-        new Chart(
+    Dashboard.s[name] =
+        new (
             canvas.getContext("2d"),
             config
         );
 
 
-    return Dashboard.charts[name];
+    return Dashboard.s[name];
 
 }
 
 
 /* ==========================================================
-   CHART OPTIONS
+    OPTIONS
 ========================================================== */
 
-function standardChartOptions(
+function standardOptions(
     beginAtZero = true
 ) {
 
@@ -4898,10 +4276,10 @@ function standardChartOptions(
 
 
 /* ==========================================================
-   PARTICIPANT TYPE CHART
+   PARTICIPANT TYPE 
 ========================================================== */
 
-function renderFirstTimeReturningChart() {
+function renderFirstTimeReturning() {
 
     const data =
         Dashboard.data
@@ -4913,9 +4291,9 @@ function renderFirstTimeReturningChart() {
         return;
 
 
-    createChart(
+    create(
         "firstTimeReturning",
-        "firstTimeReturningChart",
+        "firstTimeReturning",
         {
 
             type: "doughnut",
@@ -4952,7 +4330,7 @@ function renderFirstTimeReturningChart() {
    AGE DISTRIBUTION
 ========================================================== */
 
-function renderAgeDistributionChart() {
+function renderAgeDistribution() {
 
     const data =
         Dashboard.data
@@ -4964,9 +4342,9 @@ function renderAgeDistributionChart() {
         return;
 
 
-    createChart(
+    create(
         "ageDistribution",
-        "ageDistributionChart",
+        "ageDistribution",
         {
 
             type: "bar",
@@ -4989,7 +4367,7 @@ function renderAgeDistributionChart() {
             },
 
             options:
-                standardChartOptions()
+                standardOptions()
 
         }
     );
@@ -5001,7 +4379,7 @@ function renderAgeDistributionChart() {
    CHURCH PARTICIPATION
 ========================================================== */
 
-function renderChurchParticipationChart() {
+function renderChurchParticipation() {
 
     const data =
         Dashboard.data
@@ -5013,9 +4391,9 @@ function renderChurchParticipationChart() {
         return;
 
 
-    createChart(
+    create(
         "churchParticipation",
-        "churchParticipationChart",
+        "churchParticipation",
         {
 
             type: "bar",
@@ -5038,7 +4416,7 @@ function renderChurchParticipationChart() {
             },
 
             options:
-                standardChartOptions()
+                standardOptions()
 
         }
     );
@@ -5050,7 +4428,7 @@ function renderChurchParticipationChart() {
    CHURCH ATTENDANCE
 ========================================================== */
 
-function renderChurchAttendanceChart() {
+function renderChurchAttendance() {
 
     const data =
         Dashboard.data
@@ -5062,9 +4440,9 @@ function renderChurchAttendanceChart() {
         return;
 
 
-    createChart(
+    create(
         "churchAttendance",
-        "churchAttendanceChart",
+        "churchAttendance",
         {
 
             type: "bar",
@@ -5088,7 +4466,7 @@ function renderChurchAttendanceChart() {
 
             options: {
 
-                ...standardChartOptions(),
+                ...standardOptions(),
 
                 scales: {
 
@@ -5114,7 +4492,7 @@ function renderChurchAttendanceChart() {
    EVENT POPULARITY
 ========================================================== */
 
-function renderEventPopularityChart() {
+function renderEventPopularity() {
 
     const data =
         Dashboard.data
@@ -5126,9 +4504,9 @@ function renderEventPopularityChart() {
         return;
 
 
-    createChart(
+    create(
         "eventPopularity",
-        "eventPopularityChart",
+        "eventPopularity",
         {
 
             type: "bar",
@@ -5151,7 +4529,7 @@ function renderEventPopularityChart() {
             },
 
             options:
-                standardChartOptions()
+                standardOptions()
 
         }
     );
@@ -5163,7 +4541,7 @@ function renderEventPopularityChart() {
    EVENT ATTENDANCE
 ========================================================== */
 
-function renderEventAttendanceChart() {
+function renderEventAttendance() {
 
     const data =
         Dashboard.data
@@ -5175,9 +4553,9 @@ function renderEventAttendanceChart() {
         return;
 
 
-    createChart(
+    create(
         "eventAttendance",
-        "eventAttendanceChart",
+        "eventAttendance",
         {
 
             type: "bar",
@@ -5201,7 +4579,7 @@ function renderEventAttendanceChart() {
 
             options: {
 
-                ...standardChartOptions(),
+                ...standardOptions(),
 
                 scales: {
 
@@ -5227,7 +4605,7 @@ function renderEventAttendanceChart() {
    MONTHLY TREND
 ========================================================== */
 
-function renderMonthlyTrendChart() {
+function renderMonthlyTrend() {
 
     const data =
         Dashboard.data
@@ -5239,9 +4617,9 @@ function renderMonthlyTrendChart() {
         return;
 
 
-    createChart(
+    create(
         "monthlyTrend",
-        "monthlyTrendChart",
+        "monthlyTrend",
         {
 
             type: "line",
@@ -5267,7 +4645,7 @@ function renderMonthlyTrendChart() {
             },
 
             options:
-                standardChartOptions()
+                standardOptions()
 
         }
     );
@@ -5276,10 +4654,10 @@ function renderMonthlyTrendChart() {
 
 
 /* ==========================================================
-   EVENT TYPE CHART
+   EVENT TYPE 
 ========================================================== */
 
-function renderEventTypeChart() {
+function renderEventType() {
 
     const data =
         Dashboard.data
@@ -5291,9 +4669,9 @@ function renderEventTypeChart() {
         return;
 
 
-    createChart(
+    create(
         "eventTypes",
-        "eventTypeChart",
+        "eventType",
         {
 
             type: "doughnut",
@@ -5330,7 +4708,7 @@ function renderEventTypeChart() {
    LEADERSHIP PIPELINE
 ========================================================== */
 
-function renderLeadershipPipelineChart() {
+function renderLeadershipPipeline() {
 
     const data =
         Dashboard.data
@@ -5342,9 +4720,9 @@ function renderLeadershipPipelineChart() {
         return;
 
 
-    createChart(
+    create(
         "leadershipPipeline",
-        "leadershipPipelineChart",
+        "leadershipPipeline",
         {
 
             type: "bar",
@@ -5367,7 +4745,7 @@ function renderLeadershipPipelineChart() {
             },
 
             options:
-                standardChartOptions()
+                standardOptions()
 
         }
     );
@@ -5379,7 +4757,7 @@ function renderLeadershipPipelineChart() {
    EXPERIENCE LEVEL
 ========================================================== */
 
-function renderExperienceChart() {
+function renderExperience() {
 
     const data =
         Dashboard.data
@@ -5391,9 +4769,9 @@ function renderExperienceChart() {
         return;
 
 
-    createChart(
+    create(
         "experience",
-        "experienceChart",
+        "experience",
         {
 
             type: "doughnut",
@@ -5427,30 +4805,30 @@ function renderExperienceChart() {
 
 
 /* ==========================================================
-   RENDER ALL CHARTS
+   RENDER ALL S
 ========================================================== */
 
-function renderAllCharts() {
+function renderAlls() {
 
-    renderFirstTimeReturningChart();
+    renderFirstTimeReturning();
 
-    renderAgeDistributionChart();
+    renderAgeDistribution();
 
-    renderChurchParticipationChart();
+    renderChurchParticipation();
 
-    renderChurchAttendanceChart();
+    renderChurchAttendance();
 
-    renderEventPopularityChart();
+    renderEventPopularity();
 
-    renderEventAttendanceChart();
+    renderEventAttendance();
 
-    renderMonthlyTrendChart();
+    renderMonthlyTrend();
 
-    renderEventTypeChart();
+    renderEventType();
 
-    renderLeadershipPipelineChart();
+    renderLeadershipPipeline();
 
-    renderExperienceChart();
+    renderExperience();
 
 }
 
@@ -6660,7 +6038,7 @@ function renderDashboard() {
 
     renderParticipantJourneySummary();
 
-    renderAllCharts();
+    renderAlls();
 
     setupParticipantTableSearch();
 
@@ -6828,22 +6206,22 @@ function renderMissionTripSummary() {
     });
 }
 
-function renderParticipantCharts() {
+function renderParticipants() {
 
     const participants = Dashboard.data?.participants || {};
 
     /*
      * Participant Growth
      */
-    const growthCanvas = document.getElementById("participantGrowthChart");
+    const growthCanvas = document.getElementById("participantGrowth");
 
     if (growthCanvas) {
 
-        if (Dashboard.charts.participantGrowth) {
-            Dashboard.charts.participantGrowth.destroy();
+        if (Dashboard.s.participantGrowth) {
+            Dashboard.s.participantGrowth.destroy();
         }
 
-        Dashboard.charts.participantGrowth = new Chart(
+        Dashboard.s.participantGrowth = new (
             growthCanvas.getContext("2d"),
             {
                 type: "line",
@@ -6886,15 +6264,15 @@ function renderParticipantCharts() {
     /*
      * Participant Type
      */
-    const typeCanvas = document.getElementById("participantTypeChart");
+    const typeCanvas = document.getElementById("participantType");
 
     if (typeCanvas) {
 
-        if (Dashboard.charts.participantType) {
-            Dashboard.charts.participantType.destroy();
+        if (Dashboard.s.participantType) {
+            Dashboard.s.participantType.destroy();
         }
 
-        Dashboard.charts.participantType = new Chart(
+        Dashboard.s.participantType = new (
             typeCanvas.getContext("2d"),
             {
                 type: "doughnut",
@@ -6928,15 +6306,15 @@ function renderParticipantCharts() {
      * Participant Engagement
      */
     const engagementCanvas =
-        document.getElementById("participantEngagementChart");
+        document.getElementById("participantEngagement");
 
     if (engagementCanvas) {
 
-        if (Dashboard.charts.participantEngagement) {
-            Dashboard.charts.participantEngagement.destroy();
+        if (Dashboard.s.participantEngagement) {
+            Dashboard.s.participantEngagement.destroy();
         }
 
-        Dashboard.charts.participantEngagement = new Chart(
+        Dashboard.s.participantEngagement = new (
             engagementCanvas.getContext("2d"),
             {
                 type: "bar",
@@ -6969,7 +6347,7 @@ function renderParticipantCharts() {
     }
 }
 
-function renderChurchCharts() {
+function renderChurchs() {
 
     const churches = Dashboard.data?.churches || {};
 
@@ -6977,15 +6355,15 @@ function renderChurchCharts() {
      * Church Participation
      */
     const participationCanvas =
-        document.getElementById("churchParticipationChart");
+        document.getElementById("churchParticipation");
 
     if (participationCanvas) {
 
-        if (Dashboard.charts.churchParticipation) {
-            Dashboard.charts.churchParticipation.destroy();
+        if (Dashboard.s.churchParticipation) {
+            Dashboard.s.churchParticipation.destroy();
         }
 
-        Dashboard.charts.churchParticipation = new Chart(
+        Dashboard.s.churchParticipation = new (
             participationCanvas.getContext("2d"),
             {
                 type: "bar",
@@ -7028,15 +6406,15 @@ function renderChurchCharts() {
      * Church Growth
      */
     const growthCanvas =
-        document.getElementById("churchGrowthChart");
+        document.getElementById("churchGrowth");
 
     if (growthCanvas) {
 
-        if (Dashboard.charts.churchGrowth) {
-            Dashboard.charts.churchGrowth.destroy();
+        if (Dashboard.s.churchGrowth) {
+            Dashboard.s.churchGrowth.destroy();
         }
 
-        Dashboard.charts.churchGrowth = new Chart(
+        Dashboard.s.churchGrowth = new (
             growthCanvas.getContext("2d"),
             {
                 type: "line",
