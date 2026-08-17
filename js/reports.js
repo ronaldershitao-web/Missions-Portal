@@ -6973,3 +6973,104 @@ function renderParticipantCharts() {
         );
     }
 }
+
+function renderChurchCharts() {
+
+    const churches = Dashboard.data?.churches || {};
+
+    /*
+     * Church Participation
+     */
+    const participationCanvas =
+        document.getElementById("churchParticipationChart");
+
+    if (participationCanvas) {
+
+        if (Dashboard.charts.churchParticipation) {
+            Dashboard.charts.churchParticipation.destroy();
+        }
+
+        Dashboard.charts.churchParticipation = new Chart(
+            participationCanvas.getContext("2d"),
+            {
+                type: "bar",
+
+                data: {
+                    labels: churches.labels || [],
+                    datasets: [
+                        {
+                            label: "Participants",
+                            data: churches.participants || []
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+
+    /*
+     * Church Growth
+     */
+    const growthCanvas =
+        document.getElementById("churchGrowthChart");
+
+    if (growthCanvas) {
+
+        if (Dashboard.charts.churchGrowth) {
+            Dashboard.charts.churchGrowth.destroy();
+        }
+
+        Dashboard.charts.churchGrowth = new Chart(
+            growthCanvas.getContext("2d"),
+            {
+                type: "line",
+
+                data: {
+                    labels: churches.growthLabels || [],
+                    datasets: [
+                        {
+                            label: "Churches",
+                            data: churches.growthData || [],
+                            tension: 0.3
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            }
+        );
+    }
+}
