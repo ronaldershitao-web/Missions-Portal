@@ -1,528 +1,381 @@
+```javascript
 /* ==========================================================
-   Missions Intelligence Dashboard
+   MISSIONS INTELLIGENCE DASHBOARD
    reports.js
-   Compatible with the current REPORTS.GS API
-========================================================== */
 
-console.log("Missions Intelligence Dashboard");
+   Compatible with current REPORTS.GS API
 
-const Dashboard = {
-    data: null,
-    missionData: null,
-    s: {},
-    filters: {
-        year: "",
-        startDate: "",
-        endDate: ""
-    },
-    initialised: false,
-    participantSearchTimer: null
-};
+   PRIMARY API
+   ----------------------------------------------------------
+   API.post("getMissionDashboard", filters)
 
-document.addEventListener("DOMContentLoaded", initialiseDashboard);
-
-async function initialiseDashboard() {
-    try {
-        showLoading();
-        await loadDashboard();
-        renderDashboard();
-        initialiseFilters();
-        initialiseLegacyFilters();
-        updateLastRefresh();
-        Dashboard.initialised = true;
-    } catch (err) {
-        console.error("DASHBOARD INITIALISATION ERROR:", err);
-        alert(err.message || "Unable to load dashboard.");
-    } finally {
-        hideLoading();
-    }
-}
-
-async function loadDashboard() {
-    const result = await API.post("getMissionDashboard", Dashboard.filters);
-
-    if (!result || !result.success) {
-        throw new Error(result?.message || "Unable to load mission dashboard.");
-    }
-
-    /*
-       Current REPORTS.GS response:
-       result.data = {
+   Expected response:
+   {
+       success: true,
+       data: {
            generatedAt,
            filters,
            totalRows,
-           dashboard
+           dashboard: {
+               kpis,
+               executive,
+               missionInsights,
+               participants,
+               events,
+               churches,
+               leadership,
+               tables,
+               missionTrips,
+               participantJourney
+           }
        }
+   }
+
+   ========================================================== */
+
+
+/* ==========================================================
+   INITIALISATION
+========================================================== */
+
+console.log(
+    "Missions Intelligence Dashboard"
+);
+
+
+/* ==========================================================
+   GLOBAL DASHBOARD STATE
+========================================================== */
+
+const Dashboard = {
+
+    data: null,
+
+    missionData: null,
+
+    serverFilters: {},
+
+    filteredParticipants: [],
+
+    filteredData: [],
+
+    charts: {},
+
+    /* Backward-compatible alias */
+    s: {},
+
+    filters: {
+
+        year: "",
+
+        startDate: "",
+
+        endDate: ""
+
+    },
+
+    initialised: false,
+
+    participantSearchTimer: null,
+
+    uiBound: false,
+
+    filtersBound: false
+
+};
+
+
+/* ==========================================================
+   PAGE LOAD
+========================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initialiseDashboard
+);
+
+
+/* ==========================================================
+   INITIALISE DASHBOARD
+========================================================== */
+
+async function initialiseDashboard() {
+
+    try {
+
+        showLoading();
+
+        clearError();
+
+        await loadDashboard();
+
+        renderDashboard();
+
+        initialiseFilters();
+
+        bindDashboardUI();
+
+        updateLastRefresh();
+
+        Dashboard.initialised = true;
+
+        console.log(
+            "Missions Intelligence Dashboard ready."
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "DASHBOARD INITIALISATION ERROR:",
+            error
+        );
+
+        showError(
+            error.message ||
+            "Unable to load dashboard."
+        );
+
+    }
+
+    finally {
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* ==========================================================
+   LOAD DASHBOARD
+========================================================== */
+
+async function loadDashboard() {
+
+    const result =
+        await API.post(
+            "getMissionDashboard",
+            Dashboard.filters
+        );
+
+
+    if (
+        !result ||
+        result.success === false
+    ) {
+
+        throw new Error(
+            result?.message ||
+            "Unable to load mission dashboard."
+        );
+
+    }
+
+
+    /*
+       Current REPORTS.GS structure:
+
+       result.data.dashboard
     */
-    Dashboard.data = result.data?.dashboard || null;
-    Dashboard.missionData = Dashboard.data?.missionTrips || null;
-    Dashboard.serverFilters = result.data?.filters || {};
 
-    if (!Dashboard.data) {
-        throw new Error("Mission dashboard data was not returned by REPORTS.GS.");
-    }
-}
+    const payload =
+        result.data || {};
 
-function renderDashboard() {
-    if (!Dashboard.data) return;
 
-    renderKPIs();
-    renderMissionTripSummary();
-    renderMissionInsights();
-    renderEventSummaryTable();
-    renderParticipantDirectory();
-    renderParticipantJourneySummary();
-}
+    Dashboard.serverFilters =
+        payload.filters || {};
 
-async function refreshDashboard() {
-    await applyFilters();
-}
 
-function showLoading() {
-    document.getElementById("loadingOverlay")?.classList.remove("hidden");
-}
+    Dashboard.data =
+        payload.dashboard ||
+        payload;
 
-function hideLoading() {
-    document.getElementById("loadingOverlay")?.classList.add("hidden");
-}
-
-function updateLastRefresh() {
-    const el = document.getElementById("lastRefresh");
-    if (el) el.textContent = new Date().toLocaleString("en-SG");
-}
-
-function goBack() {
-    history.back();
-}
-
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value ?? "-";
-}
-
-/* ==========================================================
-   PART 2
-   KPI + EXECUTIVE SUMMARY + MINISTRY INSIGHTS
-========================================================== */
-
-/* ==========================================================
-   KPI CARDS
-========================================================== */
-
-function renderKPIs() {
-
-    const k = Dashboard.data.kpis;
-
-
-    setText(
-        "kpiRegistrations",
-        k.registrations
-    );
-
-
-    setText(
-        "kpiUnique",
-        k.uniqueParticipants
-    );
-
-
-    setText(
-        "kpiReturning",
-        k.repeatParticipants
-    );
-
-
-    setText(
-        "kpiFirstTimers",
-        k.firstTimers
-    );
-
-
-    setText(
-        "kpiEvents",
-        k.totalEvents
-    );
-
-
-    setText(
-        "kpiChurches",
-        k.totalChurches
-    );
-
-
-    setText(
-        "kpiAttendance",
-        k.attendanceRate + "%"
-    );
-
-
-    setText(
-        "kpiAverageEvent",
-        Dashboard.data.events.averages.average
-    );
-
-
-
-    // ====================================
-    // Mission Trip KPIs
-    // ====================================
-
-    const m =
-    Dashboard.missionData;
-
-
-    if(m){
-
-        setText(
-            "kpiMissionTrips",
-            m.totalTrips
-        );
-
-
-        setText(
-            "kpiTrippers",
-            m.uniqueMissionaries
-        );
-
-
-        setText(
-            "kpiAvgTeam",
-            m.averageParticipants
-        );
-
-    }
-
-
-}
-
-/* ==========================================================
-   EXECUTIVE SUMMARY
-========================================================== */
-
-
-/* ==========================================================
-   MINISTRY INSIGHTS
-========================================================== */
-
-function renderMissionInsights() {
-
-    const insights =
-        Dashboard.data.missionInsights || {};
-
-
-    renderInsightList(
-        "celebrateInsights",
-        insights.celebrate
-    );
-
-
-    renderInsightList(
-        "followupInsights",
-        insights.warning
-    );
-
-
-    renderInsightList(
-        "opportunityInsights",
-        insights.recommendation
-    );
-
-
-    renderInsightList(
-        "riskInsights",
-        insights.risk
-    );
-
-
-}
-/* ==========================================================
-   PASTOR'S CORNER
-========================================================== */
-
-function renderStrategicCorner() {
-
-    const executive =
-        Dashboard.data.executive;
-
-    const div =
-        document.getElementById(
-            "missionIntelligence"
-        );
-
-    div.innerHTML = "";
-
-    addPastorCard(
-        div,
-        "Mission Health",
-        executive.healthScore +
-        "/100"
-    );
-
-    addPastorCard(
-        div,
-        "Mission Stage",
-        executive.healthDescriptor
-    );
-
-    addPastorCard(
-        div,
-        "Highest Participation",
-        executive.topChurch
-    );
-
-    addPastorCard(
-        div,
-        "Most Popular Event",
-        executive.topEvent
-    );
-
-    addPastorCard(
-        div,
-        "Repeat Missionaries",
-        executive.repeatParticipants
-    );
-
-}
-
-/* ==========================================================
-   INSIGHT LIST
-========================================================== */
-
-function renderInsightList(
-    elementId,
-    items
-){
-
-    const container =
-        document.getElementById(
-            elementId
-        );
-
-    container.innerHTML = "";
-
-    if(
-        !items ||
-        items.length===0
-    ){
-
-        container.innerHTML =
-            "<p>No insights available.</p>";
-
-        return;
-    }
-
-    items.forEach(item=>{
-
-        const li =
-            document.createElement("div");
-
-        li.className =
-            "insightItem";
-
-        li.innerHTML =
-            "• " + item;
-
-        container.appendChild(li);
-    });
-
-}
-
-/* ==========================================================
-   EXECUTIVE ROW
-========================================================== */
-
-function addInsightRow(
-    container,
-    label,
-    value
-){
-
-    const row =
-        document.createElement("div");
-
-    row.className =
-        "summaryRow";
-
-    row.innerHTML =
-        `<span>${label}</span>
-         <strong>${value}</strong>`;
-
-    container.appendChild(row);
-}
-
-/* ==========================================================
-   PASTOR CARD
-========================================================== */
-
-function addPastorCard(
-    container,
-    title,
-    value
-){
-
-    const card =
-        document.createElement("div");
-
-    card.className =
-        "pastorCard";
-
-    card.innerHTML =
-        `
-        <div class="pastorTitle">
-
-            ${title}
-
-        </div>
-
-        <div class="pastorValue">
-
-            ${value}
-
-        </div>
-        `;
-
-    container.appendChild(card);
-}
-
-/* ==========================================================
-   SMALL HELPER
-========================================================== */
-
-function setText(
-    id,
-    value
-){
-
-    const el =
-        document.getElementById(id);
-
-    if(el)
-
-        el.textContent = value;
-
-/* ==========================================================
-   Missions Intelligence Dashboard
-   reports.js
-   Part 2 - Dashboard Rendering & Data Binding
-========================================================== */
-
-
-/* ==========================================================
-   DASHBOARD DATA ACCESS
-========================================================== */
-
-function getDashboardData() {
 
     if (!Dashboard.data) {
 
         throw new Error(
-            "Dashboard data has not been loaded."
+            "Mission dashboard data was not returned."
         );
 
     }
 
-    return Dashboard.data.dashboard ||
-           Dashboard.data;
+
+    Dashboard.missionData =
+        Dashboard.data.missionTrips ||
+        null;
+
+
+    /*
+       Preserve participant source
+    */
+
+    Dashboard.filteredParticipants =
+        Dashboard.data
+            ?.tables
+            ?.participantSummary ||
+        [];
+
+
+    /*
+       Preserve raw data if REPORTS.GS
+       provides it.
+    */
+
+    Dashboard.rawData =
+        Dashboard.data.rawData ||
+        Dashboard.data.rows ||
+        payload.rawData ||
+        [];
+
+
+    console.log(
+        "Dashboard loaded:",
+        Dashboard.data
+    );
 
 }
 
 
 /* ==========================================================
-   RENDER COMPLETE DASHBOARD
+   REFRESH DASHBOARD
+========================================================== */
+
+async function refreshDashboard() {
+
+    showLoading();
+
+    clearError();
+
+    try {
+
+        await loadDashboard();
+
+        renderDashboard();
+
+        initialiseFilters();
+
+        updateLastRefresh();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "DASHBOARD REFRESH ERROR:",
+            error
+        );
+
+        showError(
+            error.message ||
+            "Unable to refresh dashboard."
+        );
+
+    }
+
+    finally {
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* ==========================================================
+   MAIN DASHBOARD RENDER
 ========================================================== */
 
 function renderDashboard() {
 
-    const dashboard =
-        getDashboardData();
+    if (!Dashboard.data)
+        return;
+
 
     console.log(
         "Rendering dashboard:",
-        dashboard
+        Dashboard.data
     );
 
 
     /* ------------------------------------------------------
-       TOP LINE KPIs
+       TOP LINE
     ------------------------------------------------------ */
 
-    renderKPIs(
-        dashboard.kpis
-    );
+    renderKPIs();
 
 
     /* ------------------------------------------------------
        EXECUTIVE SUMMARY
     ------------------------------------------------------ */
 
-    renderExecutiveSummary(
-        dashboard.executive
-    );
+    renderExecutiveSummary();
 
 
     /* ------------------------------------------------------
        MISSION INSIGHTS
     ------------------------------------------------------ */
 
-    renderMissionInsights(
-        dashboard.missionInsights
-    );
+    renderMissionInsights();
 
 
     /* ------------------------------------------------------
-       PARTICIPANT SECTION
+       MISSION TRIPS
     ------------------------------------------------------ */
 
-    renderParticipant(
-        dashboard.participants
-    );
-
-
-   
-
-    /* ------------------------------------------------------
-       EVENT SECTION
-    ------------------------------------------------------ */
-
-    renderEvent(
-        dashboard.events
-    );
+    renderMissionTripSummary();
 
 
     /* ------------------------------------------------------
-       LEADERSHIP SECTION
+       PARTICIPANTS
     ------------------------------------------------------ */
 
-    renderLeadership(
-        dashboard.leadership
-    );
+    renderParticipants();
+
+
+    renderParticipantDirectory();
+
+
+    renderParticipantJourneySummary();
 
 
     /* ------------------------------------------------------
-       TABLES
+       EVENTS
     ------------------------------------------------------ */
 
-    renderTables(
-        dashboard.tables
-    );
+    renderEvent();
+
+
+    renderEventSummaryTable();
 
 
     /* ------------------------------------------------------
-       MISSION JOURNEY
+       CHURCHES
     ------------------------------------------------------ */
 
-    renderMissionJourney(
-        dashboard
-    );
+    renderChurches();
 
 
     /* ------------------------------------------------------
-       FILTERS
+       LEADERSHIP
     ------------------------------------------------------ */
 
-    initialiseDashboardFilters(
-        dashboard
-    );
+    renderLeadership();
+
+
+    /* ------------------------------------------------------
+       CHARTS
+    ------------------------------------------------------ */
+
+    renderAllCharts();
+
+
+    /* ------------------------------------------------------
+       FILTER RESULT
+    ------------------------------------------------------ */
+
+    updateFilterResultCount();
 
 }
 
@@ -531,16 +384,19 @@ function renderDashboard() {
    KPI RENDERING
 ========================================================== */
 
-function renderKPIs(kpis) {
+function renderKPIs() {
 
-    if (!kpis)
+    const k =
+        Dashboard.data?.kpis;
+
+    if (!k)
         return;
 
 
     setText(
         "kpiRegistrations",
         formatNumber(
-            kpis.registrations
+            k.registrations
         )
     );
 
@@ -548,37 +404,25 @@ function renderKPIs(kpis) {
     setText(
         "kpiParticipants",
         formatNumber(
-            kpis.uniqueParticipants
+            k.uniqueParticipants
         )
     );
 
 
-    setText(
-        "kpiEvents",
+    /*
+       Some versions of HTML used
+       kpiRepeat while others used
+       kpiRepeatParticipants.
+    */
+
+    setTextMultiple(
+        [
+            "kpiReturning",
+            "kpiRepeat",
+            "kpiRepeatParticipants"
+        ],
         formatNumber(
-            kpis.totalEvents
-        )
-    );
-
-
-    setText(
-        "kpiChurches",
-        formatNumber(
-            kpis.totalChurches
-        )
-    );
-
-
-    setText(
-        "kpiAttendance",
-        `${kpis.attendanceRate || 0}%`
-    );
-
-
-    setText(
-        "kpiRepeat",
-        formatNumber(
-            kpis.repeatParticipants
+            k.repeatParticipants
         )
     );
 
@@ -586,46 +430,123 @@ function renderKPIs(kpis) {
     setText(
         "kpiFirstTimers",
         formatNumber(
-            kpis.firstTimers
+            k.firstTimers
         )
+    );
+
+
+    setText(
+        "kpiEvents",
+        formatNumber(
+            k.totalEvents
+        )
+    );
+
+
+    setText(
+        "kpiChurches",
+        formatNumber(
+            k.totalChurches
+        )
+    );
+
+
+    setText(
+        "kpiAttendance",
+        `${Number(
+            k.attendanceRate || 0
+        )}%`
     );
 
 
     setText(
         "kpiGrowth",
         formatGrowth(
-            kpis.growthRate
+            k.growthRate
         )
     );
 
 
-    /* ------------------------------------------------------
-       MISSION HEALTH
-    ------------------------------------------------------ */
-
     setText(
-        "missionHealthScore",
-        kpis.missionHealthScore ?? 0
+        "kpiAverageEvent",
+        formatNumber(
+            Dashboard.data
+                ?.events
+                ?.averages
+                ?.average || 0
+        )
     );
 
 
-    setText(
-        "missionHealthStatus",
-        kpis.missionHealthStatus ||
+    /*
+       Mission Health
+    */
+
+    setTextMultiple(
+        [
+            "missionHealthScore",
+            "kpiMissionHealth"
+        ],
+        k.missionHealthScore ?? 0
+    );
+
+
+    setTextMultiple(
+        [
+            "missionHealthStatus",
+            "kpiMissionHealthStatus"
+        ],
+        k.missionHealthStatus ||
         "Unknown"
     );
 
 
     setText(
         "missionHealthDescription",
-        kpis.missionHealthDescription ||
+        k.missionHealthDescription ||
         ""
     );
 
 
     updateMissionHealthClass(
-        kpis.missionHealthStatus
+        k.missionHealthStatus
     );
+
+
+    /*
+       Mission Trip KPIs
+    */
+
+    const mission =
+        Dashboard.data?.missionTrips;
+
+
+    if (mission) {
+
+        setText(
+            "kpiMissionTrips",
+            formatNumber(
+                mission.totalTrips
+            )
+        );
+
+
+        setText(
+            "kpiTrippers",
+            formatNumber(
+                mission.uniqueMissionaries
+            )
+        );
+
+
+        setText(
+            "kpiAvgTeam",
+            formatNumber(
+                mission.averageParticipants
+            )
+        );
+
+    }
 
 }
 
@@ -634,7 +555,10 @@ function renderKPIs(kpis) {
    EXECUTIVE SUMMARY
 ========================================================== */
 
-function renderExecutiveSummary(executive) {
+function renderExecutiveSummary() {
+
+    const executive =
+        Dashboard.data?.executive;
 
     if (!executive)
         return;
@@ -643,56 +567,159 @@ function renderExecutiveSummary(executive) {
     setText(
         "executiveTitle",
         executive.title ||
-        ""
+        "Mission Intelligence"
     );
-
-
-    const overview =
-        executive.overview || [];
 
 
     renderList(
         "executiveOverview",
-        overview
+        executive.overview || []
     );
 
 
     const highlights =
-        executive.highlights || {};
+        executive.highlights ||
+        {};
 
 
-    setText(
-        "highlightTopChurch",
+    setTextMultiple(
+        [
+            "highlightTopChurch",
+            "topChurch"
+        ],
         highlights.topChurch ||
         "N/A"
     );
 
 
-    setText(
-        "highlightTopEvent",
+    setTextMultiple(
+        [
+            "highlightTopEvent",
+            "topEvent"
+        ],
         highlights.topEvent ||
         "N/A"
     );
 
 
-    setText(
-        "highlightTopReferral",
+    setTextMultiple(
+        [
+            "highlightTopReferral",
+            "topReferral"
+        ],
         highlights.topReferral ||
         "N/A"
     );
 
 
-    setText(
-        "highlightLatestEvent",
+    setTextMultiple(
+        [
+            "highlightLatestEvent",
+            "latestEvent"
+        ],
         highlights.newestEvent ||
+        highlights.latestEvent ||
         "N/A"
     );
 
 
-    setText(
-        "highlightMissionHealth",
+    setTextMultiple(
+        [
+            "highlightMissionHealth",
+            "missionHealth"
+        ],
         highlights.missionHealth ||
         "N/A"
+    );
+
+
+    /*
+       Pastor / strategic corner
+    */
+
+    renderStrategicCorner();
+
+}
+
+
+/* ==========================================================
+   STRATEGIC CORNER
+========================================================== */
+
+function renderStrategicCorner() {
+
+    const executive =
+        Dashboard.data?.executive;
+
+    const container =
+        document.getElementById(
+            "missionIntelligence"
+        );
+
+
+    if (
+        !container ||
+        !executive
+    )
+        return;
+
+
+    /*
+       Only render if executive health
+       information exists.
+    */
+
+    if (
+        executive.healthScore === undefined &&
+        !executive.healthDescriptor &&
+        !executive.topChurch &&
+        !executive.topEvent
+    )
+        return;
+
+
+    container.innerHTML = "";
+
+
+    addPastorCard(
+        container,
+        "Mission Health",
+        executive.healthScore !== undefined
+            ? `${executive.healthScore}/100`
+            : "N/A"
+    );
+
+
+    addPastorCard(
+        container,
+        "Mission Stage",
+        executive.healthDescriptor ||
+        "N/A"
+    );
+
+
+    addPastorCard(
+        container,
+        "Highest Participation",
+        executive.topChurch ||
+        "N/A"
+    );
+
+
+    addPastorCard(
+        container,
+        "Most Popular Event",
+        executive.topEvent ||
+        "N/A"
+    );
+
+
+    addPastorCard(
+        container,
+        "Repeat Missionaries",
+        executive.repeatParticipants ??
+        Dashboard.data?.kpis?.repeatParticipants ??
+        0
     );
 
 }
@@ -702,15 +729,29 @@ function renderExecutiveSummary(executive) {
    MISSION INSIGHTS
 ========================================================== */
 
-function renderMissionInsights(insights) {
+function renderMissionInsights() {
 
-    if (!insights)
-        return;
+    const insights =
+        Dashboard.data
+            ?.missionInsights ||
+        {};
+
+
+    renderInsightGroup(
+        "celebrateInsights",
+        insights.celebrate
+    );
 
 
     renderInsightGroup(
         "insightCelebrate",
         insights.celebrate
+    );
+
+
+    renderInsightGroup(
+        "warningInsights",
+        insights.warning
     );
 
 
@@ -721,8 +762,32 @@ function renderMissionInsights(insights) {
 
 
     renderInsightGroup(
+        "followupInsights",
+        insights.warning
+    );
+
+
+    renderInsightGroup(
+        "recommendationInsights",
+        insights.recommendation
+    );
+
+
+    renderInsightGroup(
         "insightRecommendation",
         insights.recommendation
+    );
+
+
+    renderInsightGroup(
+        "opportunityInsights",
+        insights.recommendation
+    );
+
+
+    renderInsightGroup(
+        "riskInsights",
+        insights.risk
     );
 
 
@@ -748,6 +813,7 @@ function renderInsightGroup(
             elementId
         );
 
+
     if (!container)
         return;
 
@@ -755,7 +821,10 @@ function renderInsightGroup(
     container.innerHTML = "";
 
 
-    if (!items || !items.length) {
+    if (
+        !Array.isArray(items) ||
+        !items.length
+    ) {
 
         container.innerHTML =
             `<div class="empty-state">
@@ -767,327 +836,592 @@ function renderInsightGroup(
     }
 
 
-    items.forEach(item => {
+    items.forEach(
+        item => {
 
-        const div =
-            document.createElement("div");
+            const div =
+                document.createElement(
+                    "div"
+                );
 
-        div.className =
-            "insight-item";
 
-        div.textContent =
-            item;
+            div.className =
+                "missionInsight insightItem";
 
-        container.appendChild(
-            div
-        );
 
-    });
+            div.textContent =
+                item;
+
+
+            container.appendChild(
+                div
+            );
+
+        }
+    );
 
 }
 
 
+/* ==========================================================
+   MISSION TRIP SUMMARY
+========================================================== */
+
+function renderMissionTripSummary() {
+
+    const tbody =
+        document.getElementById(
+            "missionTripSummaryTable"
+        );
+
+
+    if (!tbody)
+        return;
+
+
+    tbody.innerHTML = "";
+
+
+    const summary =
+        Dashboard.data
+            ?.missionTrips
+            ?.tripSummary ||
+        [];
+
+
+    if (!summary.length) {
+
+        renderEmptyRow(
+            tbody,
+            4,
+            "No mission trips available."
+        );
+
+        return;
+
+    }
+
+
+    summary.forEach(
+        trip => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${escapeHtml(
+                        trip.tripCode ||
+                        trip.tripID ||
+                        trip.tripId ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        trip.location ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${formatDate(
+                        trip.startDate
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        trip.participants ||
+                        0
+                    )}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT DATA
+========================================================== */
+
+function getParticipantRows() {
+
+    return Dashboard.data
+        ?.tables
+        ?.participantSummary ||
+        [];
+
+}
 
 
 /* ==========================================================
    PARTICIPANT DIRECTORY
 ========================================================== */
 
-function renderParticipantDirectory(
-    participants
-) {
+function renderParticipantDirectory() {
 
-    const table =
+    /*
+       Support the IDs used by the different
+       HTML versions.
+    */
+
+    const tbody =
+        document.getElementById(
+            "participantSummaryTable"
+        ) ||
         document.getElementById(
             "participantTableBody"
         );
 
-    if (!table)
+
+    if (!tbody)
         return;
 
 
-    table.innerHTML = "";
+    tbody.innerHTML = "";
 
 
-    const rows =
-        Dashboard.filteredParticipants ||
-        Dashboard.data.dashboard
-            .tables
-            .participantSummary ||
-        [];
+    let people =
+        Dashboard.filteredParticipants;
 
 
-    rows.forEach(person => {
+    if (
+        !Array.isArray(people) ||
+        !people.length
+    ) {
 
-        const tr =
-            document.createElement("tr");
+        people =
+            getParticipantRows();
 
-
-        tr.innerHTML = `
-
-            <td>
-                <button
-                    class="participant-link"
-                    type="button"
-                    data-email="${escapeHtml(
-                        person.email || ""
-                    )}"
-                >
-                    ${escapeHtml(
-                        person.name || "Unknown"
-                    )}
-                </button>
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.church || "Unknown"
-                )}
-            </td>
-
-            <td>
-                ${person.age || ""}
-            </td>
-
-            <td>
-                ${person.events || 0}
-            </td>
-
-            <td>
-                ${person.attendanceRate || 0}%
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.leadership || ""
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.status || ""
-                )}
-            </td>
-
-        `;
+    }
 
 
-        table.appendChild(tr);
+    /*
+       Main participant table search
+    */
 
-    });
-
-
-    bindParticipantLinks();
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT SEARCH
-========================================================== */
-
-function searchParticipants(searchTerm) {
-
-    const dashboard =
-        getDashboardData();
+    const searchElement =
+        document.getElementById(
+            "participantTableSearch"
+        );
 
 
-    const participants =
-        dashboard.tables
-            ?.participantSummary || [];
-
-
-    const search =
+    const tableSearch =
         String(
-            searchTerm || ""
+            searchElement?.value ||
+            ""
         )
         .trim()
         .toLowerCase();
 
 
-    if (!search) {
+    if (tableSearch) {
 
-        Dashboard.filteredParticipants =
-            participants;
-
-    } else {
-
-        Dashboard.filteredParticipants =
-            participants.filter(person => {
-
-                return (
-
-                    String(
-                        person.name || ""
+        people =
+            people.filter(
+                person =>
+                    participantMatchesSearch(
+                        person,
+                        tableSearch
                     )
-                    .toLowerCase()
-                    .includes(search)
-
-                    ||
-
-                    String(
-                        person.church || ""
-                    )
-                    .toLowerCase()
-                    .includes(search)
-
-                    ||
-
-                    String(
-                        person.email || ""
-                    )
-                    .toLowerCase()
-                    .includes(search)
-
-                );
-
-            });
+            );
 
     }
 
 
-    renderParticipantDirectory(
-        dashboard.participants
-    );
+    /*
+       IMPORTANT:
+       Participant directory is always
+       sorted by NAME A-Z.
+    */
 
-}
-
-
-/* ==========================================================
-   PARTICIPANT SEARCH EVENT
-========================================================== */
-
-function bindParticipantSearch() {
-
-    const input =
-        document.getElementById(
-            "participantSearch"
+    const sorted =
+        [...people].sort(
+            (a, b) =>
+                String(
+                    a.name || ""
+                )
+                .localeCompare(
+                    String(
+                        b.name || ""
+                    ),
+                    undefined,
+                    {
+                        sensitivity: "base"
+                    }
+                )
         );
 
-    if (!input)
+
+    if (!sorted.length) {
+
+        renderEmptyRow(
+            tbody,
+            7,
+            "No participants found."
+        );
+
         return;
-
-
-    input.addEventListener(
-        "input",
-        debounce(
-            function () {
-
-                searchParticipants(
-                    this.value
-                );
-
-            },
-            200
-        )
-    );
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT DETAIL
-========================================================== */
-
-async function openParticipantDetails(
-    email
-) {
-
-    if (!email)
-        return;
-
-
-    try {
-
-        const response =
-            await apiPost(
-                "getParticipantDetails",
-                {
-                    email: email
-                }
-            );
-
-
-        if (
-            !response ||
-            response.success === false
-        ) {
-
-            throw new Error(
-                response?.message ||
-                "Unable to load participant."
-            );
-
-        }
-
-
-        renderParticipantJourney(
-            response.data ||
-            response
-        );
-
-
-        openModal(
-            "participantJourneyModal"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Participant detail error:",
-            error
-        );
-
-        showError(
-            "Unable to load participant details."
-        );
 
     }
 
-}
+
+    sorted.forEach(
+        person => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
 
 
-/* ==========================================================
-   PARTICIPANT LINKS
-========================================================== */
+            tr.innerHTML = `
 
-function bindParticipantLinks() {
+                <td>
 
-    document
-        .querySelectorAll(
-            ".participant-link"
-        )
-        .forEach(button => {
+                    <button
+                        type="button"
+                        class="participant-link"
+                    >
+                        ${escapeHtml(
+                            person.name ||
+                            "Unnamed"
+                        )}
+                    </button>
 
-            button.addEventListener(
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        person.church ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${person.age ??
+                    person.ageGroup ??
+                    "-"}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        person.events ||
+                        0
+                    )}
+                </td>
+
+                <td>
+                    ${Number(
+                        person.attendanceRate ||
+                        0
+                    )}%
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        person.leadership ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        person.status ||
+                        "-"
+                    )}
+                </td>
+
+            `;
+
+
+            const button =
+                tr.querySelector(
+                    ".participant-link"
+                );
+
+
+            if (button) {
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        event.stopPropagation();
+
+                        openParticipantJourney(
+                            person.personKey ||
+                            person.email ||
+                            person.mobile ||
+                            person.name
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /*
+               Entire row clickable
+            */
+
+            tr.style.cursor =
+                "pointer";
+
+
+            tr.addEventListener(
                 "click",
-                function () {
+                () => {
 
-                    openParticipantDetails(
-                        this.dataset.email
+                    openParticipantJourney(
+                        person.personKey ||
+                        person.email ||
+                        person.mobile ||
+                        person.name
                     );
 
                 }
             );
 
-        });
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
 
 }
 
 
 /* ==========================================================
-   PARTICIPANT JOURNEY
+   PARTICIPANT SEARCH MATCH
 ========================================================== */
 
-function renderParticipantJourney(
-    rows
+function participantMatchesSearch(
+    person,
+    search
 ) {
 
-    const container =
+    return [
+
+        person.name,
+
+        person.church,
+
+        person.mobile,
+
+        person.email,
+
+        person.leadership,
+
+        person.status
+
+    ]
+
+    .filter(Boolean)
+
+    .some(
+        value =>
+            String(value)
+                .toLowerCase()
+                .includes(search)
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT TABLE SEARCH
+========================================================== */
+
+function setupParticipantTableSearch() {
+
+    const search =
         document.getElementById(
-            "participantJourney"
+            "participantTableSearch"
         );
+
+
+    if (!search)
+        return;
+
+
+    if (
+        search.dataset.bound ===
+        "true"
+    )
+        return;
+
+
+    search.dataset.bound =
+        "true";
+
+
+    search.addEventListener(
+        "input",
+        debounce(
+            () => {
+
+                renderParticipantDirectory();
+
+            },
+            250
+        )
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT API SEARCH
+========================================================== */
+
+function setupParticipantSearch() {
+
+    const search =
+        document.getElementById(
+            "participantSearch"
+        );
+
+
+    const resultsContainer =
+        document.getElementById(
+            "participantSearchResults"
+        );
+
+
+    if (!search)
+        return;
+
+
+    if (
+        search.dataset.bound ===
+        "true"
+    )
+        return;
+
+
+    search.dataset.bound =
+        "true";
+
+
+    search.addEventListener(
+        "input",
+        debounce(
+            async function () {
+
+                const value =
+                    this.value.trim();
+
+
+                if (!value) {
+
+                    if (
+                        resultsContainer
+                    )
+                        resultsContainer.innerHTML =
+                            "";
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const result =
+                        await API.post(
+                            "searchParticipant",
+                            {
+                                searchTerm:
+                                    value
+                            }
+                        );
+
+
+                    if (
+                        !result?.success
+                    ) {
+
+                        throw new Error(
+                            result?.message ||
+                            "Participant search failed."
+                        );
+
+                    }
+
+
+                    const results =
+                        Array.isArray(
+                            result.data
+                        )
+                            ? result.data
+                            : [];
+
+
+                    renderParticipantSearchResults(
+                        results,
+                        resultsContainer
+                    );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "PARTICIPANT SEARCH ERROR:",
+                        error
+                    );
+
+
+                    if (
+                        resultsContainer
+                    ) {
+
+                        resultsContainer.innerHTML =
+                            `<p>
+                                ${escapeHtml(
+                                    error.message
+                                )}
+                             </p>`;
+
+                    }
+
+                }
+
+            },
+            350
+        )
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT SEARCH RESULTS
+========================================================== */
+
+function renderParticipantSearchResults(
+    results,
+    container
+) {
 
     if (!container)
         return;
@@ -1096,486 +1430,585 @@ function renderParticipantJourney(
     container.innerHTML = "";
 
 
-    if (!rows || !rows.length) {
+    if (!results.length) {
 
         container.innerHTML =
-            `<div class="empty-state">
-                No mission history found.
-             </div>`;
+            "<p>No participant found.</p>";
 
         return;
 
     }
 
+
+    results.forEach(
+        person => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "participantSearchResult";
+
+
+            button.innerHTML = `
+
+                <strong>
+                    ${escapeHtml(
+                        person.name ||
+                        "Unnamed"
+                    )}
+                </strong>
+
+                <span>
+                    ${escapeHtml(
+                        person.church ||
+                        ""
+                    )}
+                </span>
+
+            `;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openParticipantJourney(
+                        person.personKey ||
+                        person.email ||
+                        person.mobile ||
+                        person.name
+                    );
+
+                }
+            );
+
+
+            container.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   OPEN PARTICIPANT JOURNEY
+========================================================== */
+
+async function openParticipantJourney(
+    identifier
+) {
+
+    if (!identifier)
+        return;
+
+
+    showLoading();
+
+
+    try {
+
+        const result =
+            await API.post(
+                "getParticipantDetails",
+                {
+                    identifier:
+                        identifier
+                }
+            );
+
+
+        if (
+            !result?.success
+        ) {
+
+            throw new Error(
+                result?.message ||
+                "Unable to load participant journey."
+            );
+
+        }
+
+
+        renderJourneyModal(
+            result.data ||
+            {}
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "JOURNEY ERROR:",
+            error
+        );
+
+
+        showError(
+            error.message ||
+            "Unable to load participant journey."
+        );
+
+    }
+
+    finally {
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT JOURNEY SUMMARY
+========================================================== */
+
+function renderParticipantJourneySummary() {
+
+    const tbody =
+        document.getElementById(
+            "participantJourneySummaryTable"
+        );
+
+
+    if (!tbody)
+        return;
+
+
+    tbody.innerHTML = "";
+
+
+    const people =
+        Dashboard.data
+            ?.participantJourney ||
+        [];
+
+
+    /*
+       A-Z by participant name
+    */
 
     const sorted =
-        [...rows]
-        .sort(
+        [...people].sort(
             (a, b) =>
-                new Date(
-                    a.eventDate || 0
+                String(
+                    a.name || ""
                 )
-                -
-                new Date(
-                    b.eventDate || 0
+                .localeCompare(
+                    String(
+                        b.name || ""
+                    ),
+                    undefined,
+                    {
+                        sensitivity:
+                            "base"
+                    }
                 )
         );
 
 
-    sorted.forEach(row => {
+    if (!sorted.length) {
 
-        const item =
-            document.createElement(
-                "div"
-            );
-
-
-        item.className =
-            "journey-item";
-
-
-        const attended =
-            row.attendance === true;
-
-
-        item.innerHTML = `
-
-            <div class="journey-date">
-                ${formatDate(
-                    row.eventDate
-                )}
-            </div>
-
-            <div class="journey-content">
-
-                <div class="journey-event">
-                    ${escapeHtml(
-                        row.eventName ||
-                        "Mission Event"
-                    )}
-                </div>
-
-                <div class="journey-meta">
-
-                    <span>
-                        ${escapeHtml(
-                            row.eventType ||
-                            ""
-                        )}
-                    </span>
-
-                    <span>
-                        ${escapeHtml(
-                            row.church ||
-                            ""
-                        )}
-                    </span>
-
-                    <span class="${
-                        attended
-                            ? "status-attended"
-                            : "status-absent"
-                    }">
-
-                        ${
-                            attended
-                                ? "Attended"
-                                : "Absent"
-                        }
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        container.appendChild(
-            item
+        renderEmptyRow(
+            tbody,
+            6,
+            "No participant journey data."
         );
-
-    });
-
-}
-
-
-/* ==========================================================
-   MISSION JOURNEY
-========================================================== */
-
-function renderMissionJourney(
-    dashboard
-) {
-
-    const events =
-        dashboard.events;
-
-
-    if (!events)
-        return;
-
-
-    const timeline =
-        events.timeline || [];
-
-
-    renderMissionTimeline(
-        timeline
-    );
-
-
-    renderEventJourneyTable(
-        dashboard.tables
-            ?.eventSummary || []
-    );
-
-}
-
-
-/* ==========================================================
-   MISSION TIMELINE
-========================================================== */
-
-function renderMissionTimeline(
-    timeline
-) {
-
-    const container =
-        document.getElementById(
-            "missionTimeline"
-        );
-
-    if (!container)
-        return;
-
-
-    container.innerHTML = "";
-
-
-    if (!timeline.length) {
-
-        container.innerHTML =
-            `<div class="empty-state">
-                No mission journey data available.
-             </div>`;
 
         return;
 
     }
 
 
-    timeline.forEach(event => {
+    sorted
+        .slice(0, 20)
+        .forEach(
+            person => {
 
-        const item =
-            document.createElement(
-                "div"
-            );
+                const tr =
+                    document.createElement(
+                        "tr"
+                    );
 
 
-        item.className =
-            "timeline-item";
+                tr.innerHTML = `
+
+                    <td>
+                        ${escapeHtml(
+                            person.name ||
+                            "Unnamed"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            person.church ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            person.events ||
+                            0
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            person.attended ||
+                            0
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            person.missionTrips ||
+                            0
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            person.totalEngagement ||
+                            0
+                        )}
+                    </td>
+
+                `;
 
 
-        item.innerHTML = `
+                tr.style.cursor =
+                    "pointer";
 
-            <div class="timeline-marker"></div>
 
-            <div class="timeline-content">
+                tr.addEventListener(
+                    "click",
+                    () =>
+                        openParticipantJourney(
+                            person.personKey ||
+                            person.email ||
+                            person.mobile ||
+                            person.name
+                        )
+                );
 
-                <div class="timeline-date">
 
-                    ${formatDate(
-                        event.date
-                    )}
+                tbody.appendChild(
+                    tr
+                );
 
-                </div>
+            }
+        );
 
-                <div class="timeline-title">
+}
 
-                    ${escapeHtml(
-                        event.event ||
-                        event.name ||
-                        "Mission Event"
-                    )}
 
-                </div>
+/* ==========================================================
+   JOURNEY MODAL
+========================================================== */
 
-                <div class="timeline-participants">
+function renderJourneyModal(
+    data
+) {
 
-                    ${formatNumber(
-                        event.participants ||
-                        0
-                    )}
+    const modal =
+        document.getElementById(
+            "detailsModal"
+        ) ||
+        document.getElementById(
+            "participantJourneyModal"
+        );
 
-                    participants
 
-                </div>
+    const title =
+        document.getElementById(
+            "modalTitle"
+        );
 
+
+    const body =
+        document.getElementById(
+            "modalBody"
+        );
+
+
+    if (
+        !modal ||
+        !title ||
+        !body
+    )
+        return;
+
+
+    if (
+        !data ||
+        data.found === false
+    ) {
+
+        title.textContent =
+            "Participant Not Found";
+
+
+        body.innerHTML = `
+            <p>
+                No missional journey was
+                found for this participant.
+            </p>
+        `;
+
+
+        showModalElement(
+            modal
+        );
+
+
+        return;
+
+    }
+
+
+    const person =
+        data.person ||
+        {};
+
+
+    const summary =
+        data.summary ||
+        {};
+
+
+    const journey =
+        Array.isArray(
+            data.journey
+        )
+            ? data.journey
+            : [];
+
+
+    title.textContent =
+        `Missional Journey — ${
+            person.name ||
+            "Participant"
+        }`;
+
+
+    const entries =
+        journey
+            .slice()
+            .sort(
+                (a, b) =>
+                    new Date(
+                        a.date || 0
+                    ) -
+                    new Date(
+                        b.date || 0
+                    )
+            )
+            .map(
+                item => {
+
+                    const attended =
+                        item.attended === true ||
+                        item.attendance === true;
+
+
+                    return `
+
+                        <div
+                            class="journeyEntry"
+                        >
+
+                            <div
+                                class="journeyDate"
+                            >
+                                ${escapeHtml(
+                                    item.dateText ||
+                                    formatDate(
+                                        item.date
+                                    )
+                                )}
+                            </div>
+
+                            <div
+                                class="journeyContent"
+                            >
+
+                                <strong>
+                                    ${escapeHtml(
+                                        item.title ||
+                                        item.eventName ||
+                                        "Mission engagement"
+                                    )}
+                                </strong>
+
+                                ${
+                                    item.eventType ||
+                                    item.type
+                                        ? `
+                                            <span
+                                                class="journeyType"
+                                            >
+                                                ${escapeHtml(
+                                                    item.eventType ||
+                                                    item.type
+                                                )}
+                                            </span>
+                                          `
+                                        : ""
+                                }
+
+                                ${
+                                    item.description
+                                        ? `
+                                            <p>
+                                                ${escapeHtml(
+                                                    item.description
+                                                )}
+                                            </p>
+                                          `
+                                        : ""
+                                }
+
+                                ${
+                                    item.location
+                                        ? `
+                                            <small>
+                                                ${escapeHtml(
+                                                    item.location
+                                                )}
+                                            </small>
+                                          `
+                                        : ""
+                                }
+
+                                <small>
+                                    ${
+                                        attended
+                                            ? "Attended"
+                                            : "Registered"
+                                    }
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    body.innerHTML = `
+
+        <div
+            class="journeyParticipantHeader"
+        >
+
+            <h3>
+                ${escapeHtml(
+                    person.name ||
+                    "Participant"
+                )}
+            </h3>
+
+            ${
+                person.church
+                    ? `
+                        <p>
+                            ${escapeHtml(
+                                person.church
+                            )}
+                        </p>
+                      `
+                    : ""
+            }
+
+        </div>
+
+
+        <div
+            class="journeySummary"
+        >
+
+            <div>
+                <strong>
+                    ${summary.events ?? 0}
+                </strong>
+
+                <span>
+                    Events
+                </span>
             </div>
 
-        `;
+
+            <div>
+                <strong>
+                    ${summary.attended ?? 0}
+                </strong>
+
+                <span>
+                    Attended
+                </span>
+            </div>
 
 
-        container.appendChild(
-            item
-        );
+            <div>
+                <strong>
+                    ${summary.missionTrips ?? 0}
+                </strong>
 
-    });
-
-}
-
-
-/* ==========================================================
-   EVENT JOURNEY TABLE
-========================================================== */
-
-function renderEventJourneyTable(
-    events
-) {
-
-    const body =
-        document.getElementById(
-            "eventJourneyTableBody"
-        );
-
-    if (!body)
-        return;
+                <span>
+                    Mission Trips
+                </span>
+            </div>
 
 
-    body.innerHTML = "";
+            <div>
+                <strong>
+                    ${summary.totalJourneyEntries ??
+                    journey.length}
+                </strong>
+
+                <span>
+                    Journey Entries
+                </span>
+            </div>
+
+        </div>
 
 
-    events.forEach(event => {
+        <div
+            class="journeyTimeline"
+        >
 
-        const tr =
-            document.createElement(
-                "tr"
-            );
+            ${
+                entries ||
+                "<p>No journey entries.</p>"
+            }
 
+        </div>
 
-        tr.innerHTML = `
-
-            <td>
-                ${formatDate(
-                    event.date
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    event.event ||
-                    ""
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    event.type ||
-                    ""
-                )}
-            </td>
-
-            <td>
-                ${event.registered || 0}
-            </td>
-
-            <td>
-                ${event.attended || 0}
-            </td>
-
-            <td>
-                ${event.attendance || 0}%
-            </td>
-
-            <td>
-                ${event.firstTimers || 0}
-            </td>
-
-            <td>
-                ${event.repeat || 0}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    event.status ||
-                    ""
-                )}
-            </td>
-
-        `;
+    `;
 
 
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-
-
-/* ==========================================================
-   EVENT 
-========================================================== */
-
-function renderEvent(
-    events
-) {
-
-    if (!events)
-        return;
-
-
-    render(
-        "eventPopularity",
-        "bar",
-        events.popularity
+    showModalElement(
+        modal
     );
-
-
-    render(
-        "eventAttendance",
-        "bar",
-        events.attendance
-    );
-
-
-    render(
-        "eventType",
-        "doughnut",
-        events.eventTypes
-    );
-
-
-    render(
-        "monthlyTrend",
-        "line",
-        events.monthlyTrend
-    );
-
-
-    setText(
-        "averageAttendance",
-        events.averages?.average ||
-        0
-    );
-
-
-    renderEventEffectiveness(
-        events.effectiveness
-    );
-
-}
-
-
-/* ==========================================================
-   REPEAT MISSIONARIES
-========================================================== */
-
-function renderRepeatMissionaries(
-    people
-) {
-
-    const body =
-        document.getElementById(
-            "repeatMissionariesTableBody"
-        );
-
-    if (!body)
-        return;
-
-
-    body.innerHTML = "";
-
-
-    (people || []).forEach(person => {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-
-            <td>
-                ${escapeHtml(
-                    person.name || ""
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.church || ""
-                )}
-            </td>
-
-            <td>
-                ${person.events || 0}
-            </td>
-
-            <td>
-                ${person.attendanceRate || 0}%
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
-
-}
-
-
-
-
-/* ==========================================================
-   TABLE RENDERING
-========================================================== */
-
-function renderTables(tables) {
-
-    if (!tables)
-        return;
-
-
-    /* ------------------------------------------------------
-       EVENT SUMMARY
-    ------------------------------------------------------ */
-
-    renderEventSummaryTable(
-        tables.eventSummary
-    );
-
-
-    /* ------------------------------------------------------
-       PARTICIPANT SUMMARY
-    ------------------------------------------------------ */
-
-    Dashboard.filteredParticipants =
-        tables.participantSummary || [];
-
-    renderParticipantDirectory(
-        Dashboard.data.dashboard.participants
-    );
-
-
-    /* ------------------------------------------------------
-       TOP MISSIONARIES
-    ------------------------------------------------------ */
-
-    renderTopMissionaries(
-        tables.topMissionaries
-    );
-
-
-    /* ------------------------------------------------------
-       TOP CHURCHES
-    ------------------------------------------------------ */
-
 
 }
 
@@ -1584,133 +2017,1338 @@ function renderTables(tables) {
    EVENT SUMMARY TABLE
 ========================================================== */
 
-function renderEventSummaryTable(rows) {
+function renderEventSummaryTable() {
 
-    const body =
+    const tbody =
         document.getElementById(
             "eventSummaryTableBody"
+        ) ||
+        document.getElementById(
+            "eventSummaryTable"
         );
 
-    if (!body)
+
+    if (!tbody)
         return;
 
 
-    body.innerHTML = "";
+    tbody.innerHTML = "";
 
 
-    (rows || []).forEach(row => {
+    const events =
+        Dashboard.data
+            ?.tables
+            ?.eventSummary ||
+        [];
 
-        const tr =
-            document.createElement(
-                "tr"
+
+    if (!events.length) {
+
+        renderEmptyRow(
+            tbody,
+            10,
+            "No event data available."
+        );
+
+        return;
+
+    }
+
+
+    events.forEach(
+        event => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${formatDate(
+                        event.date
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        event.event ||
+                        ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        event.type ||
+                        ""
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        event.registered
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        event.attended
+                    )}
+                </td>
+
+                <td>
+                    ${Number(
+                        event.attendance ||
+                        0
+                    )}%
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        event.firstTimers
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        event.repeat
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        event.churches
+                    )}
+                </td>
+
+                <td>
+
+                    <span class="
+                        status-badge
+                        ${getStatusClass(
+                            event.status
+                        )}
+                    ">
+                        ${escapeHtml(
+                            event.status ||
+                            ""
+                        )}
+                    </span>
+
+                </td>
+
+            `;
+
+
+            tr.style.cursor =
+                "pointer";
+
+
+            tr.addEventListener(
+                "click",
+                () =>
+                    openEventDetails(
+                        event.event
+                    )
             );
 
 
-        tr.innerHTML = `
+            tbody.appendChild(
+                tr
+            );
 
-            <td>
-                ${formatDate(row.date)}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    row.event || ""
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    row.type || ""
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    row.registered
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    row.attended
-                )}
-            </td>
-
-            <td>
-                ${row.attendance || 0}%
-            </td>
-
-            <td>
-                ${formatNumber(
-                    row.firstTimers
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    row.repeat
-                )}
-            </td>
-
-            <td>
-                ${formatNumber(
-                    row.churches
-                )}
-            </td>
-
-            <td>
-                <span class="
-                    status-badge
-                    ${getStatusClass(
-                        row.status
-                    )}
-                ">
-                    ${escapeHtml(
-                        row.status || ""
-                    )}
-                </span>
-            </td>
-
-        `;
-
-
-        body.appendChild(tr);
-
-    });
+        }
+    );
 
 }
 
 
 /* ==========================================================
-   TOP MISSIONARIES
+   EVENT RENDERING
 ========================================================== */
 
+function renderEvent() {
+
+    const events =
+        Dashboard.data?.events;
+
+
+    if (!events)
+        return;
+
+
+    setText(
+        "averageAttendance",
+        events.averages?.average ||
+        0
+    );
+
+}
+
+
+/* ==========================================================
+   EVENT DETAILS
+========================================================== */
+
+async function openEventDetails(
+    eventName
+) {
+
+    if (!eventName)
+        return;
+
+
+    showLoading();
+
+
+    try {
+
+        const result =
+            await API.post(
+                "getEventDetails",
+                {
+                    eventName:
+                        eventName,
+
+                    event:
+                        eventName
+                }
+            );
+
+
+        if (
+            !result?.success
+        ) {
+
+            throw new Error(
+                result?.message ||
+                "Unable to load event details."
+            );
+
+        }
+
+
+        showDetailsModal(
+            eventName,
+            result.data
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "EVENT DETAILS ERROR:",
+            error
+        );
+
+
+        showError(
+            error.message ||
+            "Unable to load event details."
+        );
+
+    }
+
+    finally {
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* ==========================================================
+   CHURCH RENDERING
+========================================================== */
+
+function renderChurches() {
+
+    /*
+       Charts are rendered separately.
+       This function exists so the dashboard
+       can safely call it regardless of HTML
+       version.
+    */
+
+    return;
+
+}
+
+
+/* ==========================================================
+   LEADERSHIP RENDERING
+========================================================== */
+
+function renderLeadership() {
+
+    /*
+       Leadership charts are handled by
+       renderLeadershipPipeline() and
+       renderExperience().
+    */
+
+    return;
+
+}
+
+
+/* ==========================================================
+   CHART REGISTRY
+========================================================== */
+
+function destroyChart(
+    name
+) {
+
+    if (
+        Dashboard.charts &&
+        Dashboard.charts[name]
+    ) {
+
+        try {
+
+            Dashboard.charts[
+                name
+            ].destroy();
+
+        }
+
+        catch (error) {
+
+            console.warn(
+                "Unable to destroy chart:",
+                name,
+                error
+            );
+
+        }
+
+        delete Dashboard.charts[
+            name
+        ];
+
+    }
+
+
+    /*
+       Backward-compatible registry
+    */
+
+    if (
+        Dashboard.s &&
+        Dashboard.s[name]
+    ) {
+
+        delete Dashboard.s[name];
+
+    }
+
+}
+
+
+/* ==========================================================
+   CREATE CHART
+========================================================== */
+
+function createChart(
+    name,
+    canvasId,
+    config
+) {
+
+    const canvas =
+        document.getElementById(
+            canvasId
+        );
+
+
+    if (!canvas)
+        return null;
+
+
+    if (
+        typeof Chart ===
+        "undefined"
+    ) {
+
+        console.error(
+            "Chart.js is not loaded."
+        );
+
+        return null;
+
+    }
+
+
+    destroyChart(
+        name
+    );
+
+
+    const chart =
+        new Chart(
+            canvas.getContext("2d"),
+            config
+        );
+
+
+    Dashboard.charts[
+        name
+    ] = chart;
+
+
+    Dashboard.s[
+        name
+    ] = chart;
+
+
+    return chart;
+
+}
+
+
+/* ==========================================================
+   STANDARD CHART OPTIONS
+========================================================== */
+
+function standardChartOptions(
+    beginAtZero = true
+) {
+
+    return {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                display: true
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero:
+                    beginAtZero
+
+            }
+
+        }
+
+    };
+
+}
+
+
+/* ==========================================================
+   RENDER ALL CHARTS
+========================================================== */
+
+function renderAllCharts() {
+
+    renderFirstTimeReturning();
+
+    renderAgeDistribution();
+
+    renderChurchParticipation();
+
+    renderChurchAttendance();
+
+    renderChurchGrowth();
+
+    renderEventPopularity();
+
+    renderEventAttendance();
+
+    renderMonthlyTrend();
+
+    renderEventType();
+
+    renderLeadershipPipeline();
+
+    renderExperience();
+
+    renderParticipantGrowth();
+
+    renderParticipantType();
+
+    renderParticipantEngagement();
+
+}
+
+
+/* ==========================================================
+   FIRST TIME VS RETURNING
+========================================================== */
+
+function renderFirstTimeReturning() {
+
+    const data =
+        Dashboard.data
+            ?.participants
+            ?.firstTimeVsReturning;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "firstTimeReturning",
+        "firstTimeReturning",
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio:
+                    false
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   AGE DISTRIBUTION
+========================================================== */
+
+function renderAgeDistribution() {
+
+    const data =
+        Dashboard.data
+            ?.participants
+            ?.ageDistribution;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "ageDistribution",
+        "ageDistribution",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Participants",
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   CHURCH PARTICIPATION
+========================================================== */
+
+function renderChurchParticipation() {
+
+    const data =
+        Dashboard.data
+            ?.churches
+            ?.participation;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "churchParticipation",
+        "churchParticipation",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Participants",
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   CHURCH ATTENDANCE
+========================================================== */
+
+function renderChurchAttendance() {
+
+    const data =
+        Dashboard.data
+            ?.churches
+            ?.attendance;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "churchAttendance",
+        "churchAttendance",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Attendance %",
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...standardChartOptions(),
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   CHURCH GROWTH
+========================================================== */
+
+function renderChurchGrowth() {
+
+    const data =
+        Dashboard.data
+            ?.churches
+            ?.growth;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "churchGrowth",
+        "churchGrowth",
+        {
+
+            type: "line",
+
+            data: {
+
+                labels:
+                    data.labels ||
+                    data.growthLabels ||
+                    [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Churches",
+
+                        data:
+                            data.values ||
+                            data.growthData ||
+                            [],
+
+                        tension:
+                            0.3
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   EVENT POPULARITY
+========================================================== */
+
+function renderEventPopularity() {
+
+    const data =
+        Dashboard.data
+            ?.events
+            ?.popularity;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "eventPopularity",
+        "eventPopularity",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Registrations",
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   EVENT ATTENDANCE
+========================================================== */
+
+function renderEventAttendance() {
+
+    const data =
+        Dashboard.data
+            ?.events
+            ?.attendance;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "eventAttendance",
+        "eventAttendance",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Attendance %",
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...standardChartOptions(),
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   MONTHLY TREND
+========================================================== */
+
+function renderMonthlyTrend() {
+
+    const data =
+        Dashboard.data
+            ?.events
+            ?.monthlyTrend;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "monthlyTrend",
+        "monthlyTrend",
+        {
+
+            type: "line",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Registrations",
+
+                        data:
+                            data.values || [],
+
+                        tension:
+                            0.25
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   EVENT TYPE
+========================================================== */
+
+function renderEventType() {
+
+    const data =
+        Dashboard.data
+            ?.events
+            ?.eventTypes;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "eventTypes",
+        "eventType",
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio:
+                    false
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   LEADERSHIP PIPELINE
+========================================================== */
+
+function renderLeadershipPipeline() {
+
+    const data =
+        Dashboard.data
+            ?.leadership
+            ?.pipeline;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "leadershipPipeline",
+        "leadershipPipeline",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Participants",
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   EXPERIENCE
+========================================================== */
+
+function renderExperience() {
+
+    const data =
+        Dashboard.data
+            ?.leadership
+            ?.experience;
+
+
+    if (!data)
+        return;
+
+
+    createChart(
+        "experience",
+        "experience",
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels:
+                    data.labels || [],
+
+                datasets: [
+
+                    {
+
+                        data:
+                            data.values || []
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio:
+                    false
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT GROWTH
+========================================================== */
+
+function renderParticipantGrowth() {
+
+    const data =
+        Dashboard.data
+            ?.participants;
+
+
+    if (!data)
+        return;
+
+
+    const labels =
+        data.growthLabels ||
+        data.growth?.labels ||
+        [];
+
+
+    const values =
+        data.growthData ||
+        data.growth?.values ||
+        [];
+
+
+    if (!labels.length)
+        return;
+
+
+    createChart(
+        "participantGrowth",
+        "participantGrowth",
+        {
+
+            type: "line",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Participants",
+
+                        data: values,
+
+                        tension:
+                            0.3
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT TYPE
+========================================================== */
+
+function renderParticipantType() {
+
+    const data =
+        Dashboard.data
+            ?.participants;
+
+
+    if (!data)
+        return;
+
+
+    const labels =
+        data.typeLabels ||
+        data.type?.labels ||
+        [];
+
+
+    const values =
+        data.typeData ||
+        data.type?.values ||
+        [];
+
+
+    if (!labels.length)
+        return;
+
+
+    createChart(
+        "participantType",
+        "participantType",
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+
+                        data: values
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio:
+                    false,
+
+                plugins: {
+
+                    legend: {
+
+                        position:
+                            "bottom"
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   PARTICIPANT ENGAGEMENT
+========================================================== */
+
+function renderParticipantEngagement() {
+
+    const data =
+        Dashboard.data
+            ?.participants;
+
+
+    if (!data)
+        return;
+
+
+    const labels =
+        data.engagementLabels ||
+        data.engagement?.labels ||
+        [];
+
+
+    const values =
+        data.engagementData ||
+        data.engagement?.values ||
+        [];
+
+
+    if (!labels.length)
+        return;
+
+
+    createChart(
+        "participantEngagement",
+        "participantEngagement",
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Participants",
+
+                        data: values
+
+                    }
+
+                ]
+
+            },
+
+            options:
+                standardChartOptions()
+
+        }
+    );
+
+}
 
 
 /* ==========================================================
    FILTER INITIALISATION
 ========================================================== */
 
-function initialiseDashboardFilters(
-    dashboard
-) {
+function initialiseFilters() {
 
-    console.log(
-        "Initialising dashboard filters"
-    );
-
-
-    const tables =
-        dashboard.tables || {};
-
+    /*
+       Build participant filters from
+       participantSummary.
+    */
 
     const participants =
-        tables.participantSummary || [];
+        getParticipantRows();
 
-
-    /* ------------------------------------------------------
-       BUILD FILTER OPTIONS
-    ------------------------------------------------------ */
 
     populateFilter(
         "filterChurch",
@@ -1742,49 +3380,114 @@ function initialiseDashboardFilters(
     );
 
 
+    /*
+       Event filter
+    */
+
     populateFilter(
         "filterEvent",
         getEventNames(
-            tables.eventSummary
+            Dashboard.data
+                ?.tables
+                ?.eventSummary ||
+            []
         ),
         "All Events"
     );
 
 
-    /* ------------------------------------------------------
-       SEARCH
-    ------------------------------------------------------ */
+    /*
+       Event type
+    */
 
-    bindParticipantSearch();
-
-
-    /* ------------------------------------------------------
-       FILTER EVENTS
-    ------------------------------------------------------ */
-
-    bindFilter(
-        "filterChurch"
+    populateFilter(
+        "filterEventType",
+        uniqueValues(
+            Dashboard.data
+                ?.tables
+                ?.eventSummary ||
+            [],
+            "type"
+        ),
+        "All Event Types"
     );
 
 
-    bindFilter(
-        "filterLeadership"
+    /*
+       Year
+    */
+
+    const years =
+        getEventYears();
+
+
+    populateFilter(
+        "filterYear",
+        years,
+        "All Years"
     );
 
 
-    bindFilter(
-        "filterStatus"
-    );
+    bindFilterControls();
+
+}
 
 
-    bindFilter(
+/* ==========================================================
+   FILTER CONTROLS
+========================================================== */
+
+function bindFilterControls() {
+
+    const filterIds = [
+
+        "filterYear",
+
+        "filterChurch",
+
+        "filterLeadership",
+
+        "filterStatus",
+
+        "filterEventType",
+
         "filterEvent"
+
+    ];
+
+
+    filterIds.forEach(
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (!element)
+                return;
+
+
+            if (
+                element.dataset.bound ===
+                "true"
+            )
+                return;
+
+
+            element.dataset.bound =
+                "true";
+
+
+            element.addEventListener(
+                "change",
+                applyDashboardFilters
+            );
+
+        }
     );
 
-
-    /* ------------------------------------------------------
-       RESET
-    ------------------------------------------------------ */
 
     const reset =
         document.getElementById(
@@ -1792,7 +3495,15 @@ function initialiseDashboardFilters(
         );
 
 
-    if (reset) {
+    if (
+        reset &&
+        reset.dataset.bound !==
+            "true"
+    ) {
+
+        reset.dataset.bound =
+            "true";
+
 
         reset.addEventListener(
             "click",
@@ -1802,46 +3513,33 @@ function initialiseDashboardFilters(
     }
 
 
-    Dashboard.filtersInitialised =
+    /*
+       Participant table search
+    */
+
+    setupParticipantTableSearch();
+
+    /*
+       Main participant search
+    */
+
+    setupParticipantSearch();
+
+
+    Dashboard.filtersBound =
         true;
 
 }
 
 
 /* ==========================================================
-   FILTER BINDING
-========================================================== */
-
-function bindFilter(id) {
-
-    const element =
-        document.getElementById(id);
-
-    if (!element)
-        return;
-
-
-    element.addEventListener(
-        "change",
-        applyDashboardFilters
-    );
-
-}
-
-
-/* ==========================================================
-   APPLY FILTERS
+   APPLY DASHBOARD FILTERS
 ========================================================== */
 
 function applyDashboardFilters() {
 
-    const dashboard =
-        getDashboardData();
-
-
     const participants =
-        dashboard.tables
-            ?.participantSummary || [];
+        getParticipantRows();
 
 
     const church =
@@ -1862,25 +3560,16 @@ function applyDashboardFilters() {
         );
 
 
-    const event =
-        getFilterValue(
-            "filterEvent"
-        );
-
-
-    const searchInput =
-        document.getElementById(
-            "participantSearch"
-        );
-
-
     const search =
-        String(
-            searchInput?.value || ""
+        getFilterValue(
+            "participantSearch"
         )
-        .trim()
         .toLowerCase();
 
+
+    /*
+       Participant-level filters
+    */
 
     Dashboard.filteredParticipants =
         participants.filter(
@@ -1888,69 +3577,45 @@ function applyDashboardFilters() {
 
                 if (
                     church &&
-                    person.church !== church
+                    String(
+                        person.church ||
+                        ""
+                    ) !==
+                    church
                 )
                     return false;
 
 
                 if (
                     leadership &&
-                    person.leadership !== leadership
+                    String(
+                        person.leadership ||
+                        ""
+                    ) !==
+                    leadership
                 )
                     return false;
 
 
                 if (
                     status &&
-                    person.status !== status
+                    String(
+                        person.status ||
+                        ""
+                    ) !==
+                    status
                 )
                     return false;
 
 
-                if (event) {
-
-                    /*
-                     * ParticipantSummary from report.gs
-                     * does not currently contain an event
-                     * list.
-                     *
-                     * Therefore event filtering cannot
-                     * be reliably performed here until
-                     * participant event history is included
-                     * in the backend response.
-                     */
-
-                }
-
-
                 if (search) {
 
-                    const matches =
-
-                        String(
-                            person.name || ""
+                    if (
+                        !participantMatchesSearch(
+                            person,
+                            search
                         )
-                        .toLowerCase()
-                        .includes(search)
-
-                        ||
-
-                        String(
-                            person.church || ""
-                        )
-                        .toLowerCase()
-                        .includes(search)
-
-                        ||
-
-                        String(
-                            person.email || ""
-                        )
-                        .toLowerCase()
-                        .includes(search);
-
-
-                    if (!matches)
+                    )
                         return false;
 
                 }
@@ -1962,10 +3627,153 @@ function applyDashboardFilters() {
         );
 
 
-    renderParticipantDirectory(
-        dashboard.participants
+    /*
+       Event filter is applied to
+       participant directory only when
+       event history is available.
+    */
+
+    const event =
+        getFilterValue(
+            "filterEvent"
+        );
+
+
+    if (event) {
+
+        const eventParticipants =
+            getParticipantsForEvent(
+                event
+            );
+
+
+        if (
+            eventParticipants.length
+        ) {
+
+            const allowed =
+                new Set(
+                    eventParticipants.map(
+                        getPersonKey
+                    )
+                );
+
+
+            Dashboard.filteredParticipants =
+                Dashboard.filteredParticipants
+                    .filter(
+                        person =>
+                            allowed.has(
+                                getPersonKey(
+                                    person
+                                )
+                            )
+                    );
+
+        }
+
+    }
+
+
+    renderParticipantDirectory();
+
+    updateFilterResultCount();
+
+}
+
+
+/* ==========================================================
+   GET PARTICIPANTS FOR EVENT
+========================================================== */
+
+function getParticipantsForEvent(
+    eventName
+) {
+
+    const rows =
+        Dashboard.rawData ||
+        Dashboard.data?.rows ||
+        [];
+
+
+    if (!Array.isArray(rows))
+        return [];
+
+
+    return rows.filter(
+        row =>
+            String(
+                row.eventName ||
+                row.event ||
+                ""
+            )
+            .toLowerCase() ===
+            String(
+                eventName
+            )
+            .toLowerCase()
     );
 
+}
+
+
+/* ==========================================================
+   RESET FILTERS
+========================================================== */
+
+function resetDashboardFilters() {
+
+    [
+
+        "filterYear",
+
+        "filterChurch",
+
+        "filterLeadership",
+
+        "filterStatus",
+
+        "filterEventType",
+
+        "filterEvent",
+
+        "participantSearch",
+
+        "participantTableSearch"
+
+    ]
+    .forEach(
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (element)
+                element.value = "";
+
+        }
+    );
+
+
+    const results =
+        document.getElementById(
+            "participantSearchResults"
+        );
+
+
+    if (results)
+        results.innerHTML =
+            "";
+
+
+    Dashboard.filteredParticipants =
+        getParticipantRows();
+
+
+    renderDashboard();
 
     updateFilterResultCount();
 
@@ -1980,76 +3788,16 @@ function updateFilterResultCount() {
 
     const count =
         Dashboard.filteredParticipants
-            ?.length || 0;
+            ?.length ||
+        getParticipantRows().length;
 
 
     setText(
         "participantResultCount",
-        `${formatNumber(count)} participants`
+        `${formatNumber(
+            count
+        )} participants`
     );
-
-}
-
-
-/* ==========================================================
-   RESET FILTERS
-========================================================== */
-
-function resetDashboardFilters() {
-
-    const ids = [
-
-        "filterChurch",
-
-        "filterLeadership",
-
-        "filterStatus",
-
-        "filterEvent",
-
-        "participantSearch"
-
-    ];
-
-
-    ids.forEach(id => {
-
-        const element =
-            document.getElementById(id);
-
-        if (!element)
-            return;
-
-
-        if (
-            element.tagName ===
-            "SELECT"
-        ) {
-
-            element.selectedIndex = 0;
-
-        } else {
-
-            element.value = "";
-
-        }
-
-    });
-
-
-    Dashboard.filteredParticipants =
-        Dashboard.data.dashboard
-            .tables
-            .participantSummary || [];
-
-
-    renderParticipantDirectory(
-        Dashboard.data.dashboard
-            .participants
-    );
-
-
-    updateFilterResultCount();
 
 }
 
@@ -2074,7 +3822,12 @@ function populateFilter(
         return;
 
 
-    select.innerHTML = "";
+    const current =
+        select.value;
+
+
+    select.innerHTML =
+        "";
 
 
     const defaultOption =
@@ -2083,7 +3836,9 @@ function populateFilter(
         );
 
 
-    defaultOption.value = "";
+    defaultOption.value =
+        "";
+
 
     defaultOption.textContent =
         defaultLabel;
@@ -2097,33 +3852,87 @@ function populateFilter(
     values
         .filter(Boolean)
         .sort(
-            (a,b) =>
+            (a, b) =>
                 String(a)
-                .localeCompare(
-                    String(b)
-                )
+                    .localeCompare(
+                        String(b),
+                        undefined,
+                        {
+                            numeric: true,
+                            sensitivity:
+                                "base"
+                        }
+                    )
         )
-        .forEach(value => {
+        .forEach(
+            value => {
 
-            const option =
-                document.createElement(
-                    "option"
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    value;
+
+
+                option.textContent =
+                    value;
+
+
+                select.appendChild(
+                    option
                 );
 
-
-            option.value =
-                value;
-
-
-            option.textContent =
-                value;
+            }
+        );
 
 
-            select.appendChild(
-                option
-            );
+    if (
+        values.includes(
+            current
+        )
+    ) {
 
-        });
+        select.value =
+            current;
+
+    }
+
+}
+
+
+/* ==========================================================
+   GET EVENT YEARS
+========================================================== */
+
+function getEventYears() {
+
+    const events =
+        Dashboard.data
+            ?.tables
+            ?.eventSummary ||
+        [];
+
+
+    return [
+        ...new Set(
+            events
+                .map(
+                    event =>
+                        getYear(
+                            event.date
+                        )
+                )
+                .filter(Boolean)
+        )
+    ]
+    .sort(
+        (a, b) =>
+            Number(a) -
+            Number(b)
+    );
 
 }
 
@@ -2139,13 +3948,12 @@ function uniqueValues(
 
     return [
         ...new Set(
-
             (rows || [])
-            .map(row =>
-                row[field]
-            )
-            .filter(Boolean)
-
+                .map(
+                    row =>
+                        row?.[field]
+                )
+                .filter(Boolean)
         )
     ];
 
@@ -2162,13 +3970,13 @@ function getEventNames(
 
     return [
         ...new Set(
-
             (rows || [])
-            .map(row =>
-                row.event
-            )
-            .filter(Boolean)
-
+                .map(
+                    row =>
+                        row.event ||
+                        row.eventName
+                )
+                .filter(Boolean)
         )
     ];
 
@@ -2179,157 +3987,352 @@ function getEventNames(
    FILTER VALUE
 ========================================================== */
 
-function getFilterValue(id) {
+function getFilterValue(
+    id
+) {
 
     const element =
-        document.getElementById(id);
-
-
-    if (!element)
-        return "";
+        document.getElementById(
+            id
+        );
 
 
     return String(
-        element.value || ""
-    ).trim();
+        element?.value ||
+        ""
+    )
+    .trim();
 
 }
 
 
 /* ==========================================================
-    ENGINE
+   PARTICIPANT IDENTIFIER
 ========================================================== */
 
-function render(
-    canvasId,
-    type,
-    dataset
+function getPersonKey(
+    person
 ) {
 
-    const canvas =
+    return String(
+        person?.personKey ||
+        person?.email ||
+        person?.mobile ||
+        person?.name ||
+        ""
+    )
+    .trim()
+    .toLowerCase();
+
+}
+
+
+/* ==========================================================
+   MODAL — JOURNEY
+========================================================== */
+
+function showModalElement(
+    modal
+) {
+
+    if (!modal)
+        return;
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    modal.classList.add(
+        "active"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+}
+
+
+/* ==========================================================
+   DETAILS MODAL
+========================================================== */
+
+function showDetailsModal(
+    title,
+    data
+) {
+
+    const modal =
         document.getElementById(
-            canvasId
+            "detailsModal"
         );
 
 
-    if (!canvas)
-        return;
+    const titleElement =
+        document.getElementById(
+            "modalTitle"
+        );
 
 
-    if (!dataset)
-        return;
+    const body =
+        document.getElementById(
+            "modalBody"
+        );
 
 
     if (
-        !Array.isArray(
-            dataset.labels
-        ) ||
-        !Array.isArray(
-            dataset.values
-        )
+        !modal ||
+        !titleElement ||
+        !body
     )
         return;
 
 
-    Dashboard.s =
-        Dashboard.s || {};
+    titleElement.textContent =
+        title ||
+        "Details";
 
 
-    /* ------------------------------------------------------
-       DESTROY EXISTING 
-    ------------------------------------------------------ */
+    body.innerHTML = `
 
-    if (
-        Dashboard.s[canvasId]
-    ) {
+        <pre>
+${escapeHtml(
+    JSON.stringify(
+        data,
+        null,
+        2
+    )
+)}
+        </pre>
 
-        try {
-
-            Dashboard.s[
-                canvasId
-            ].destroy();
-
-        } catch (error) {
-
-            console.warn(
-                "Unable to destroy :",
-                canvasId,
-                error
-            );
-
-        }
-
-    }
+    `;
 
 
-    /* ------------------------------------------------------
-       CREATE 
-    ------------------------------------------------------ */
+    showModalElement(
+        modal
+    );
 
-    if (
-        typeof  ===
-        "undefined"
-    ) {
+}
 
-        console.error(
-            ".js is not loaded."
+
+/* ==========================================================
+   OPEN MODAL
+========================================================== */
+
+function openModal(
+    modalId
+) {
+
+    const modal =
+        document.getElementById(
+            modalId
         );
 
+
+    if (!modal)
         return;
 
-    }
+
+    showModalElement(
+        modal
+    );
+
+}
 
 
-    Dashboard.s[canvasId] =
-        new (
-            canvas,
-            {
+/* ==========================================================
+   CLOSE MODAL
+========================================================== */
 
-                type: type,
+function closeModal(
+    modalId
+) {
 
-                data: {
+    const modal =
+        document.getElementById(
+            modalId
+        );
 
-                    labels:
-                        dataset.labels,
 
-                    datasets: [
+    if (!modal)
+        return;
 
-                        {
 
-                            data:
-                                dataset.values,
+    modal.classList.remove(
+        "active"
+    );
 
-                            borderWidth: 1
 
-                        }
+    modal.classList.add(
+        "hidden"
+    );
 
-                    ]
 
-                },
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 
-                options: {
+}
 
-                    responsive: true,
 
-                    maintainAspectRatio:
-                        false,
+/* ==========================================================
+   BIND MODALS
+========================================================== */
 
-                    plugins: {
+function bindModalControls() {
 
-                        legend: {
+    document
+        .querySelectorAll(
+            "[data-close-modal]"
+        )
+        .forEach(
+            button => {
 
-                            display:
-                                type ===
-                                "doughnut"
+                if (
+                    button.dataset.bound ===
+                    "true"
+                )
+                    return;
+
+
+                button.dataset.bound =
+                    "true";
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        closeModal(
+                            this.dataset
+                                .closeModal
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".modal"
+        )
+        .forEach(
+            modal => {
+
+                if (
+                    modal.dataset.bound ===
+                    "true"
+                )
+                    return;
+
+
+                modal.dataset.bound =
+                    "true";
+
+
+                modal.addEventListener(
+                    "click",
+                    event => {
+
+                        if (
+                            event.target ===
+                            modal
+                        ) {
+
+                            closeModal(
+                                modal.id
+                            );
 
                         }
 
                     }
-
-                }
+                );
 
             }
         );
+
+
+    /*
+       Common participant modal close
+    */
+
+    const closeParticipant =
+        document.getElementById(
+            "closeParticipantJourney"
+        );
+
+
+    if (
+        closeParticipant &&
+        closeParticipant.dataset.bound !==
+            "true"
+    ) {
+
+        closeParticipant.dataset.bound =
+            "true";
+
+
+        closeParticipant.addEventListener(
+            "click",
+            () => {
+
+                closeModal(
+                    "participantJourneyModal"
+                );
+
+                closeModal(
+                    "detailsModal"
+                );
+
+            }
+        );
+
+    }
+
+}
+
+
+/* ==========================================================
+   DASHBOARD UI
+========================================================== */
+
+function bindDashboardUI() {
+
+    if (
+        Dashboard.uiBound
+    )
+        return;
+
+
+    bindModalControls();
+
+
+    const refresh =
+        document.getElementById(
+            "refreshDashboard"
+        );
+
+
+    if (refresh) {
+
+        refresh.addEventListener(
+            "click",
+            refreshDashboard
+        );
+
+    }
+
+
+    Dashboard.uiBound =
+        true;
 
 }
 
@@ -2342,82 +4345,157 @@ function updateMissionHealthClass(
     status
 ) {
 
-    const element =
+    const elements = [
+
         document.getElementById(
             "missionHealthStatus"
-        );
+        ),
+
+        document.getElementById(
+            "kpiMissionHealthStatus"
+        )
+
+    ]
+    .filter(Boolean);
 
 
-    if (!element)
-        return;
+    elements.forEach(
+        element => {
+
+            element.classList.remove(
+
+                "health-excellent",
+
+                "health-healthy",
+
+                "health-growing",
+
+                "health-attention",
+
+                "health-critical",
+
+                "excellent",
+
+                "healthy",
+
+                "growing",
+
+                "needs-attention",
+
+                "critical"
+
+            );
 
 
-    element.classList.remove(
+            const value =
+                String(
+                    status ||
+                    ""
+                )
+                .toLowerCase();
 
-        "health-excellent",
 
-        "health-healthy",
+            switch(value) {
 
-        "health-growing",
+                case "excellent":
 
-        "health-attention",
+                    element.classList.add(
+                        "health-excellent",
+                        "excellent"
+                    );
 
-        "health-critical"
+                    break;
 
+
+                case "healthy":
+
+                    element.classList.add(
+                        "health-healthy",
+                        "healthy"
+                    );
+
+                    break;
+
+
+                case "growing":
+
+                    element.classList.add(
+                        "health-growing",
+                        "growing"
+                    );
+
+                    break;
+
+
+                case "needs attention":
+
+                    element.classList.add(
+                        "health-attention",
+                        "needs-attention"
+                    );
+
+                    break;
+
+
+                case "critical":
+
+                    element.classList.add(
+                        "health-critical",
+                        "critical"
+                    );
+
+                    break;
+
+            }
+
+        }
     );
-
-
-    switch(status) {
-
-        case "Excellent":
-
-            element.classList.add(
-                "health-excellent"
-            );
-
-            break;
-
-
-        case "Healthy":
-
-            element.classList.add(
-                "health-healthy"
-            );
-
-            break;
-
-
-        case "Growing":
-
-            element.classList.add(
-                "health-growing"
-            );
-
-            break;
-
-
-        case "Needs Attention":
-
-            element.classList.add(
-                "health-attention"
-            );
-
-            break;
-
-
-        case "Critical":
-
-            element.classList.add(
-                "health-critical"
-            );
-
-            break;
-
-    }
 
 }
 
 
+/* ==========================================================
+   PASTOR CARD
+========================================================== */
+
+function addPastorCard(
+    container,
+    title,
+    value
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "pastorCard";
+
+
+    card.innerHTML = `
+
+        <div class="pastorTitle">
+            ${escapeHtml(
+                title
+            )}
+        </div>
+
+        <div class="pastorValue">
+            ${escapeHtml(
+                value
+            )}
+        </div>
+
+    `;
+
+
+    container.appendChild(
+        card
+    );
+
+}
 
 
 /* ==========================================================
@@ -2439,42 +4517,52 @@ function renderList(
         return;
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
-    (items || []).forEach(item => {
+    if (
+        !Array.isArray(items) ||
+        !items.length
+    )
+        return;
 
-        const li =
-            document.createElement(
-                "li"
+
+    items.forEach(
+        item => {
+
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+
+            li.textContent =
+                item;
+
+
+            container.appendChild(
+                li
             );
 
-
-        li.textContent =
-            item;
-
-
-        container.appendChild(
-            li
-        );
-
-    });
+        }
+    );
 
 }
 
 
 /* ==========================================================
-   TEXT HELPER
+   SET TEXT
 ========================================================== */
 
 function setText(
-    elementId,
+    id,
     value
 ) {
 
     const element =
         document.getElementById(
-            elementId
+            id
         );
 
 
@@ -2483,7 +4571,28 @@ function setText(
 
 
     element.textContent =
-        value ?? "";
+        value ??
+        "";
+
+}
+
+
+/* ==========================================================
+   SET MULTIPLE TEXT ELEMENTS
+========================================================== */
+
+function setTextMultiple(
+    ids,
+    value
+) {
+
+    ids.forEach(
+        id =>
+            setText(
+                id,
+                value
+            )
+    );
 
 }
 
@@ -2497,10 +4606,22 @@ function formatNumber(
 ) {
 
     const number =
-        Number(value || 0);
+        Number(
+            value || 0
+        );
 
 
-    return number.toLocaleString();
+    if (
+        Number.isNaN(
+            number
+        )
+    )
+        return "0";
+
+
+    return number.toLocaleString(
+        "en-SG"
+    );
 
 }
 
@@ -2514,10 +4635,22 @@ function formatGrowth(
 ) {
 
     const number =
-        Number(value || 0);
+        Number(
+            value || 0
+        );
 
 
-    if (number > 0)
+    if (
+        Number.isNaN(
+            number
+        )
+    )
+        return "0%";
+
+
+    if (
+        number > 0
+    )
         return `+${number}%`;
 
 
@@ -2539,7 +4672,9 @@ function formatDate(
 
 
     const date =
-        new Date(value);
+        new Date(
+            value
+        );
 
 
     if (
@@ -2547,20 +4682,120 @@ function formatDate(
             date.getTime()
         )
     )
-        return "—";
+        return String(
+            value
+        );
 
 
     return date.toLocaleDateString(
         "en-SG",
         {
 
-            day: "2-digit",
+            day:
+                "2-digit",
 
-            month: "short",
+            month:
+                "short",
 
-            year: "numeric"
+            year:
+                "numeric"
 
         }
+    );
+
+}
+
+
+/* ==========================================================
+   YEAR
+========================================================== */
+
+function getYear(
+    value
+) {
+
+    if (!value)
+        return "";
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    )
+        return "";
+
+
+    return String(
+        date.getFullYear()
+    );
+
+}
+
+
+/* ==========================================================
+   STATUS CLASS
+========================================================== */
+
+function getStatusClass(
+    status
+) {
+
+    return String(
+        status ||
+        ""
+    )
+    .toLowerCase()
+    .replace(
+        /[^a-z0-9]+/g,
+        "-"
+    )
+    .replace(
+        /^-|-$/g,
+        ""
+    );
+
+}
+
+
+/* ==========================================================
+   EMPTY TABLE ROW
+========================================================== */
+
+function renderEmptyRow(
+    tbody,
+    colspan,
+    message
+) {
+
+    const tr =
+        document.createElement(
+            "tr"
+        );
+
+
+    tr.innerHTML = `
+
+        <td
+            colspan="${colspan}"
+            style="text-align:center;"
+        >
+            ${escapeHtml(
+                message
+            )}
+        </td>
+
+    `;
+
+
+    tbody.appendChild(
+        tr
     );
 
 }
@@ -2575,7 +4810,8 @@ function escapeHtml(
 ) {
 
     return String(
-        value ?? ""
+        value ??
+        ""
     )
 
     .replace(
@@ -2644,125 +4880,77 @@ function debounce(
 
 
 /* ==========================================================
-   MODAL OPEN
+   LOADING
 ========================================================== */
 
-function openModal(
-    modalId
-) {
+function showLoading() {
 
-    const modal =
-        document.getElementById(
-            modalId
-        );
+    const ids = [
 
+        "loadingOverlay",
 
-    if (!modal)
-        return;
+        "dashboardLoading"
+
+    ];
 
 
-    modal.classList.add(
-        "active"
-    );
+    ids.forEach(
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
 
 
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
+            if (element)
+                element.classList.remove(
+                    "hidden"
+                );
+
+        }
     );
 
 }
 
 
 /* ==========================================================
-   MODAL CLOSE
+   HIDE LOADING
 ========================================================== */
 
-function closeModal(
-    modalId
-) {
+function hideLoading() {
 
-    const modal =
-        document.getElementById(
-            modalId
-        );
+    const ids = [
 
+        "loadingOverlay",
 
-    if (!modal)
-        return;
+        "dashboardLoading"
+
+    ];
 
 
-    modal.classList.remove(
-        "active"
-    );
+    ids.forEach(
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
 
 
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
+            if (element)
+                element.classList.add(
+                    "hidden"
+                );
+
+        }
     );
 
 }
 
 
 /* ==========================================================
-   MODAL BINDING
-========================================================== */
-
-function bindModalControls() {
-
-    document
-        .querySelectorAll(
-            "[data-close-modal]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    closeModal(
-                        this.dataset
-                            .closeModal
-                    );
-
-                }
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(
-            ".modal"
-        )
-        .forEach(modal => {
-
-            modal.addEventListener(
-                "click",
-                function(event) {
-
-                    if (
-                        event.target ===
-                        modal
-                    ) {
-
-                        closeModal(
-                            modal.id
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
-}
-
-
-/* ==========================================================
-   ERROR MESSAGE
+   ERROR
 ========================================================== */
 
 function showError(
@@ -2780,12 +4968,21 @@ function showError(
         );
 
 
-    if (!element)
+    if (!element) {
+
+        console.error(
+            "Dashboard error element not found:",
+            message
+        );
+
         return;
+
+    }
 
 
     element.textContent =
-        message;
+        message ||
+        "Unable to load dashboard.";
 
 
     element.classList.remove(
@@ -2823,16 +5020,14 @@ function clearError() {
 
 
 /* ==========================================================
-   LOADING STATE
+   LAST REFRESH
 ========================================================== */
 
-function setDashboardLoading(
-    loading
-) {
+function updateLastRefresh() {
 
     const element =
         document.getElementById(
-            "dashboardLoading"
+            "lastRefresh"
         );
 
 
@@ -2840,3610 +5035,76 @@ function setDashboardLoading(
         return;
 
 
-    element.classList.toggle(
-        "hidden",
-        !loading
-    );
-
-}
-
-
-/* ==========================================================
-   SAFE EVENT LISTENER
-========================================================== */
-
-function on(
-    elementId,
-    event,
-    handler
-) {
-
-    const element =
-        document.getElementById(
-            elementId
-        );
-
-
-    if (!element)
-        return;
-
-
-    element.addEventListener(
-        event,
-        handler
-    );
-
-}
-
-
-/* ==========================================================
-   GLOBAL UI EVENTS
-========================================================== */
-
-function bindDashboardUI() {
-
-    bindModalControls();
-
-
-    on(
-        "closeParticipantJourney",
-        "click",
-        function () {
-
-            closeModal(
-                "participantJourneyModal"
+    element.textContent =
+        new Date()
+            .toLocaleString(
+                "en-SG"
             );
 
-        }
-    );
+}
 
 
-    on(
-        "refreshDashboard",
-        "click",
-        function () {
+/* ==========================================================
+   BACK BUTTON
+========================================================== */
 
-            loadDashboard();
+function goBack() {
 
-        }
-    );
-
-
-    on(
-        "resetFilters",
-        "click",
-        resetDashboardFilters
-    );
+    history.back();
 
 }
 
 
 /* ==========================================================
-   DASHBOARD READY
+   GLOBAL DASHBOARD READY
 ========================================================== */
 
 function dashboardReady() {
+
+    clearError();
+
+    updateLastRefresh();
+
+    updateFilterResultCount();
 
     console.log(
         "Missions Intelligence Dashboard ready."
     );
 
-
-    clearError();
-
-    updateFilterResultCount();
-
-}
-
-   /* ==========================================================
-   PART 4
-   TABLES + PARTICIPANT SEARCH + MISSION JOURNEY
-========================================================== */
-
-
-/* ==========================================================
-   EVENT SUMMARY TABLE
-========================================================== */
-
-function renderEventSummaryTable() {
-
-    const tbody =
-        document.getElementById("eventSummaryTable");
-
-    if (!tbody)
-        return;
-
-    tbody.innerHTML = "";
-
-    const events =
-        Dashboard.data?.tables?.eventSummary || [];
-
-    events.forEach(event => {
-
-        const tr =
-            document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${formatDate(event.date)}</td>
-            <td>${escapeHtml(event.event)}</td>
-            <td>${escapeHtml(event.type)}</td>
-            <td>${event.registered ?? 0}</td>
-            <td>${event.attended ?? 0}</td>
-            <td>${event.attendance ?? 0}%</td>
-            <td>${event.firstTimers ?? 0}</td>
-            <td>${event.repeat ?? 0}</td>
-            <td>${event.churches ?? 0}</td>
-            <td>${escapeHtml(event.status)}</td>
-        `;
-
-        tr.style.cursor = "pointer";
-
-        tr.addEventListener(
-            "click",
-            () => openEventDetails(event.event)
-        );
-
-        tbody.appendChild(tr);
-
-    });
-
 }
 
 
 /* ==========================================================
-   PARTICIPANT DIRECTORY
+   COMPATIBILITY ALIASES
 ========================================================== */
 
-function renderParticipantDirectory() {
-
-    const tbody =
-        document.getElementById(
-            "participantSummaryTable"
-        );
-
-    if (!tbody)
-        return;
-
-    tbody.innerHTML = "";
-
-    const people =
-        Dashboard.data
-            ?.tables
-            ?.participantSummary || [];
-
-    const searchElement =
-        document.getElementById(
-            "participantTableSearch"
-        );
-
-    const search =
-        (
-            searchElement?.value || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    const filtered =
-        people.filter(person => {
-
-            if (!search)
-                return true;
-
-            return [
-
-                person.name,
-                person.church,
-                person.mobile,
-                person.email,
-                person.leadership,
-                person.status
-
-            ]
-            .filter(Boolean)
-            .some(value =>
-                String(value)
-                    .toLowerCase()
-                    .includes(search)
-            );
-
-        });
-
-
-    /*
-       Sort participant directory
-       alphabetically by NAME
-    */
-
-    filtered.sort((a, b) =>
-        String(a.name || "")
-            .localeCompare(
-                String(b.name || ""),
-                undefined,
-                {
-                    sensitivity: "base"
-                }
-            )
-    );
-
-
-    filtered.forEach(person => {
-
-        const tr =
-            document.createElement("tr");
-
-        tr.innerHTML = `
-
-            <td>
-                <button
-                    type="button"
-                    class="participant-link"
-                >
-                    ${escapeHtml(
-                        person.name || "Unnamed"
-                    )}
-                </button>
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.church || "-"
-                )}
-            </td>
-
-            <td>
-                ${person.age ?? "-"}
-            </td>
-
-            <td>
-                ${person.events ?? 0}
-            </td>
-
-            <td>
-                ${person.attendanceRate ?? 0}%
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.leadership || "-"
-                )}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                    person.status || "-"
-                )}
-            </td>
-
-        `;
-
-
-        const button =
-            tr.querySelector(
-                ".participant-link"
-            );
-
-
-        if (button) {
-
-            button.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-                    openParticipantJourney(
-                        person.email ||
-                        person.mobile ||
-                        person.name
-                    );
-
-                }
-            );
-
-        }
-
-
-        /*
-           Allow clicking anywhere on the row
-        */
-
-        tr.style.cursor = "pointer";
-
-        tr.addEventListener(
-            "click",
-            () => {
-
-                openParticipantJourney(
-                    person.email ||
-                    person.mobile ||
-                    person.name
-                );
-
-            }
-        );
-
-
-        tbody.appendChild(tr);
-
-    });
-
-
-    /*
-       Empty state
-    */
-
-    if (!filtered.length) {
-
-        const tr =
-            document.createElement("tr");
-
-        tr.innerHTML = `
-            <td
-                colspan="7"
-                style="text-align:center;"
-            >
-                No participants found.
-            </td>
-        `;
-
-        tbody.appendChild(tr);
-
-    }
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT TABLE SEARCH
-========================================================== */
-
-function setupParticipantTableSearch() {
-
-    const search =
-        document.getElementById(
-            "participantTableSearch"
-        );
-
-    if (!search)
-        return;
-
-
-    if (
-        search.dataset.bound === "true"
-    )
-        return;
-
-
-    search.dataset.bound = "true";
-
-
-    search.addEventListener(
-        "input",
-        debounce(
-            function () {
-
-                renderParticipantDirectory();
-
-            },
-            250
-        )
-    );
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT SEARCH
-   MAIN SEARCH BOX
-========================================================== */
-
-function setupParticipantSearch() {
-
-    const search =
-        document.getElementById(
-            "participantSearch"
-        );
-
-    const resultsContainer =
-        document.getElementById(
-            "participantSearchResults"
-        );
-
-
-    if (!search)
-        return;
-
-
-    if (
-        search.dataset.bound === "true"
-    )
-        return;
-
-
-    search.dataset.bound = "true";
-
-
-    search.addEventListener(
-        "input",
-        debounce(
-            async function () {
-
-                const value =
-                    this.value.trim();
-
-
-                if (!value) {
-
-                    if (
-                        resultsContainer
-                    )
-                        resultsContainer.innerHTML =
-                            "";
-
-                    return;
-
-                }
-
-
-                /*
-                   Search participant
-                   through REPORTS.GS
-                */
-
-                try {
-
-                    const result =
-                        await API.post(
-                            "searchParticipant",
-                            {
-                                searchTerm:
-                                    value
-                            }
-                        );
-
-
-                    if (
-                        !result?.success
-                    )
-                        throw new Error(
-                            result?.message ||
-                            "Participant search failed."
-                        );
-
-
-                    const results =
-                        Array.isArray(
-                            result.data
-                        )
-                            ? result.data
-                            : [];
-
-
-                    renderParticipantSearchResults(
-                        results,
-                        resultsContainer
-                    );
-
-
-                }
-                catch (error) {
-
-                    console.error(
-                        "PARTICIPANT SEARCH ERROR:",
-                        error
-                    );
-
-
-                    if (
-                        resultsContainer
-                    ) {
-
-                        resultsContainer.innerHTML = `
-                            <p>
-                                ${escapeHtml(
-                                    error.message
-                                )}
-                            </p>
-                        `;
-
-                    }
-
-                }
-
-            },
-            350
-        )
-    );
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT SEARCH RESULTS
-========================================================== */
-
-function renderParticipantSearchResults(
-    results,
-    container
-) {
-
-    if (!container)
-        return;
-
-
-    container.innerHTML = "";
-
-
-    if (!results.length) {
-
-        container.innerHTML =
-            "<p>No participant found.</p>";
-
-        return;
-
-    }
-
-
-    results.forEach(person => {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-
-        button.type = "button";
-
-        button.className =
-            "participantSearchResult";
-
-
-        button.innerHTML = `
-
-            <strong>
-                ${escapeHtml(
-                    person.name ||
-                    "Unnamed"
-                )}
-            </strong>
-
-            <span>
-                ${escapeHtml(
-                    person.church || ""
-                )}
-            </span>
-
-        `;
-
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                openParticipantJourney(
-                    person.personKey ||
-                    person.email ||
-                    person.mobile ||
-                    person.name
-                );
-
-            }
-        );
-
-
-        container.appendChild(
-            button
-        );
-
-    });
-
-}
-
-
-/* ==========================================================
-   OPEN PARTICIPANT JOURNEY
-========================================================== */
-
-async function openParticipantJourney(
-    identifier
-) {
-
-    showLoading();
-
-
-    try {
-
-        const result =
-            await API.post(
-                "getParticipantDetails",
-                {
-                    identifier:
-                        identifier
-                }
-            );
-
-
-        if (
-            !result?.success
-        )
-            throw new Error(
-                result?.message ||
-                "Unable to load participant journey."
-            );
-
-
-        renderJourneyModal(
-            result.data
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            "JOURNEY ERROR:",
-            error
-        );
-
-
-        alert(
-            error.message ||
-            "Unable to load participant journey."
-        );
-
-    }
-    finally {
-
-        hideLoading();
-
-    }
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT JOURNEY SUMMARY
-========================================================== */
-
-function renderParticipantJourneySummary() {
-
-    const tbody =
-        document.getElementById(
-            "participantJourneySummaryTable"
-        );
-
-    if (!tbody)
-        return;
-
-
-    tbody.innerHTML = "";
-
-
-    const people =
-        Dashboard.data
-            ?.participantJourney || [];
-
-
-    /*
-       Sort by participant name
-       A-Z
-    */
-
-    const sorted =
-        [...people].sort(
-            (a, b) =>
-                String(a.name || "")
-                    .localeCompare(
-                        String(b.name || ""),
-                        undefined,
-                        {
-                            sensitivity:
-                                "base"
-                        }
-                    )
-        );
-
-
-    sorted
-        .slice(0, 20)
-        .forEach(person => {
-
-            const tr =
-                document.createElement(
-                    "tr"
-                );
-
-
-            tr.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        person.name ||
-                        "Unnamed"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        person.church ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${person.events ?? 0}
-                </td>
-
-                <td>
-                    ${person.attended ?? 0}
-                </td>
-
-                <td>
-                    ${person.missionTrips ?? 0}
-                </td>
-
-                <td>
-                    ${person.totalEngagement ?? 0}
-                </td>
-
-            `;
-
-
-            tr.style.cursor =
-                "pointer";
-
-
-            tr.addEventListener(
-                "click",
-                () =>
-                    openParticipantJourney(
-                        person.personKey
-                    )
-            );
-
-
-            tbody.appendChild(tr);
-
-        });
-
-
-    if (!sorted.length) {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-            <td
-                colspan="6"
-                style="text-align:center;"
-            >
-                No participant journey data.
-            </td>
-        `;
-
-
-        tbody.appendChild(tr);
-
-    }
-
-}
-
-
-/* ==========================================================
-   JOURNEY MODAL
-========================================================== */
-
-function renderJourneyModal(
-    data
-) {
-
-    const modal =
-        document.getElementById(
-            "detailsModal"
-        );
-
-    const title =
-        document.getElementById(
-            "modalTitle"
-        );
-
-    const body =
-        document.getElementById(
-            "modalBody"
-        );
-
-
-    if (
-        !modal ||
-        !title ||
-        !body
-    )
-        return;
-
-
-    /*
-       Participant not found
-    */
-
-    if (
-        !data ||
-        !data.found
-    ) {
-
-        title.textContent =
-            "Participant Not Found";
-
-
-        body.innerHTML = `
-            <p>
-                No missional journey was
-                found for this participant.
-            </p>
-        `;
-
-
-        modal.classList.remove(
-            "hidden"
-        );
-
-        return;
-
-    }
-
-
-    const person =
-        data.person || {};
-
-
-    const summary =
-        data.summary || {};
-
-
-    const journey =
-        Array.isArray(
-            data.journey
-        )
-            ? data.journey
-            : [];
-
-
-    title.textContent =
-        `Missional Journey — ${
-            person.name ||
-            "Participant"
-        }`;
-
-
-    /*
-       Build journey timeline
-    */
-
-    const entries =
-        journey
-            .map(item => {
-
-                const date =
-                    item.dateText ||
-                    formatDate(
-                        item.date
-                    );
-
-
-                const attended =
-                    item.attended;
-
-
-                return `
-
-                    <div
-                        class="journeyEntry"
-                    >
-
-                        <div
-                            class="journeyDate"
-                        >
-                            ${escapeHtml(
-                                date
-                            )}
-                        </div>
-
-
-                        <div
-                            class="journeyContent"
-                        >
-
-                            <strong>
-                                ${escapeHtml(
-                                    item.title ||
-                                    "Mission engagement"
-                                )}
-                            </strong>
-
-
-                            ${
-                                item.eventType ||
-                                item.type
-                                    ? `
-                                        <span
-                                            class="journeyType"
-                                        >
-                                            ${escapeHtml(
-                                                item.eventType ||
-                                                item.type ||
-                                                ""
-                                            )}
-                                        </span>
-                                      `
-                                    : ""
-                            }
-
-
-                            ${
-                                item.description
-                                    ? `
-                                        <p>
-                                            ${escapeHtml(
-                                                item.description
-                                            )}
-                                        </p>
-                                      `
-                                    : ""
-                            }
-
-
-                            ${
-                                item.location
-                                    ? `
-                                        <small>
-                                            ${escapeHtml(
-                                                item.location
-                                            )}
-                                        </small>
-                                      `
-                                    : ""
-                            }
-
-
-                            <small>
-                                ${
-                                    attended
-                                        ? "Attended"
-                                        : "Registered"
-                                }
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            })
-            .join("");
-
-
-    /*
-       Modal summary
-    */
-
-    body.innerHTML = `
-
-        <div
-            class="journeyParticipantHeader"
-        >
-
-            <h3>
-                ${escapeHtml(
-                    person.name ||
-                    "Participant"
-                )}
-            </h3>
-
-
-            ${
-                person.church
-                    ? `
-                        <p>
-                            ${escapeHtml(
-                                person.church
-                            )}
-                        </p>
-                      `
-                    : ""
-            }
-
-        </div>
-
-
-        <div
-            class="journeySummary"
-        >
-
-            <div>
-
-                <strong>
-                    ${summary.events ?? 0}
-                </strong>
-
-                <span>
-                    Events
-                </span>
-
-            </div>
-
-
-            <div>
-
-                <strong>
-                    ${summary.attended ?? 0}
-                </strong>
-
-                <span>
-                    Attended
-                </span>
-
-            </div>
-
-
-            <div>
-
-                <strong>
-                    ${summary.missionTrips ?? 0}
-                </strong>
-
-                <span>
-                    Mission Trips
-                </span>
-
-            </div>
-
-
-            <div>
-
-                <strong>
-                    ${summary.totalJourneyEntries ?? 0}
-                </strong>
-
-                <span>
-                    Journey Entries
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="journeyTimeline"
-        >
-
-            ${
-                entries ||
-                "<p>No journey entries.</p>"
-            }
-
-        </div>
-
-    `;
-
-
-    modal.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-/* ==========================================================
-   EVENT DETAILS
-========================================================== */
-
-async function openEventDetails(
-    eventName
-) {
-
-    showLoading();
-
-
-    try {
-
-        const result =
-            await API.post(
-                "getEventDetails",
-                {
-                    eventName:
-                        eventName,
-
-                    event:
-                        eventName
-                }
-            );
-
-
-        if (
-            !result?.success
-        )
-            throw new Error(
-                result?.message ||
-                "Unable to load event details."
-            );
-
-
-        openModal(
-            eventName,
-            result.data
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            "EVENT DETAILS ERROR:",
-            error
-        );
-
-
-        alert(
-            error.message ||
-            "Unable to load event details."
-        );
-
-    }
-    finally {
-
-        hideLoading();
-
-    }
-
-}
-
-
-/* ==========================================================
-   GENERIC DETAILS MODAL
-========================================================== */
-
-function openModal(
-    title,
-    data
-) {
-
-    const modal =
-        document.getElementById(
-            "detailsModal"
-        );
-
-    const titleElement =
-        document.getElementById(
-            "modalTitle"
-        );
-
-    const body =
-        document.getElementById(
-            "modalBody"
-        );
-
-
-    if (
-        !modal ||
-        !titleElement ||
-        !body
-    )
-        return;
-
-
-    titleElement.textContent =
-        title || "Details";
-
-
-    body.innerHTML =
-        `
-        <pre>
-${escapeHtml(
-    JSON.stringify(
-        data,
-        null,
-        2
-    )
-)}
-        </pre>
-        `;
-
-
-    modal.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-/* ==========================================================
-   CLOSE MODAL
-========================================================== */
-
-function closeModal() {
-
-    const modal =
-        document.getElementById(
-            "detailsModal"
-        );
-
-
-    if (modal)
-        modal.classList.add(
-            "hidden"
-        );
-
-}
-
-
-/* ==========================================================
-   ESCAPE HTML
-========================================================== */
-
-function escapeHtml(
-    value
-) {
-
-    return String(
-        value ?? ""
-    )
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* ==========================================================
-   DATE FORMATTER
-========================================================== */
-
-function formatDate(
-    date
-) {
-
-    if (!date)
-        return "-";
-
-
-    const d =
-        new Date(date);
-
-
-    if (
-        Number.isNaN(
-            d.getTime()
-        )
-    )
-        return String(date);
-
-
-    return d.toLocaleDateString(
-        "en-SG",
-        {
-            year: "numeric",
-            month: "short",
-            day: "numeric"
-        }
-    );
-
-}
-
-   /* ==========================================================
-   PART 5
-   S + FILTERS + DASHBOARD REFRESH
-========================================================== */
-
-
-/* ==========================================================
-    REGISTRY
-========================================================== */
-
-function destroy(name) {
-
-    if (
-        Dashboard.s &&
-        Dashboard.s[name]
-    ) {
-
-        try {
-
-            Dashboard.s[name].destroy();
-
-        }
-        catch (error) {
-
-            console.warn(
-                "Unable to destroy :",
-                name,
-                error
-            );
-
-        }
-
-        delete Dashboard.s[name];
-
-    }
-
-}
-
-
-function create(
-    name,
-    canvasId,
-    config
-) {
-
-    const canvas =
-        document.getElementById(
-            canvasId
-        );
-
-    if (!canvas)
-        return null;
-
-
-    destroy(name);
-
-
-    if (
-        typeof  === "undefined"
-    ) {
-
-        console.error(
-            ".js is not available."
-        );
-
-        return null;
-
-    }
-
-
-    Dashboard.s[name] =
-        new (
-            canvas.getContext("2d"),
-            config
-        );
-
-
-    return Dashboard.s[name];
-
-}
-
-
-/* ==========================================================
-    OPTIONS
-========================================================== */
-
-function standardOptions(
-    beginAtZero = true
-) {
-
-    return {
-
-        responsive: true,
-
-        maintainAspectRatio: false,
-
-        plugins: {
-
-            legend: {
-
-                display: true
-
-            }
-
-        },
-
-        scales: {
-
-            y: {
-
-                beginAtZero
-
-            }
-
-        }
-
-    };
-
-}
-
-
-/* ==========================================================
-   PARTICIPANT TYPE 
-========================================================== */
-
-function renderFirstTimeReturning() {
-
-    const data =
-        Dashboard.data
-            ?.participants
-            ?.firstTimeVsReturning;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "firstTimeReturning",
-        "firstTimeReturning",
-        {
-
-            type: "doughnut",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   AGE DISTRIBUTION
-========================================================== */
-
-function renderAgeDistribution() {
-
-    const data =
-        Dashboard.data
-            ?.participants
-            ?.ageDistribution;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "ageDistribution",
-        "ageDistribution",
-        {
-
-            type: "bar",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Participants",
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options:
-                standardOptions()
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   CHURCH PARTICIPATION
-========================================================== */
-
-function renderChurchParticipation() {
-
-    const data =
-        Dashboard.data
-            ?.churches
-            ?.participation;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "churchParticipation",
-        "churchParticipation",
-        {
-
-            type: "bar",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Participants",
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options:
-                standardOptions()
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   CHURCH ATTENDANCE
-========================================================== */
-
-function renderChurchAttendance() {
-
-    const data =
-        Dashboard.data
-            ?.churches
-            ?.attendance;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "churchAttendance",
-        "churchAttendance",
-        {
-
-            type: "bar",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Attendance %",
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options: {
-
-                ...standardOptions(),
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        max: 100
-
-                    }
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   EVENT POPULARITY
-========================================================== */
-
-function renderEventPopularity() {
-
-    const data =
-        Dashboard.data
-            ?.events
-            ?.popularity;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "eventPopularity",
-        "eventPopularity",
-        {
-
-            type: "bar",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Registrations",
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options:
-                standardOptions()
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   EVENT ATTENDANCE
-========================================================== */
-
-function renderEventAttendance() {
-
-    const data =
-        Dashboard.data
-            ?.events
-            ?.attendance;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "eventAttendance",
-        "eventAttendance",
-        {
-
-            type: "bar",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Attendance %",
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options: {
-
-                ...standardOptions(),
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        max: 100
-
-                    }
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   MONTHLY TREND
-========================================================== */
-
-function renderMonthlyTrend() {
-
-    const data =
-        Dashboard.data
-            ?.events
-            ?.monthlyTrend;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "monthlyTrend",
-        "monthlyTrend",
-        {
-
-            type: "line",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Registrations",
-
-                    data:
-                        data.values || [],
-
-                    tension:
-                        0.25
-
-                }]
-
-            },
-
-            options:
-                standardOptions()
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   EVENT TYPE 
-========================================================== */
-
-function renderEventType() {
-
-    const data =
-        Dashboard.data
-            ?.events
-            ?.eventTypes;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "eventTypes",
-        "eventType",
-        {
-
-            type: "doughnut",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   LEADERSHIP PIPELINE
-========================================================== */
-
-function renderLeadershipPipeline() {
-
-    const data =
-        Dashboard.data
-            ?.leadership
-            ?.pipeline;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "leadershipPipeline",
-        "leadershipPipeline",
-        {
-
-            type: "bar",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    label:
-                        "Participants",
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options:
-                standardOptions()
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   EXPERIENCE LEVEL
-========================================================== */
-
-function renderExperience() {
-
-    const data =
-        Dashboard.data
-            ?.leadership
-            ?.experience;
-
-
-    if (!data)
-        return;
-
-
-    create(
-        "experience",
-        "experience",
-        {
-
-            type: "doughnut",
-
-            data: {
-
-                labels:
-                    data.labels || [],
-
-                datasets: [{
-
-                    data:
-                        data.values || []
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================================
-   RENDER ALL S
-========================================================== */
-
-function renderAlls() {
-
-    renderFirstTimeReturning();
-
-    renderAgeDistribution();
-
-    renderChurchParticipation();
-
-    renderChurchAttendance();
-
-    renderEventPopularity();
-
-    renderEventAttendance();
-
-    renderMonthlyTrend();
-
-    renderEventType();
-
-    renderLeadershipPipeline();
-
-    renderExperience();
-
-}
-
-
-/* ==========================================================
-   KPI RENDERING
-========================================================== */
-
-function renderKPIs() {
-
-    const kpis =
-        Dashboard.data?.kpis;
-
-
-    if (!kpis)
-        return;
-
-
-    setText(
-        "kpiRegistrations",
-        kpis.registrations
-    );
-
-
-    setText(
-        "kpiParticipants",
-        kpis.uniqueParticipants
-    );
-
-
-    setText(
-        "kpiRepeatParticipants",
-        kpis.repeatParticipants
-    );
-
-
-    setText(
-        "kpiFirstTimers",
-        kpis.firstTimers
-    );
-
-
-    setText(
-        "kpiEvents",
-        kpis.totalEvents
-    );
-
-
-    setText(
-        "kpiChurches",
-        kpis.totalChurches
-    );
-
-
-    setText(
-        "kpiAttendance",
-        `${kpis.attendanceRate}%`
-    );
-
-
-    setText(
-        "kpiGrowth",
-        `${kpis.growthRate}%`
-    );
-
-
-    setText(
-        "kpiMissionHealth",
-        kpis.missionHealthScore
-    );
-
-
-    setText(
-        "kpiMissionHealthStatus",
-        kpis.missionHealthStatus
-    );
-
-
-    /*
-       Optional executive health description
-    */
-
-    setText(
-        "missionHealthDescription",
-        kpis.missionHealthDescription
-    );
-
-
-    /*
-       Add status class
-    */
-
-    const health =
-        document.getElementById(
-            "kpiMissionHealthStatus"
-        );
-
-
-    if (health) {
-
-        health.classList.remove(
-            "excellent",
-            "healthy",
-            "growing",
-            "needs-attention",
-            "critical"
-        );
-
-
-        const status =
-            String(
-                kpis.missionHealthStatus ||
-                ""
-            )
-            .toLowerCase()
-            .replace(/\s+/g, "-");
-
-
-        if (status)
-            health.classList.add(status);
-
-    }
-
-}
-
-
-/* ==========================================================
-   EXECUTIVE SUMMARY
-========================================================== */
-
-function renderExecutiveSummary() {
-
-    const executive =
-        Dashboard.data?.executive;
-
-
-    if (!executive)
-        return;
-
-
-    setText(
-        "executiveTitle",
-        executive.title
-    );
-
-
-    const overview =
-        document.getElementById(
-            "executiveOverview"
-        );
-
-
-    if (overview) {
-
-        overview.innerHTML =
-            (executive.overview || [])
-                .map(item =>
-                    `<p>${escapeHtml(item)}</p>`
-                )
-                .join("");
-
-    }
-
-
-    const highlights =
-        executive.highlights ||
-        {};
-
-
-    setText(
-        "topChurch",
-        highlights.topChurch
-    );
-
-
-    setText(
-        "topEvent",
-        highlights.topEvent
-    );
-
-
-    setText(
-        "topReferral",
-        highlights.topReferral
-    );
-
-
-    setText(
-        "latestEvent",
-        highlights.newestEvent
-    );
-
-
-    setText(
-        "missionHealth",
-        highlights.missionHealth
-    );
-
-}
-
-
-/* ==========================================================
-   MISSION INSIGHTS
-========================================================== */
-
-function renderMissionInsights() {
-
-    const insights =
-        Dashboard.data
-            ?.missionInsights;
-
-
-    if (!insights)
-        return;
-
-
-    renderInsightGroup(
-        "celebrateInsights",
-        insights.celebrate
-    );
-
-
-    renderInsightGroup(
-        "warningInsights",
-        insights.warning
-    );
-
-
-    renderInsightGroup(
-        "recommendationInsights",
-        insights.recommendation
-    );
-
-
-    renderInsightGroup(
-        "riskInsights",
-        insights.risk
-    );
-
-}
-
-
-function renderInsightGroup(
-    elementId,
-    items
-) {
-
-    const container =
-        document.getElementById(
-            elementId
-        );
-
-
-    if (!container)
-        return;
-
-
-    container.innerHTML =
-        "";
-
-
-    if (
-        !Array.isArray(items) ||
-        !items.length
-    ) {
-
-        container.innerHTML =
-            "<p>No insights available.</p>";
-
-        return;
-
-    }
-
-
-    items.forEach(item => {
-
-        const div =
-            document.createElement(
-                "div"
-            );
-
-
-        div.className =
-            "missionInsight";
-
-
-        div.textContent =
-            item;
-
-
-        container.appendChild(
-            div
-        );
-
-    });
-
-}
-
-
-/* ==========================================================
-   FILTER STATE
-========================================================== */
-
-function getActiveFilters() {
-
-    return {
-
-        year:
-            getValue(
-                "filterYear"
-            ),
-
-        church:
-            getValue(
-                "filterChurch"
-            ),
-
-        eventType:
-            getValue(
-                "filterEventType"
-            ),
-
-        event:
-            getValue(
-                "filterEvent"
-            ),
-
-        search:
-            getValue(
-                "participantSearch"
-            )
-
-    };
-
-}
-
-
-/* ==========================================================
-   FILTER DATA
-========================================================== */
-
-function applyClientFilters() {
-
-    const source =
-        Dashboard.rawData ||
-        [];
-
-
-    if (!source.length)
-        return [];
-
-
-    const filters =
-        getActiveFilters();
-
-
-    return source.filter(row => {
-
-        /*
-           YEAR
-        */
-
-        if (
-            filters.year &&
-            getYear(row.eventDate) !==
-                String(filters.year)
-        ) {
-
-            return false;
-
-        }
-
-
-        /*
-           CHURCH
-        */
-
-        if (
-            filters.church &&
-            String(row.church || "")
-                .toLowerCase() !==
-                String(filters.church)
-                    .toLowerCase()
-        ) {
-
-            return false;
-
-        }
-
-
-        /*
-           EVENT TYPE
-        */
-
-        if (
-            filters.eventType &&
-            String(row.eventType || "")
-                .toLowerCase() !==
-                String(filters.eventType)
-                    .toLowerCase()
-        ) {
-
-            return false;
-
-        }
-
-
-        /*
-           EVENT
-        */
-
-        if (
-            filters.event &&
-            String(row.eventName || "")
-                .toLowerCase() !==
-                String(filters.event)
-                    .toLowerCase()
-        ) {
-
-            return false;
-
-        }
-
-
-        /*
-           PARTICIPANT SEARCH
-        */
-
-        if (
-            filters.search
-        ) {
-
-            const search =
-                filters.search
-                    .toLowerCase();
-
-
-            const matches =
-                [
-
-                    row.name,
-                    row.email,
-                    row.mobile,
-                    row.church,
-                    row.eventName
-
-                ]
-                .filter(Boolean)
-                .some(value =>
-                    String(value)
-                        .toLowerCase()
-                        .includes(search)
-                );
-
-
-            if (!matches)
-                return false;
-
-        }
-
-
-        return true;
-
-    });
-
-}
-
-
-/* ==========================================================
-   FILTER SETUP
-========================================================== */
-
-function setupFilters() {
-
-    const filterIds = [
-
-        "filterYear",
-        "filterChurch",
-        "filterEventType",
-        "filterEvent"
-
-    ];
-
-
-    filterIds.forEach(
-        id => {
-
-            const element =
-                document.getElementById(id);
-
-
-            if (!element)
-                return;
-
-
-            if (
-                element.dataset.bound ===
-                "true"
-            )
-                return;
-
-
-            element.dataset.bound =
-                "true";
-
-
-            element.addEventListener(
-                "change",
-                () => {
-
-                    refreshFilteredDashboard();
-
-                }
-            );
-
-        }
-    );
-
-
-    const reset =
-        document.getElementById(
-            "resetFilters"
-        );
-
-
-    if (
-        reset &&
-        reset.dataset.bound !== "true"
-    ) {
-
-        reset.dataset.bound =
-            "true";
-
-
-        reset.addEventListener(
-            "click",
-            resetDashboardFilters
-        );
-
-    }
-
-}
-
-
-/* ==========================================================
-   POPULATE FILTER OPTIONS
-========================================================== */
-
-function populateFilters() {
-
-    const data =
-        Dashboard.rawData ||
-        [];
-
-
-    populateSelect(
-        "filterYear",
-        uniqueSorted(
-            data
-                .map(row =>
-                    getYear(
-                        row.eventDate
-                    )
-                )
-                .filter(Boolean)
-        )
-    );
-
-
-    populateSelect(
-        "filterChurch",
-        uniqueSorted(
-            data
-                .map(row =>
-                    row.church
-                )
-                .filter(Boolean)
-        )
-    );
-
-
-    populateSelect(
-        "filterEventType",
-        uniqueSorted(
-            data
-                .map(row =>
-                    row.eventType
-                )
-                .filter(Boolean)
-        )
-    );
-
-
-    populateSelect(
-        "filterEvent",
-        uniqueSorted(
-            data
-                .map(row =>
-                    row.eventName
-                )
-                .filter(Boolean)
-        )
-    );
-
-}
-
-
-/* ==========================================================
-   SELECT POPULATOR
-========================================================== */
-
-function populateSelect(
-    id,
-    values
-) {
-
-    const select =
-        document.getElementById(id);
-
-
-    if (!select)
-        return;
-
-
-    const current =
-        select.value;
-
-
-    /*
-       Preserve first option
-       such as "All"
-    */
-
-    const first =
-        select.options.length
-            ? select.options[0]
-            : null;
-
-
-    select.innerHTML =
-        "";
-
-
-    if (first) {
-
-        select.appendChild(
-            first
-        );
-
-    }
-    else {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value =
-            "";
-
-
-        option.textContent =
-            "All";
-
-
-        select.appendChild(
-            option
-        );
-
-    }
-
-
-    values.forEach(value => {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value =
-            value;
-
-
-        option.textContent =
-            value;
-
-
-        select.appendChild(
-            option
-        );
-
-    });
-
-
-    if (
-        values.includes(current)
-    ) {
-
-        select.value =
-            current;
-
-    }
-
-}
-
-
-/* ==========================================================
-   RESET FILTERS
-========================================================== */
-
-function resetDashboardFilters() {
-
-    [
-
-        "filterYear",
-        "filterChurch",
-        "filterEventType",
-        "filterEvent",
-        "participantSearch"
-
-    ]
-    .forEach(id => {
-
-        const element =
-            document.getElementById(id);
-
-
-        if (element)
-            element.value = "";
-
-    });
-
-
-    const results =
-        document.getElementById(
-            "participantSearchResults"
-        );
-
-
-    if (results)
-        results.innerHTML =
-            "";
-
-
-    refreshFilteredDashboard();
-
-}
-
-
-/* ==========================================================
-   FILTERED DASHBOARD REFRESH
-========================================================== */
+/*
+   These aliases allow existing HTML onclick
+   handlers or older code to continue working.
+*/
 
 function refreshFilteredDashboard() {
 
-    const filtered =
-        applyClientFilters();
-
-
-    /*
-       Keep original dashboard
-       available for reset/search.
-    */
-
-    Dashboard.filteredData =
-        filtered;
-
-
-    /*
-       For now render participant
-       directory from the filtered
-       source when available.
-    */
-
-    renderFilteredKPIs(
-        filtered
-    );
-
-
-    renderFilteredParticipantDirectory(
-        filtered
-    );
+    applyDashboardFilters();
 
 }
 
 
-/* ==========================================================
-   FILTERED KPI CALCULATION
-========================================================== */
+function setupFilters() {
 
-function renderFilteredKPIs(
-    data
-) {
-
-    if (!data)
-        return;
-
-
-    const registrations =
-        data.length;
-
-
-    const participants =
-        new Set(
-            data
-                .map(row =>
-                    row.email ||
-                    row.mobile ||
-                    row.name
-                )
-                .filter(Boolean)
-        );
-
-
-    const attended =
-        data.filter(
-            row =>
-                row.attendance === true
-        ).length;
-
-
-    const events =
-        new Set(
-            data
-                .map(row =>
-                    row.eventName
-                )
-                .filter(Boolean)
-        );
-
-
-    const churches =
-        new Set(
-            data
-                .map(row =>
-                    row.church
-                )
-                .filter(Boolean)
-        );
-
-
-    const attendanceRate =
-        registrations
-            ? Math.round(
-                attended /
-                registrations *
-                100
-            )
-            : 0;
-
-
-    setText(
-        "kpiRegistrations",
-        registrations
-    );
-
-
-    setText(
-        "kpiParticipants",
-        participants.size
-    );
-
-
-    setText(
-        "kpiEvents",
-        events.size
-    );
-
-
-    setText(
-        "kpiChurches",
-        churches.size
-    );
-
-
-    setText(
-        "kpiAttendance",
-        `${attendanceRate}%`
-    );
+    initialiseFilters();
 
 }
 
 
-/* ==========================================================
-   FILTERED PARTICIPANT DIRECTORY
-========================================================== */
-
-function renderFilteredParticipantDirectory(
-    data
-) {
-
-    const tbody =
-        document.getElementById(
-            "participantSummaryTable"
-        );
-
-
-    if (!tbody)
-        return;
-
-
-    const people = {};
-
-
-    data.forEach(row => {
-
-        const id =
-            row.email ||
-            row.mobile ||
-            row.name;
-
-
-        if (!id)
-            return;
-
-
-        if (!people[id]) {
-
-            people[id] = {
-
-                name:
-                    row.name,
-
-                church:
-                    row.church,
-
-                age:
-                    row.age,
-
-                events:
-                    0,
-
-                attended:
-                    0
-
-            };
-
-        }
-
-
-        people[id].events++;
-
-
-        if (
-            row.attendance
-        )
-            people[id].attended++;
-
-    });
-
-
-    const participants =
-        Object.values(
-            people
-        )
-        .map(person => ({
-
-            ...person,
-
-            attendanceRate:
-                person.events
-                    ? Math.round(
-                        person.attended /
-                        person.events *
-                        100
-                    )
-                    : 0
-
-        }))
-        .sort(
-            (a, b) =>
-                String(
-                    a.name || ""
-                )
-                .localeCompare(
-                    String(
-                        b.name || ""
-                    ),
-                    undefined,
-                    {
-                        sensitivity:
-                            "base"
-                    }
-                )
-        );
-
-
-    tbody.innerHTML =
-        "";
-
-
-    participants.forEach(
-        person => {
-
-            const tr =
-                document.createElement(
-                    "tr"
-                );
-
-
-            tr.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        person.name ||
-                        "Unnamed"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        person.church ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${person.age ?? "-"}
-                </td>
-
-                <td>
-                    ${person.events}
-                </td>
-
-                <td>
-                    ${person.attendanceRate}%
-                </td>
-
-            `;
-
-
-            tbody.appendChild(
-                tr
-            );
-
-        });
-
-
-    if (!participants.length) {
-
-        const tr =
-            document.createElement(
-                "tr"
-            );
-
-
-        tr.innerHTML = `
-            <td
-                colspan="5"
-                style="text-align:center;"
-            >
-                No participants match the
-                selected filters.
-            </td>
-        `;
-
-
-        tbody.appendChild(
-            tr
-        );
-
-    }
-
-}
-
-
-/* ==========================================================
-   UTILITY FUNCTIONS
-========================================================== */
-
-function setText(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(id);
-
-
-    if (!element)
-        return;
-
-
-    element.textContent =
-        value ??
-        "";
-
-}
-
-
-function getValue(id) {
-
-    const element =
-        document.getElementById(id);
-
-
-    return element
-        ? element.value
-        : "";
-
-}
-
-
-function getYear(date) {
-
-    if (!date)
-        return "";
-
-
-    const d =
-        new Date(date);
-
-
-    if (
-        Number.isNaN(
-            d.getTime()
-        )
-    )
-        return "";
-
-
-    return String(
-        d.getFullYear()
-    );
-
-}
-
-
-function uniqueSorted(
-    values
-) {
-
-    return [
-        ...new Set(
-            values
-        )
-    ]
-    .sort(
-        (a, b) =>
-            String(a)
-                .localeCompare(
-                    String(b),
-                    undefined,
-                    {
-                        numeric: true,
-                        sensitivity:
-                            "base"
-                    }
-                )
-    );
-
-}
-
-
-function debounce(
-    fn,
-    delay
-) {
-
-    let timer;
-
-
-    return function (...args) {
-
-        clearTimeout(
-            timer
-        );
-
-
-        timer =
-            setTimeout(
-                () =>
-                    fn.apply(
-                        this,
-                        args
-                    ),
-                delay
-            );
-
-    };
-
-}
-
-
-/* ==========================================================
-   FINAL DASHBOARD RENDER
-========================================================== */
-
-function renderDashboard() {
-
-    console.log(
-        "Rendering Missions Intelligence Dashboard"
-    );
-
-
-    renderKPIs();
-
-    renderExecutiveSummary();
-
-    renderMissionInsights();
-
-    renderEventSummaryTable();
-
-    renderParticipantDirectory();
-
-    renderParticipantJourneySummary();
-
-    renderAlls();
-
-    setupParticipantTableSearch();
+function setupParticipantSearchLegacy() {
 
     setupParticipantSearch();
 
-    setupFilters();
-
-    populateFilters();
-
 }
 
 
 /* ==========================================================
-   UPDATE DASHBOARD DATA
+   END OF REPORTS.JS
 ========================================================== */
-
-function updateDashboardData(
-    response
-) {
-
-    if (!response)
-        return;
-
-
-    /*
-       Support both:
-
-       {
-           success:true,
-           data:{...}
-       }
-
-       and
-
-       {
-           success:true,
-           dashboard:{...}
-       }
-    */
-
-    const payload =
-        response.data ||
-        response.dashboard ||
-        response;
-
-
-    Dashboard.data =
-        payload;
-
-
-    renderDashboard();
-
-}
-
-
-/* ==========================================================
-   SAFE DASHBOARD REFRESH
-========================================================== */
-
-async function refreshDashboard() {
-
-    showLoading();
-
-
-    try {
-
-        const response =
-            await API.post(
-                "getMissionDashboard",
-                {}
-            );
-
-
-        if (
-            !response?.success
-        )
-            throw new Error(
-                response?.message ||
-                "Unable to refresh dashboard."
-            );
-
-
-        updateDashboardData(
-            response
-        );
-
-
-    }
-    catch (error) {
-
-        console.error(
-            "DASHBOARD REFRESH ERROR:",
-            error
-        );
-
-
-        showDashboardError(
-            error.message
-        );
-
-    }
-    finally {
-
-        hideLoading();
-
-    }
-
-}
-
-
-/* ==========================================================
-   DASHBOARD ERROR
-========================================================== */
-
-function showDashboardError(
-    message
-) {
-
-    const element =
-        document.getElementById(
-            "dashboardError"
-        );
-
-
-    if (!element)
-        return;
-
-
-    element.textContent =
-        message ||
-        "Unable to load dashboard.";
-
-
-    element.classList.remove(
-        "hidden"
-    );
-
-}
-
-   
-
-
-}
-
-function renderMissionTripSummary() {
-    const tbody = document.getElementById("missionTripSummaryTable");
-
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    const summary = Dashboard.data?.missionTrips?.tripSummary || [];
-
-    summary.forEach(trip => {
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${escapeHtml(trip.tripCode || trip.tripID || "-")}</td>
-            <td>${escapeHtml(trip.location || "-")}</td>
-            <td>${formatDate(trip.startDate)}</td>
-            <td>${trip.participants ?? 0}</td>
-        `;
-
-        tbody.appendChild(tr);
-    });
-}
-
-function renderParticipants() {
-
-    const participants = Dashboard.data?.participants || {};
-
-    /*
-     * Participant Growth
-     */
-    const growthCanvas = document.getElementById("participantGrowth");
-
-    if (growthCanvas) {
-
-        if (Dashboard.s.participantGrowth) {
-            Dashboard.s.participantGrowth.destroy();
-        }
-
-        Dashboard.s.participantGrowth = new (
-            growthCanvas.getContext("2d"),
-            {
-                type: "line",
-
-                data: {
-                    labels: participants.growthLabels || [],
-                    datasets: [
-                        {
-                            label: "Participants",
-                            data: participants.growthData || [],
-                            tension: 0.3
-                        }
-                    ]
-                },
-
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-
-                    plugins: {
-                        legend: {
-                            display: true
-                        }
-                    },
-
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
-                        }
-                    }
-                }
-            }
-        );
-    }
-
-
-    /*
-     * Participant Type
-     */
-    const typeCanvas = document.getElementById("participantType");
-
-    if (typeCanvas) {
-
-        if (Dashboard.s.participantType) {
-            Dashboard.s.participantType.destroy();
-        }
-
-        Dashboard.s.participantType = new (
-            typeCanvas.getContext("2d"),
-            {
-                type: "doughnut",
-
-                data: {
-                    labels: participants.typeLabels || [],
-                    datasets: [
-                        {
-                            label: "Participants",
-                            data: participants.typeData || []
-                        }
-                    ]
-                },
-
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-
-                    plugins: {
-                        legend: {
-                            position: "bottom"
-                        }
-                    }
-                }
-            }
-        );
-    }
-
-
-    /*
-     * Participant Engagement
-     */
-    const engagementCanvas =
-        document.getElementById("participantEngagement");
-
-    if (engagementCanvas) {
-
-        if (Dashboard.s.participantEngagement) {
-            Dashboard.s.participantEngagement.destroy();
-        }
-
-        Dashboard.s.participantEngagement = new (
-            engagementCanvas.getContext("2d"),
-            {
-                type: "bar",
-
-                data: {
-                    labels: participants.engagementLabels || [],
-                    datasets: [
-                        {
-                            label: "Participants",
-                            data: participants.engagementData || []
-                        }
-                    ]
-                },
-
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
-                        }
-                    }
-                }
-            }
-        );
-    }
-}
-
-function renderChurchs() {
-
-    const churches = Dashboard.data?.churches || {};
-
-    /*
-     * Church Participation
-     */
-    const participationCanvas =
-        document.getElementById("churchParticipation");
-
-    if (participationCanvas) {
-
-        if (Dashboard.s.churchParticipation) {
-            Dashboard.s.churchParticipation.destroy();
-        }
-
-        Dashboard.s.churchParticipation = new (
-            participationCanvas.getContext("2d"),
-            {
-                type: "bar",
-
-                data: {
-                    labels: churches.labels || [],
-                    datasets: [
-                        {
-                            label: "Participants",
-                            data: churches.participants || []
-                        }
-                    ]
-                },
-
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
-                        }
-                    },
-
-                    plugins: {
-                        legend: {
-                            display: true
-                        }
-                    }
-                }
-            }
-        );
-    }
-
-
-    /*
-     * Church Growth
-     */
-    const growthCanvas =
-        document.getElementById("churchGrowth");
-
-    if (growthCanvas) {
-
-        if (Dashboard.s.churchGrowth) {
-            Dashboard.s.churchGrowth.destroy();
-        }
-
-        Dashboard.s.churchGrowth = new (
-            growthCanvas.getContext("2d"),
-            {
-                type: "line",
-
-                data: {
-                    labels: churches.growthLabels || [],
-                    datasets: [
-                        {
-                            label: "Churches",
-                            data: churches.growthData || [],
-                            tension: 0.3
-                        }
-                    ]
-                },
-
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
-                        }
-                    }
-                }
-            }
-        );
-    }
-}
+```
