@@ -5227,11 +5227,15 @@ function renderMissionTripLocationSummary() {
    EVENT TOP LINES
 ========================================================== */
 
+/* ==========================================================
+   EVENT TOP LINES BY EVENT TYPE
+========================================================== */
+
 function renderEventTopLines() {
 
     const tbody =
         document.getElementById(
-            "eventTopLinesTableBody"
+            "eventTopLinesTable"
         );
 
 
@@ -5253,7 +5257,7 @@ function renderEventTopLines() {
 
         renderEmptyRow(
             tbody,
-            4,
+            3,
             "No event data available."
         );
 
@@ -5264,34 +5268,32 @@ function renderEventTopLines() {
 
     /*
        ------------------------------------------------------
-       GROUP BY EVENT TYPE
+       GROUP EVENTS BY EVENT TYPE
        ------------------------------------------------------
     */
 
-    const typeMap = {};
+    const summary = {};
 
 
     events.forEach(
         event => {
 
-            const type =
+            const eventType =
                 String(
                     event.type ||
+                    event.eventType ||
                     "Unknown"
                 ).trim();
 
 
-            if (!typeMap[type]) {
+            if (!summary[eventType]) {
 
-                typeMap[type] = {
+                summary[eventType] = {
 
-                    type:
-                        type,
+                    eventType:
+                        eventType,
 
                     registered:
-                        0,
-
-                    walkIn:
                         0,
 
                     attended:
@@ -5302,21 +5304,14 @@ function renderEventTopLines() {
             }
 
 
-            typeMap[type].registered +=
+            summary[eventType].registered +=
                 Number(
                     event.registered ||
                     0
                 );
 
 
-            typeMap[type].walkIn +=
-                Number(
-                    event.walkIn ||
-                    0
-                );
-
-
-            typeMap[type].attended +=
+            summary[eventType].attended +=
                 Number(
                     event.attended ||
                     0
@@ -5328,21 +5323,22 @@ function renderEventTopLines() {
 
     /*
        ------------------------------------------------------
-       SORT EVENT TYPES
+       CONVERT TO ARRAY
        ------------------------------------------------------
     */
 
-    const summary =
+    const rows =
         Object.values(
-            typeMap
+            summary
         )
         .sort(
             (a, b) =>
                 String(
-                    a.type
-                ).localeCompare(
+                    a.eventType
+                )
+                .localeCompare(
                     String(
-                        b.type
+                        b.eventType
                     ),
                     undefined,
                     {
@@ -5355,12 +5351,31 @@ function renderEventTopLines() {
 
     /*
        ------------------------------------------------------
+       EMPTY RESULT
+       ------------------------------------------------------
+    */
+
+    if (!rows.length) {
+
+        renderEmptyRow(
+            tbody,
+            3,
+            "No event data available."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       ------------------------------------------------------
        RENDER
        ------------------------------------------------------
     */
 
-    summary.forEach(
-        item => {
+    rows.forEach(
+        event => {
 
             const tr =
                 document.createElement(
@@ -5372,25 +5387,19 @@ function renderEventTopLines() {
 
                 <td>
                     ${escapeHtml(
-                        item.type
+                        event.eventType
                     )}
                 </td>
 
                 <td>
                     ${formatNumber(
-                        item.registered
+                        event.registered
                     )}
                 </td>
 
                 <td>
                     ${formatNumber(
-                        item.walkIn
-                    )}
-                </td>
-
-                <td>
-                    ${formatNumber(
-                        item.attended
+                        event.attended
                     )}
                 </td>
 
