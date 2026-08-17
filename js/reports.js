@@ -5235,6 +5235,11 @@ function renderMissionTripLocationSummary() {
    EVENT TOP LINES
 ========================================================== */
 
+/* ==========================================================
+   EVENT TOP LINES
+   Group events by Event Type
+========================================================== */
+
 function renderEventTopLines() {
 
     console.log(
@@ -5256,10 +5261,9 @@ function renderEventTopLines() {
 
 
     /*
-       REPORTS.GS already provides
-       the Event Top Lines here:
-
-       Dashboard.data.events.topLines
+       ------------------------------------------------------
+       SOURCE DATA
+       ------------------------------------------------------
     */
 
     const topLines =
@@ -5270,16 +5274,10 @@ function renderEventTopLines() {
 
 
     console.log(
-        "EVENT TOP LINES DATA:",
+        "RAW EVENT TOP LINES:",
         topLines
     );
 
-
-    /*
-       ------------------------------------------------------
-       EMPTY STATE
-       ------------------------------------------------------
-    */
 
     if (!topLines.length) {
 
@@ -5296,11 +5294,106 @@ function renderEventTopLines() {
 
     /*
        ------------------------------------------------------
+       GROUP BY EVENT TYPE
+       ------------------------------------------------------
+    */
+
+    const grouped = {};
+
+
+    topLines.forEach(
+        event => {
+
+            const eventType =
+                String(
+                    event.eventType ||
+                    event.type ||
+                    "Unknown"
+                )
+                .trim();
+
+
+            if (!grouped[eventType]) {
+
+                grouped[eventType] = {
+
+                    eventType:
+                        eventType,
+
+                    registered:
+                        0,
+
+                    attended:
+                        0
+
+                };
+
+            }
+
+
+            grouped[eventType].registered +=
+                Number(
+                    event.registered ||
+                    event.totalRegistered ||
+                    0
+                );
+
+
+            grouped[eventType].attended +=
+                Number(
+                    event.attended ||
+                    event.totalAttended ||
+                    0
+                );
+
+        }
+    );
+
+
+    /*
+       ------------------------------------------------------
+       CONVERT TO ARRAY
+       ------------------------------------------------------
+    */
+
+    const summary =
+        Object.values(
+            grouped
+        );
+
+
+    console.log(
+        "GROUPED EVENT TOP LINES:",
+        summary
+    );
+
+
+    /*
+       ------------------------------------------------------
+       SORT A-Z BY EVENT TYPE
+       ------------------------------------------------------
+    */
+
+    summary.sort(
+        (a, b) =>
+            a.eventType.localeCompare(
+                b.eventType,
+                undefined,
+                {
+                    sensitivity:
+                        "base"
+                }
+            )
+    );
+
+
+    /*
+       ------------------------------------------------------
        RENDER
        ------------------------------------------------------
     */
 
-    topLines.forEach(
+    summary.forEach(
         event => {
 
             const tr =
@@ -5313,25 +5406,19 @@ function renderEventTopLines() {
 
                 <td>
                     ${escapeHtml(
-                        event.eventType ||
-                        event.type ||
-                        "-"
+                        event.eventType
                     )}
                 </td>
 
                 <td>
                     ${formatNumber(
-                        event.registered ||
-                        event.totalRegistered ||
-                        0
+                        event.registered
                     )}
                 </td>
 
                 <td>
                     ${formatNumber(
-                        event.attended ||
-                        event.totalAttended ||
-                        0
+                        event.attended
                     )}
                 </td>
 
