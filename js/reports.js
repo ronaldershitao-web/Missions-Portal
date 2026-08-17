@@ -1,4 +1,4 @@
-```javascript
+
 /* ==========================================================
    MISSIONS INTELLIGENCE DASHBOARD
    reports.js
@@ -1720,295 +1720,340 @@ function renderParticipantJourneySummary() {
    JOURNEY MODAL
 ========================================================== */
 
-function renderJourneyModal(
-    data
-) {
+/* ==========================================================
+   JOURNEY MODAL
+========================================================== */
+
+function renderJourneyModal(data) {
 
     const modal =
-        document.getElementById(
-            "detailsModal"
-        ) ||
-        document.getElementById(
-            "participantJourneyModal"
-        );
-
+        document.getElementById("detailsModal") ||
+        document.getElementById("participantJourneyModal");
 
     const title =
-        document.getElementById(
-            "modalTitle"
-        );
-
+        document.getElementById("modalTitle");
 
     const body =
-        document.getElementById(
-            "modalBody"
-        );
+        document.getElementById("modalBody");
 
-
-    if (
-        !modal ||
-        !title ||
-        !body
-    )
+    if (!modal || !title || !body) {
         return;
+    }
 
+    /* ------------------------------------------------------
+       PARTICIPANT NOT FOUND
+    ------------------------------------------------------ */
 
-    if (
-        !data ||
-        data.found === false
-    ) {
+    if (!data || data.found === false) {
 
         title.textContent =
             "Participant Not Found";
 
+        body.innerHTML =
+            "<p>No missional journey was found for this participant.</p>";
 
-        body.innerHTML = `
-            <p>
-                No missional journey was
-                found for this participant.
-            </p>
-        `;
-
-
-        showModalElement(
-            modal
-        );
-
+        showModalElement(modal);
 
         return;
-
     }
 
 
-    const person =
-        data.person ||
-        {};
+    /* ------------------------------------------------------
+       DATA
+    ------------------------------------------------------ */
 
+    const person =
+        data.person || {};
 
     const summary =
-        data.summary ||
-        {};
-
+        data.summary || {};
 
     const journey =
-        Array.isArray(
-            data.journey
-        )
+        Array.isArray(data.journey)
             ? data.journey
             : [];
 
 
+    /* ------------------------------------------------------
+       TITLE
+    ------------------------------------------------------ */
+
     title.textContent =
-        `Missional Journey — ${
+        "Missional Journey — " +
+        (
             person.name ||
             "Participant"
-        }`;
+        );
 
 
-    const entries =
+    /* ------------------------------------------------------
+       SORT JOURNEY
+    ------------------------------------------------------ */
+
+    const sortedJourney =
         journey
             .slice()
-            .sort(
-                (a, b) =>
-                    new Date(
-                        a.date || 0
-                    ) -
-                    new Date(
-                        b.date || 0
-                    )
-            )
-            .map(
-                item => {
+            .sort(function(a, b) {
 
-                    const attended =
-                        item.attended === true ||
-                        item.attendance === true;
+                const dateA =
+                    new Date(a.date || 0);
+
+                const dateB =
+                    new Date(b.date || 0);
+
+                return dateA - dateB;
+
+            });
 
 
-                    return `
+    /* ------------------------------------------------------
+       BUILD JOURNEY ENTRIES
+    ------------------------------------------------------ */
 
-                        <div
-                            class="journeyEntry"
-                        >
-
-                            <div
-                                class="journeyDate"
-                            >
-                                ${escapeHtml(
-                                    item.dateText ||
-                                    formatDate(
-                                        item.date
-                                    )
-                                )}
-                            </div>
-
-                            <div
-                                class="journeyContent"
-                            >
-
-                                <strong>
-                                    ${escapeHtml(
-                                        item.title ||
-                                        item.eventName ||
-                                        "Mission engagement"
-                                    )}
-                                </strong>
-
-                                ${
-                                    item.eventType ||
-                                    item.type
-                                        ? `
-                                            <span
-                                                class="journeyType"
-                                            >
-                                                ${escapeHtml(
-                                                    item.eventType ||
-                                                    item.type
-                                                )}
-                                            </span>
-                                          `
-                                        : ""
-                                }
-
-                                ${
-                                    item.description
-                                        ? `
-                                            <p>
-                                                ${escapeHtml(
-                                                    item.description
-                                                )}
-                                            </p>
-                                          `
-                                        : ""
-                                }
-
-                                ${
-                                    item.location
-                                        ? `
-                                            <small>
-                                                ${escapeHtml(
-                                                    item.location
-                                                )}
-                                            </small>
-                                          `
-                                        : ""
-                                }
-
-                                <small>
-                                    ${
-                                        attended
-                                            ? "Attended"
-                                            : "Registered"
-                                    }
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                }
-            )
-            .join("");
+    let entries = "";
 
 
-    body.innerHTML = `
+    sortedJourney.forEach(function(item) {
 
-        <div
-            class="journeyParticipantHeader"
-        >
+        const attended =
+            item.attended === true ||
+            item.attendance === true;
 
-            <h3>
-                ${escapeHtml(
-                    person.name ||
-                    "Participant"
-                )}
-            </h3>
 
-            ${
+        const dateText =
+            item.dateText ||
+            formatDate(item.date);
+
+
+        const eventTitle =
+            item.title ||
+            item.eventName ||
+            "Mission engagement";
+
+
+        const eventType =
+            item.eventType ||
+            item.type ||
+            "";
+
+
+        const description =
+            item.description ||
+            "";
+
+
+        const location =
+            item.location ||
+            "";
+
+
+        let entryHtml = "";
+
+
+        entryHtml +=
+            '<div class="journeyEntry">';
+
+
+        entryHtml +=
+            '<div class="journeyDate">' +
+            escapeHtml(dateText) +
+            '</div>';
+
+
+        entryHtml +=
+            '<div class="journeyContent">';
+
+
+        entryHtml +=
+            '<strong>' +
+            escapeHtml(eventTitle) +
+            '</strong>';
+
+
+        if (eventType) {
+
+            entryHtml +=
+                '<span class="journeyType">' +
+                escapeHtml(eventType) +
+                '</span>';
+
+        }
+
+
+        if (description) {
+
+            entryHtml +=
+                '<p>' +
+                escapeHtml(description) +
+                '</p>';
+
+        }
+
+
+        if (location) {
+
+            entryHtml +=
+                '<small>' +
+                escapeHtml(location) +
+                '</small>';
+
+        }
+
+
+        entryHtml +=
+            '<small>' +
+            (
+                attended
+                    ? "Attended"
+                    : "Registered"
+            ) +
+            '</small>';
+
+
+        entryHtml +=
+            '</div>';
+
+
+        entryHtml +=
+            '</div>';
+
+
+        entries +=
+            entryHtml;
+
+    });
+
+
+    /* ------------------------------------------------------
+       EMPTY JOURNEY
+    ------------------------------------------------------ */
+
+    if (!entries) {
+
+        entries =
+            '<p>No journey entries.</p>';
+
+    }
+
+
+    /* ------------------------------------------------------
+       PARTICIPANT HEADER
+    ------------------------------------------------------ */
+
+    let participantHeader = "";
+
+
+    participantHeader +=
+        '<div class="journeyParticipantHeader">';
+
+
+    participantHeader +=
+        '<h3>' +
+        escapeHtml(
+            person.name ||
+            "Participant"
+        ) +
+        '</h3>';
+
+
+    if (person.church) {
+
+        participantHeader +=
+            '<p>' +
+            escapeHtml(
                 person.church
-                    ? `
-                        <p>
-                            ${escapeHtml(
-                                person.church
-                            )}
-                        </p>
-                      `
-                    : ""
-            }
+            ) +
+            '</p>';
 
-        </div>
+    }
 
 
-        <div
-            class="journeySummary"
-        >
-
-            <div>
-                <strong>
-                    ${summary.events ?? 0}
-                </strong>
-
-                <span>
-                    Events
-                </span>
-            </div>
+    participantHeader +=
+        '</div>';
 
 
-            <div>
-                <strong>
-                    ${summary.attended ?? 0}
-                </strong>
+    /* ------------------------------------------------------
+       JOURNEY SUMMARY
+    ------------------------------------------------------ */
 
-                <span>
-                    Attended
-                </span>
-            </div>
+    const events =
+        summary.events ?? 0;
 
+    const attended =
+        summary.attended ?? 0;
 
-            <div>
-                <strong>
-                    ${summary.missionTrips ?? 0}
-                </strong>
+    const missionTrips =
+        summary.missionTrips ?? 0;
 
-                <span>
-                    Mission Trips
-                </span>
-            </div>
+    const totalJourneyEntries =
+        summary.totalJourneyEntries ??
+        journey.length;
 
 
-            <div>
-                <strong>
-                    ${summary.totalJourneyEntries ??
-                    journey.length}
-                </strong>
-
-                <span>
-                    Journey Entries
-                </span>
-            </div>
-
-        </div>
+    let summaryHtml = "";
 
 
-        <div
-            class="journeyTimeline"
-        >
-
-            ${
-                entries ||
-                "<p>No journey entries.</p>"
-            }
-
-        </div>
-
-    `;
+    summaryHtml +=
+        '<div class="journeySummary">';
 
 
-    showModalElement(
-        modal
-    );
+    summaryHtml +=
+        '<div>' +
+        '<strong>' +
+        escapeHtml(events) +
+        '</strong>' +
+        '<span>Events</span>' +
+        '</div>';
+
+
+    summaryHtml +=
+        '<div>' +
+        '<strong>' +
+        escapeHtml(attended) +
+        '</strong>' +
+        '<span>Attended</span>' +
+        '</div>';
+
+
+    summaryHtml +=
+        '<div>' +
+        '<strong>' +
+        escapeHtml(missionTrips) +
+        '</strong>' +
+        '<span>Mission Trips</span>' +
+        '</div>';
+
+
+    summaryHtml +=
+        '<div>' +
+        '<strong>' +
+        escapeHtml(totalJourneyEntries) +
+        '</strong>' +
+        '<span>Journey Entries</span>' +
+        '</div>';
+
+
+    summaryHtml +=
+        '</div>';
+
+
+    /* ------------------------------------------------------
+       FINAL MODAL CONTENT
+    ------------------------------------------------------ */
+
+    body.innerHTML =
+        participantHeader +
+        summaryHtml +
+        '<div class="journeyTimeline">' +
+        entries +
+        '</div>';
+
+
+    /* ------------------------------------------------------
+       SHOW MODAL
+    ------------------------------------------------------ */
+
+    showModalElement(modal);
 
 }
 
