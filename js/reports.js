@@ -360,7 +360,7 @@ function renderDashboard() {
        MISSION TRIPS
     ------------------------------------------------------ */
 
-    renderMissionTripSummary();
+ renderEventTopLines();
 
 
     /* ------------------------------------------------------
@@ -905,92 +905,6 @@ function renderInsightGroup(
    MISSION TRIP SUMMARY
 ========================================================== */
 
-function renderMissionTripSummary() {
-
-    const tbody =
-        document.getElementById(
-            "missionTripSummaryTable"
-        );
-
-
-    if (!tbody)
-        return;
-
-
-    tbody.innerHTML = "";
-
-
-    const summary =
-        Dashboard.data
-            ?.missionTrips
-            ?.tripSummary ||
-        [];
-
-
-    if (!summary.length) {
-
-        renderEmptyRow(
-            tbody,
-            4,
-            "No mission trips available."
-        );
-
-        return;
-
-    }
-
-
-    summary.forEach(
-        trip => {
-
-            const tr =
-                document.createElement(
-                    "tr"
-                );
-
-
-            tr.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        trip.tripCode ||
-                        trip.tripID ||
-                        trip.tripId ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        trip.location ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${formatDate(
-                        trip.startDate
-                    )}
-                </td>
-
-                <td>
-                    ${formatNumber(
-                        trip.participants ||
-                        0
-                    )}
-                </td>
-
-            `;
-
-
-            tbody.appendChild(
-                tr
-            );
-
-        }
-    );
-
-}
 
 
 /* ==========================================================
@@ -5294,6 +5208,189 @@ function renderMissionTripLocationSummary() {
                     ${formatNumber(
                         location.totalParticipants ||
                         0
+                    )}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
+
+}
+
+/* ==========================================================
+   EVENT TOP LINES
+========================================================== */
+
+function renderEventTopLines() {
+
+    const tbody =
+        document.getElementById(
+            "eventTopLinesTableBody"
+        );
+
+
+    if (!tbody)
+        return;
+
+
+    tbody.innerHTML = "";
+
+
+    const events =
+        Dashboard.data
+            ?.tables
+            ?.eventSummary ||
+        [];
+
+
+    if (!events.length) {
+
+        renderEmptyRow(
+            tbody,
+            4,
+            "No event data available."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       ------------------------------------------------------
+       GROUP BY EVENT TYPE
+       ------------------------------------------------------
+    */
+
+    const typeMap = {};
+
+
+    events.forEach(
+        event => {
+
+            const type =
+                String(
+                    event.type ||
+                    "Unknown"
+                ).trim();
+
+
+            if (!typeMap[type]) {
+
+                typeMap[type] = {
+
+                    type:
+                        type,
+
+                    registered:
+                        0,
+
+                    walkIn:
+                        0,
+
+                    attended:
+                        0
+
+                };
+
+            }
+
+
+            typeMap[type].registered +=
+                Number(
+                    event.registered ||
+                    0
+                );
+
+
+            typeMap[type].walkIn +=
+                Number(
+                    event.walkIn ||
+                    0
+                );
+
+
+            typeMap[type].attended +=
+                Number(
+                    event.attended ||
+                    0
+                );
+
+        }
+    );
+
+
+    /*
+       ------------------------------------------------------
+       SORT EVENT TYPES
+       ------------------------------------------------------
+    */
+
+    const summary =
+        Object.values(
+            typeMap
+        )
+        .sort(
+            (a, b) =>
+                String(
+                    a.type
+                ).localeCompare(
+                    String(
+                        b.type
+                    ),
+                    undefined,
+                    {
+                        sensitivity:
+                            "base"
+                    }
+                )
+        );
+
+
+    /*
+       ------------------------------------------------------
+       RENDER
+       ------------------------------------------------------
+    */
+
+    summary.forEach(
+        item => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${escapeHtml(
+                        item.type
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        item.registered
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        item.walkIn
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        item.attended
                     )}
                 </td>
 
