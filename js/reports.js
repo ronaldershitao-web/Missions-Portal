@@ -159,7 +159,12 @@ async function loadDashboard() {
             "getMissionDashboard",
             Dashboard.filters
         );
-console.log("FULL DASHBOARD RESPONSE:", result);
+
+    console.log(
+        "FULL DASHBOARD RESPONSE:",
+        result
+    );
+
 
     if (
         !result ||
@@ -175,18 +180,32 @@ console.log("FULL DASHBOARD RESPONSE:", result);
 
 
     /*
-       Current REPORTS.GS structure:
+       REPORTS.GS response:
 
-       result.data.dashboard
+       result.data
     */
 
     const payload =
         result.data || {};
 
 
+    console.log(
+        "DASHBOARD PAYLOAD:",
+        payload
+    );
+
+
+    /*
+       Server filter options
+    */
+
     Dashboard.serverFilters =
         payload.filters || {};
 
+
+    /*
+       Main event dashboard
+    */
 
     Dashboard.data =
         payload.dashboard ||
@@ -202,9 +221,28 @@ console.log("FULL DASHBOARD RESPONSE:", result);
     }
 
 
+    /*
+       ========================================================
+       MISSION TRIP DATA
+       ========================================================
+
+       Support both possible GS structures:
+
+       1. payload.missionTrips
+
+       2. payload.dashboard.missionTrips
+    */
+
     Dashboard.missionData =
+        payload.missionTrips ||
         Dashboard.data.missionTrips ||
         null;
+
+
+    console.log(
+        "MISSION TRIP DATA:",
+        Dashboard.missionData
+    );
 
 
     /*
@@ -236,7 +274,6 @@ console.log("FULL DASHBOARD RESPONSE:", result);
     );
 
 }
-
 
 /* ==========================================================
    REFRESH DASHBOARD
