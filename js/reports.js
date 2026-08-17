@@ -104,54 +104,20 @@ async function initialiseDashboard() {
 
 async function loadDashboard() {
 
-    /* ------------------------------------------
-       MAIN MISSION DASHBOARD
-    ------------------------------------------ */
-
     const result =
         await API.post(
             "getMissionDashboard",
             Dashboard.filters
         );
 
-
     if (!result.success) {
-
         throw new Error(
-            result.message ||
-            "Unable to load mission dashboard."
+            result.message
         );
-
     }
-
 
     Dashboard.data =
         result.data;
-
-
-    /* ------------------------------------------
-       MISSION TRIP DASHBOARD
-    ------------------------------------------ */
-
-    const missionResult =
-        await API.post(
-            "getMissionCompilationReport",
-            Dashboard.filters
-        );
-
-
-    if (!missionResult.success) {
-
-        throw new Error(
-            missionResult.message ||
-            "Unable to load mission trip data."
-        );
-
-    }
-
-
-    Dashboard.missionData =
-        missionResult.data;
 
 }
 
