@@ -6832,3 +6832,144 @@ function renderMissionTripSummary() {
         tbody.appendChild(tr);
     });
 }
+
+function renderParticipantCharts() {
+
+    const participants = Dashboard.data?.participants || {};
+
+    /*
+     * Participant Growth
+     */
+    const growthCanvas = document.getElementById("participantGrowthChart");
+
+    if (growthCanvas) {
+
+        if (Dashboard.charts.participantGrowth) {
+            Dashboard.charts.participantGrowth.destroy();
+        }
+
+        Dashboard.charts.participantGrowth = new Chart(
+            growthCanvas.getContext("2d"),
+            {
+                type: "line",
+
+                data: {
+                    labels: participants.growthLabels || [],
+                    datasets: [
+                        {
+                            label: "Participants",
+                            data: participants.growthData || [],
+                            tension: 0.3
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+
+    /*
+     * Participant Type
+     */
+    const typeCanvas = document.getElementById("participantTypeChart");
+
+    if (typeCanvas) {
+
+        if (Dashboard.charts.participantType) {
+            Dashboard.charts.participantType.destroy();
+        }
+
+        Dashboard.charts.participantType = new Chart(
+            typeCanvas.getContext("2d"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: participants.typeLabels || [],
+                    datasets: [
+                        {
+                            label: "Participants",
+                            data: participants.typeData || []
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+
+    /*
+     * Participant Engagement
+     */
+    const engagementCanvas =
+        document.getElementById("participantEngagementChart");
+
+    if (engagementCanvas) {
+
+        if (Dashboard.charts.participantEngagement) {
+            Dashboard.charts.participantEngagement.destroy();
+        }
+
+        Dashboard.charts.participantEngagement = new Chart(
+            engagementCanvas.getContext("2d"),
+            {
+                type: "bar",
+
+                data: {
+                    labels: participants.engagementLabels || [],
+                    datasets: [
+                        {
+                            label: "Participants",
+                            data: participants.engagementData || []
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            }
+        );
+    }
+}
