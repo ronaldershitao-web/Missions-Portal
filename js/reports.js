@@ -52,13 +52,23 @@ const Dashboard = {
 
     filters: {
 
-        year: "",
+    month: "",
 
-        startDate: "",
+    year: "",
 
-        endDate: ""
+    category: "",
 
-    },
+    eventType: "",
+
+    missionTrip: "",
+
+    church: "",
+
+    referral: "",
+
+    attendance: ""
+
+},
 
     currentJourney: null,
 
@@ -306,102 +316,47 @@ function setupFilterListeners() {
 
     const filterMap = {
 
-        yearFilter: "year",
+    monthFilter: "month",
 
-        startDateFilter: "startDate",
+    yearFilter: "year",
 
-        endDateFilter: "endDate"
+    categoryFilter: "category",
 
-    };
+    eventTypeFilter: "eventType",
 
+    tripFilter: "missionTrip",
 
-    Object.keys(filterMap)
-        .forEach(id => {
+    churchFilter: "church",
 
-            const element =
-                document.getElementById(id);
+    referralFilter: "referral",
 
+    attendanceFilter: "attendance"
 
-            if (!element)
-                return;
-
-
-            element.addEventListener(
-                "change",
-                async function () {
-
-                    Dashboard.filters[
-                        filterMap[id]
-                    ] =
-                        this.value || "";
+};
 
 
-                    /*
-                     * If a date range is being used,
-                     * clear the year filter.
-                     */
+   Object.keys(filterMap).forEach(id => {
 
-                    if (
-                        id === "startDateFilter" ||
-                        id === "endDateFilter"
-                    ) {
+    const element =
+        document.getElementById(id);
 
-                        Dashboard.filters.year =
-                            "";
+    if (!element)
+        return;
 
-                        const yearElement =
-                            document.getElementById(
-                                "yearFilter"
-                            );
+    element.addEventListener(
+        "change",
+        async function () {
 
-                        if (yearElement)
-                            yearElement.value = "";
+            Dashboard.filters[
+                filterMap[id]
+            ] = this.value || "";
 
-                    }
+            await applyFilters();
 
+        }
+    );
 
-                    /*
-                     * If year is selected,
-                     * clear date range.
-                     */
-
-                    if (
-                        id === "yearFilter" &&
-                        this.value
-                    ) {
-
-                        Dashboard.filters.startDate =
-                            "";
-
-                        Dashboard.filters.endDate =
-                            "";
-
-                        const startElement =
-                            document.getElementById(
-                                "startDateFilter"
-                            );
-
-                        const endElement =
-                            document.getElementById(
-                                "endDateFilter"
-                            );
-
-                        if (startElement)
-                            startElement.value = "";
-
-                        if (endElement)
-                            endElement.value = "";
-
-                    }
-
-
-                    await applyFilters();
-
-                }
-            );
-
-        });
-
+});
 
     /*
      * Backwards-compatible search box.
@@ -434,6 +389,28 @@ function setupFilterListeners() {
 
     }
 
+   const participantTableSearch =
+    document.getElementById(
+        "participantTableSearch"
+    );
+
+if (participantTableSearch) {
+
+    participantTableSearch.addEventListener(
+        "input",
+        debounce(
+            function () {
+
+                searchParticipantDirectory(
+                    this.value
+                );
+
+            },
+            350
+        )
+    );
+
+}
 
     const searchBox =
         document.getElementById(
@@ -463,6 +440,8 @@ function setupFilterListeners() {
     }
 
 }
+
+
 
 
 /* ==========================================================
@@ -634,10 +613,10 @@ function renderKPIs() {
     );
 
 
-    setText(
-        "kpiTrippers",
-        m.totalDeployments || 0
-    );
+   setText(
+    "kpiTrippers",
+    m.uniquePeople || 0
+);
 
 
     setText(
