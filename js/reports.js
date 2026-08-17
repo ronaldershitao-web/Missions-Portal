@@ -154,17 +154,17 @@ async function initialiseDashboard() {
 
 async function loadDashboard() {
 
+    console.log("=== LOAD DASHBOARD START ===");
+
     const result =
         await API.post(
             "getMissionDashboard",
             Dashboard.filters
         );
 
-    console.log(
-        "FULL DASHBOARD RESPONSE:",
-        result
-    );
-
+    console.log("=== API POST COMPLETED ===");
+    console.log("RESULT:", result);
+    console.log("RESULT TYPE:", typeof result);
 
     if (
         !result ||
@@ -178,15 +178,14 @@ async function loadDashboard() {
 
     }
 
-
-    /*
-       REPORTS.GS response:
-
-       result.data
-    */
-
     const payload =
         result.data || {};
+
+    console.log("=== PAYLOAD ===");
+    console.log(payload);
+
+    console.log("=== MISSION TRIPS ===");
+    console.log(payload.missionTrips);
 
 
     console.log(
