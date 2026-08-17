@@ -6805,4 +6805,27 @@ function showDashboardError(
 
 }
 
+   function renderMissionTripSummary() {
+    const tbody = document.getElementById("missionTripSummaryTable");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    const summary = Dashboard.data?.missionTrips?.tripSummary || [];
+
+    summary.forEach(trip => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${escapeHtml(trip.tripCode || trip.tripID || "-")}</td>
+            <td>${escapeHtml(trip.location || "-")}</td>
+            <td>${formatDate(trip.startDate)}</td>
+            <td>${trip.participants ?? 0}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
 }
+
+
