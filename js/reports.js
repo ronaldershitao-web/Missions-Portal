@@ -5266,6 +5266,15 @@ function renderMissionTripLocationSummary() {
             ?.locations ||
         [];
 
+   console.log(
+    "MISSION LOCATIONS:",
+    JSON.stringify(
+        summary,
+        null,
+        2
+    )
+);
+
 
     /*
      * ------------------------------------------------------
