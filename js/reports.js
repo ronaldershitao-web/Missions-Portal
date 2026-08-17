@@ -5233,10 +5233,27 @@ function renderMissionTripLocationSummary() {
 
 function renderEventTopLines() {
 
+    console.log("=== RENDER EVENT TOP LINES ===");
+
+    console.log(
+        "Dashboard.data:",
+        Dashboard.data
+    );
+
+    console.log(
+        "Event Summary:",
+        Dashboard.data?.tables?.eventSummary
+    );
+
     const tbody =
         document.getElementById(
             "eventTopLinesTable"
         );
+
+    console.log(
+        "Event Top Lines TBODY:",
+        tbody
+    );
 
 
     if (!tbody)
