@@ -69,13 +69,8 @@ function renderDashboard() {
     renderKPIs();
     renderMissionTripSummary();
     renderMissionInsights();
-    renderParticipantCharts();
-    renderChurchCharts();
-    renderEventCharts();
-    renderLeadershipCharts();
     renderEventSummaryTable();
     renderParticipantDirectory();
-    renderTopContributors();
     renderParticipantJourneySummary();
 }
 
