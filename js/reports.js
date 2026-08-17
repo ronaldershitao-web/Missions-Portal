@@ -5245,6 +5245,12 @@ function renderEventTopLines() {
         Dashboard.data?.tables?.eventSummary
     );
 
+   console.log(
+    "EVENT DATA:",
+    Dashboard.data?.events
+);
+   
+
     const tbody =
         document.getElementById(
             "eventTopLinesTable"
