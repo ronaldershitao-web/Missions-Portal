@@ -19,6 +19,7 @@
 
 </head>
 
+
 <body>
 
 <!-- ===================================================== -->
@@ -29,13 +30,16 @@
 
     <div>
 
-        <h1>🌏 Mission Intelligence Centre</h1>
+        <h1>
+            🌏 Mission Intelligence Centre
+        </h1>
 
         <p>
             Executive Dashboard for COOS Missions Department
         </p>
 
     </div>
+
 
     <div class="toolbar">
 
@@ -59,482 +63,727 @@
 
 </header>
 
+
 <main class="dashboard">
 
 
 <!-- ===================================================== -->
-<!-- KPI SUMMARY -->
+<!-- FILTERS -->
 <!-- ===================================================== -->
 
-<section class="kpiSection">
+<section class="card">
 
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Registrations
+    <h2>
+        🎛 Dashboard Filters
+    </h2>
+
+    <p>
+        All headline figures, rankings and participant journeys
+        will update according to the selected filters.
+    </p>
+
+
+    <div class="filterGrid">
+
+
+        <!-- YEAR -->
+
+        <div>
+
+            <label>
+                Year
+            </label>
+
+            <select id="yearFilter">
+
+                <option value="">
+                    All Years
+                </option>
+
+            </select>
+
         </div>
-        <div class="kpiValue" id="kpiRegistrations">
-            0
+
+
+        <!-- MONTH -->
+
+        <div>
+
+            <label>
+                Month
+            </label>
+
+            <select id="monthFilter">
+
+                <option value="">
+                    All Months
+                </option>
+
+                <option value="1">
+                    January
+                </option>
+
+                <option value="2">
+                    February
+                </option>
+
+                <option value="3">
+                    March
+                </option>
+
+                <option value="4">
+                    April
+                </option>
+
+                <option value="5">
+                    May
+                </option>
+
+                <option value="6">
+                    June
+                </option>
+
+                <option value="7">
+                    July
+                </option>
+
+                <option value="8">
+                    August
+                </option>
+
+                <option value="9">
+                    September
+                </option>
+
+                <option value="10">
+                    October
+                </option>
+
+                <option value="11">
+                    November
+                </option>
+
+                <option value="12">
+                    December
+                </option>
+
+            </select>
+
         </div>
-        <div class="kpiSubtitle">
-            Total event registrations
+
+
+        <!-- ACTIVITY CATEGORY -->
+
+        <div>
+
+            <label>
+                Activity Category
+            </label>
+
+            <select id="categoryFilter">
+
+                <option value="">
+                    All Activities
+                </option>
+
+                <option value="MISSION_EVENT">
+                    Missions Events
+                </option>
+
+                <option value="MISSION_TRIP">
+                    Mission Trips
+                </option>
+
+            </select>
+
         </div>
+
+
+        <!-- EVENT TYPE -->
+
+        <div>
+
+            <label>
+                Activity Type
+            </label>
+
+            <select id="eventTypeFilter">
+
+                <option value="">
+                    All Types
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- MISSION TRIP -->
+
+        <div>
+
+            <label>
+                Mission Trip
+            </label>
+
+            <select id="tripFilter">
+
+                <option value="">
+                    All Mission Trips
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- CHURCH -->
+
+        <div>
+
+            <label>
+                Church
+            </label>
+
+            <select id="churchFilter">
+
+                <option value="">
+                    All Churches
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- REFERRAL -->
+
+        <div>
+
+            <label>
+                Referral Source
+            </label>
+
+            <select id="referralFilter">
+
+                <option value="">
+                    All Referrals
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ATTENDANCE -->
+
+        <div>
+
+            <label>
+                Attendance
+            </label>
+
+            <select id="attendanceFilter">
+
+                <option value="">
+                    All
+                </option>
+
+                <option value="Attended">
+                    Attended
+                </option>
+
+                <option value="Absent">
+                    Absent
+                </option>
+
+            </select>
+
+        </div>
+
     </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Unique Participants
-        </div>
-        <div class="kpiValue" id="kpiUnique">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Unique individuals engaged
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Returning Participants
-        </div>
-        <div class="kpiValue" id="kpiReturning">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Attended multiple events
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            First-Time Participants
-        </div>
-        <div class="kpiValue" id="kpiFirstTimers">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            New to Missions
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Mission Events
-        </div>
-        <div class="kpiValue" id="kpiEvents">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Events conducted
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Churches Engaged
-        </div>
-        <div class="kpiValue" id="kpiChurches">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Represented churches
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Attendance Rate
-        </div>
-        <div class="kpiValue" id="kpiAttendance">
-            0%
-        </div>
-        <div class="kpiSubtitle">
-            Registered vs attended
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            Average Event Size
-        </div>
-        <div class="kpiValue" id="kpiAverageEvent">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Participants per event
-        </div>
-    </div>
-
-
-    <!-- SHORT TERM MISSIONS KPIs -->
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            🌏 Mission Trips Sent
-        </div>
-        <div class="kpiValue" id="kpiMissionTrips">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Total short term mission deployments
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            👥 Total Trippers
-        </div>
-        <div class="kpiValue" id="kpiTrippers">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Unique people sent on missions
-        </div>
-    </div>
-
-
-    <div class="kpiCard">
-        <div class="kpiTitle">
-            📊 Average Team Size
-        </div>
-        <div class="kpiValue" id="kpiAvgTeam">
-            0
-        </div>
-        <div class="kpiSubtitle">
-            Average participants per trip
-        </div>
-    </div>
-
 
 </section>
 
+
 <!-- ===================================================== -->
-<!-- EXECUTIVE SUMMARY -->
+<!-- AGM MISSIONS EVENTS KPIs -->
 <!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+    <h2>
+        📊 Missions Ministry Overview
+    </h2>
+
+    <p>
+        Headline participation figures for the selected period.
+    </p>
+
+</section>
+
+
+<section class="kpiSection">
+
+
+    <!-- NUMBER OF EVENTS -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Missions Events
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiEvents">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Number of events
+        </div>
+
+    </div>
+
+
+    <!-- UNIQUE PEOPLE -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Unique People
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiUnique">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Unique individuals
+        </div>
+
+    </div>
+
+
+    <!-- PEOPLE WHO ATTENDED -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            People Who Attended
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiAttendedPeople">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Unique people who attended
+        </div>
+
+    </div>
+
+
+    <!-- RECURRING PEOPLE -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Recurring People
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiReturning">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Attended multiple events
+        </div>
+
+    </div>
+
+
+    <!-- REGISTRATIONS -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Registrations
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiRegistrations">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Total event registrations
+        </div>
+
+    </div>
+
+
+    <!-- ATTENDANCE RATE -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Attendance Rate
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiAttendance">
+
+            0%
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Registered vs attended
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- SHORT TERM MISSIONS KPIs -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+    <h2>
+        🌏 Short-Term Missions
+    </h2>
+
+    <p>
+        Mission trip mobilisation and deployment within the
+        selected period.
+    </p>
+
+</section>
+
+
+<section class="kpiSection">
+
+
+    <!-- NUMBER OF TRIPS -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Mission Trips
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiMissionTrips">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Mission trips conducted
+        </div>
+
+    </div>
+
+
+    <!-- UNIQUE MISSIONARIES -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Unique Missionaries
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiTrippers">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Unique people sent
+        </div>
+
+    </div>
+
+
+    <!-- DEPLOYMENTS -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Total Deployments
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiDeployments">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            People deployed
+        </div>
+
+    </div>
+
+
+    <!-- RECURRING TRIPPERS -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Recurring Trippers
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiRecurringTrippers">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Served on multiple trips
+        </div>
+
+    </div>
+
+
+    <!-- AVERAGE TEAM -->
+
+    <div class="kpiCard">
+
+        <div class="kpiTitle">
+            Average Team Size
+        </div>
+
+        <div
+            class="kpiValue"
+            id="kpiAvgTeam">
+
+            0
+
+        </div>
+
+        <div class="kpiSubtitle">
+            Average people per trip
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- MISSIONAL JOURNEY -->
+<!-- ===================================================== -->
+
+<section class="sectionHeader">
+
+    <h2>
+        🌱 Missional Journey
+    </h2>
+
+    <p>
+        Follow how individuals progress through Missions events
+        and mission trips over time.
+    </p>
+
+</section>
 
 
 <section class="card">
 
-<h2>
 
-Filters
+    <div class="journeyToolbar">
 
-</h2>
 
-<div class="filterGrid">
+        <div>
 
-<div>
+            <h3>
+                Top 5 Participants
+            </h3>
 
-    <label>
-        Month
-    </label>
+            <p>
+                Most active participants within the selected
+                reporting period.
+            </p>
 
-    <select id="monthFilter">
+        </div>
 
-        <option value="">
-            All Months
-        </option>
 
-        <option value="1">
-            January
-        </option>
+        <div class="journeySearch">
 
-        <option value="2">
-            February
-        </option>
+            <input
+                type="text"
+                id="participantFilter"
+                placeholder="🔎 Search by name or phone...">
 
-        <option value="3">
-            March
-        </option>
+        </div>
 
-        <option value="4">
-            April
-        </option>
 
-        <option value="5">
-            May
-        </option>
+    </div>
 
-        <option value="6">
-            June
-        </option>
 
-        <option value="7">
-            July
-        </option>
+    <!-- TOP 5 -->
 
-        <option value="8">
-            August
-        </option>
+    <div
+        id="topParticipantsJourney"
+        class="journeyPeopleGrid">
 
-        <option value="9">
-            September
-        </option>
+    </div>
 
-        <option value="10">
-            October
-        </option>
 
-        <option value="11">
-            November
-        </option>
+    <!-- SEARCH RESULTS -->
 
-        <option value="12">
-            December
-        </option>
+    <div
+        id="participantSearchResults"
+        class="journeySearchResults hidden">
 
-    </select>
-
-</div>
-    
-<div>
-
-<label>
-
-Year
-
-</label>
-
-<select id="yearFilter">
-
-<option value="">
-
-All Years
-
-</option>
-
-</select>
-
-</div>
-<div>
-
-    <label>
-        Activity Category
-    </label>
-
-    <select id="categoryFilter">
-
-        <option value="">
-            All Activities
-        </option>
-
-        <option value="MISSION_TRIP">
-            Mission Trips
-        </option>
-
-        <option value="MISSION_EVENT">
-            Missions Events
-        </option>
-
-    </select>
-
-</div>
-<div>
-
-    <label>
-        Activity Type
-    </label>
-
-    <select id="eventTypeFilter">
-
-        <option value="">
-            All Types
-        </option>
-
-    </select>
-
-</div>
-
-    <div>
-
-    <label>
-        Mission Trip
-    </label>
-
-    <select id="tripFilter">
-
-        <option value="">
-            All Mission Trips
-        </option>
-
-    </select>
-
-</div>
-
-<div>
-
-<label>
-
-Church
-
-</label>
-
-<select id="churchFilter">
-
-<option value="">
-
-All Churches
-
-</option>
-
-</select>
-
-</div>
-
-<div>
-
-<label>
-
-Referral Source
-
-</label>
-
-<select id="referralFilter">
-
-<option value="">
-
-All Referrals
-
-</option>
-
-</select>
-
-</div>
-
-<div>
-
-<label>
-
-Attendance
-
-</label>
-
-<select id="attendanceFilter">
-
-<option value="">
-
-All
-
-</option>
-
-<option>
-
-Attended
-
-</option>
-
-<option>
-
-Absent
-
-</option>
-
-</select>
-
-</div>
-
-<div>
-
-<label>
-
-Search Participant
-
-</label>
-
-<input
-    type="text"
-    id="participantFilter"
-    placeholder="Search participant...">
-
-</div>
-
-</div>
-
-</section>
-
-    <section class="card">
-
-<h2>
-📍 Mission Trip Summary
-</h2>
-
-
-<div class="tableWrapper">
-
-<table class="reportTable">
-
-<thead>
-
-<tr>
-
-<th>Trip Code</th>
-
-<th>Location</th>
-
-<th>Start Date</th>
-
-<th>Participants</th>
-
-</tr>
-
-</thead>
-
-
-<tbody id="missionTripSummaryTable">
-
-</tbody>
-
-
-</table>
-
-</div>
+    </div>
 
 
 </section>
 
-    
+
 <!-- ===================================================== -->
-<!-- MINISTRY GROWTH -->
-<!-- Part 2 starts here -->
+<!-- MISSION TRIP SUMMARY -->
 <!-- ===================================================== -->
 
-    <!-- ===================================================== -->
+<section class="card">
+
+    <h2>
+        📍 Mission Trip Summary
+    </h2>
+
+    <p>
+        Mission trips conducted within the selected period.
+    </p>
+
+
+    <div class="tableWrapper">
+
+        <table class="reportTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Trip Code
+                    </th>
+
+                    <th>
+                        Location
+                    </th>
+
+                    <th>
+                        Start Date
+                    </th>
+
+                    <th>
+                        Participants
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="missionTripSummaryTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
 <!-- MINISTRY GROWTH -->
 <!-- ===================================================== -->
 
 <section class="sectionHeader">
 
-<h2>📈 Ministry Growth</h2>
+    <h2>
+        📈 Ministry Growth
+    </h2>
 
-<p>
-
-Track the overall growth and momentum of the Missions Ministry.
-
-</p>
+    <p>
+        Track overall growth and momentum of the Missions Ministry.
+    </p>
 
 </section>
+
 
 <section class="analyticsGrid">
 
 
+    <div class="chartCard">
 
-<div class="chartCard">
+        <h3>
+            New vs Returning Participants
+        </h3>
 
-<h3>New vs Returning Participants</h3>
+        <div class="chartContainer">
 
-<canvas id="newReturningChart"></canvas>
+            <canvas id="newReturningChart"></canvas>
 
-</div>
+        </div>
+
+    </div>
+
+
+    <div class="chartCard">
+
+        <h3>
+            Participant Growth
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="participantsTimelineChart"></canvas>
+
+        </div>
+
+    </div>
 
 
 </section>
+
 
 <!-- ===================================================== -->
 <!-- PARTICIPANT INSIGHTS -->
@@ -542,33 +791,52 @@ Track the overall growth and momentum of the Missions Ministry.
 
 <section class="sectionHeader">
 
-<h2>👥 Participant Insights</h2>
+    <h2>
+        👥 Participant Insights
+    </h2>
 
-<p>
-
-Understand who is responding to missions and how participants are progressing throughout their missions journey.
-
-</p>
+    <p>
+        Understand who is responding to missions and how
+        participants are progressing.
+    </p>
 
 </section>
+
 
 <section class="analyticsGrid">
 
-<div class="chartCard">
 
-<h3>Age Distribution</h3>
+    <div class="chartCard">
 
-<canvas id="ageChart"></canvas>
+        <h3>
+            Age Distribution
+        </h3>
 
-</div>
+        <div class="chartContainer">
 
+            <canvas id="ageChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="chartCard">
+
+        <h3>
+            Participant Churches
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="churchChart"></canvas>
+
+        </div>
+
+    </div>
 
 
 </section>
-
-<!-- ===================================================== -->
-<!-- PARTICIPANT JOURNEY TABLE -->
-<!-- ===================================================== -->
 
 
 <!-- ===================================================== -->
@@ -577,50 +845,67 @@ Understand who is responding to missions and how participants are progressing th
 
 <section class="sectionHeader">
 
-<h2>⛪ Church Engagement</h2>
+    <h2>
+        ⛪ Church Engagement
+    </h2>
 
-<p>
-
-Measure how churches are partnering with the Missions Department.
-
-</p>
+    <p>
+        Measure how churches are partnering with the Missions
+        Department.
+    </p>
 
 </section>
+
 
 <section class="analyticsGrid">
 
-<div class="chartCard">
 
-<h3>Top Sending Churches</h3>
+    <div class="chartCard">
 
-<canvas id="topChurchChart"></canvas>
+        <h3>
+            Top Sending Churches
+        </h3>
 
-</div>
+        <div class="chartContainer">
 
+            <canvas id="topChurchChart"></canvas>
 
+        </div>
 
-<div class="chartCard">
-
-<h3>Church Retention</h3>
-
-<canvas id="churchRetentionChart"></canvas>
-
-</div>
+    </div>
 
 
+    <div class="chartCard">
+
+        <h3>
+            Church Retention
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="churchRetentionChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="chartCard">
+
+        <h3>
+            Church Growth
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="churchGrowthChart"></canvas>
+
+        </div>
+
+    </div>
 
 </section>
 
-<!-- ===================================================== -->
-<!-- CHURCH SUMMARY -->
-<!-- ===================================================== -->
-
-
-
-<!-- ===================================================== -->
-<!-- PART 3 STARTS HERE -->
-<!-- EVENT EFFECTIVENESS -->
-<!-- ===================================================== -->
 
 <!-- ===================================================== -->
 <!-- EVENT EFFECTIVENESS -->
@@ -628,42 +913,83 @@ Measure how churches are partnering with the Missions Department.
 
 <section class="sectionHeader">
 
-<h2>📅 Event Effectiveness</h2>
+    <h2>
+        📅 Event Effectiveness
+    </h2>
 
-<p>
-
-Evaluate how each Missions event contributes to participation,
-engagement and ministry impact.
-
-</p>
+    <p>
+        Evaluate how each Missions event contributes to
+        participation and engagement.
+    </p>
 
 </section>
+
 
 <section class="analyticsGrid">
 
-<div class="chartCard">
 
-<h3>Participants by Event Type</h3>
+    <div class="chartCard">
 
-<canvas id="eventTypeChart"></canvas>
+        <h3>
+            Participants by Event Type
+        </h3>
 
-</div>
+        <div class="chartContainer">
 
+            <canvas id="eventTypeChart"></canvas>
 
+        </div>
 
-<div class="chartCard">
-
-<h3>Attendance Rate by Event</h3>
-
-<canvas id="attendanceChart"></canvas>
-
-</div>
+    </div>
 
 
+    <div class="chartCard">
 
+        <h3>
+            Event Popularity
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="eventPopularityChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="chartCard">
+
+        <h3>
+            Attendance Rate by Event
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="attendanceChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="chartCard">
+
+        <h3>
+            Monthly Missions Activity
+        </h3>
+
+        <div class="chartContainer">
+
+            <canvas id="monthlyTrendChart"></canvas>
+
+        </div>
+
+    </div>
 
 
 </section>
+
 
 <!-- ===================================================== -->
 <!-- EVENT SUMMARY -->
@@ -671,85 +997,95 @@ engagement and ministry impact.
 
 <section class="card">
 
-<h2>
+    <h2>
+        Mission Event Summary
+    </h2>
 
-Mission Event Summary
+    <p>
+        Overall performance of Missions Department events.
+    </p>
 
-</h2>
 
-<p>
+    <div class="tableToolbar">
 
-Overall performance of every Missions Department event.
+        <input
+            type="text"
+            id="eventTableSearch"
+            placeholder="Search event...">
 
-</p>
 
-<div class="tableToolbar">
+        <button onclick="exportEventTable()">
 
-<input
-type="text"
-id="eventTableSearch"
-placeholder="Search event...">
+            Export
 
-<button onclick="exportEventTable()">
+        </button>
 
-Export
+    </div>
 
-</button>
 
-</div>
+    <div class="tableWrapper">
 
-<div class="tableWrapper">
+        <table class="reportTable">
 
-<table class="reportTable">
+            <thead>
 
-<thead>
+                <tr>
 
-<tr>
+                    <th>
+                        Date
+                    </th>
 
-<th>Date</th>
+                    <th>
+                        Mission Event
+                    </th>
 
-<th>Mission Event</th>
+                    <th>
+                        Event Type
+                    </th>
 
-<th>Event Type</th>
+                    <th>
+                        Registered
+                    </th>
 
-<th>Registered</th>
+                    <th>
+                        Attended
+                    </th>
 
-<th>Attended</th>
+                    <th>
+                        Attendance %
+                    </th>
 
-<th>Attendance %</th>
+                    <th>
+                        First Timers
+                    </th>
 
-<th>First Timers</th>
+                    <th>
+                        Returning
+                    </th>
 
-<th>Returning</th>
+                    <th>
+                        Churches
+                    </th>
 
-<th>Churches</th>
+                    <th>
+                        Status
+                    </th>
 
-<th>Average Age</th>
+                </tr>
 
-<th>Impact Score</th>
+            </thead>
 
-</tr>
 
-</thead>
+            <tbody
+                id="eventSummaryTable">
 
-<tbody id="eventSummaryTable">
+            </tbody>
 
-</tbody>
+        </table>
 
-</table>
-
-</div>
+    </div>
 
 </section>
-
-<!-- ===================================================== -->
-<!-- RECRUITMENT ANALYTICS -->
-<!-- ===================================================== -->
-
-
-<!-- ===================================================== -->
-<!-- RECRUITMENT SUMMARY -->
-<!-- ===================================================== -->
 
 
 <!-- ===================================================== -->
@@ -758,105 +1094,89 @@ Export
 
 <section class="sectionHeader">
 
-<h2>🧠 Mission Intelligence</h2>
+    <h2>
+        🧠 Mission Intelligence
+    </h2>
 
-<p>
-
-Automatically generated insights based on ministry data.
-
-</p>
+    <p>
+        Automatically generated insights based on ministry data.
+    </p>
 
 </section>
+
 
 <section class="insightGrid">
 
-<div class="insightCard success">
 
-<h3>
+    <!-- CELEBRATE -->
 
-🎉 Celebrate
+    <div class="insightCard success">
 
-</h3>
+        <h3>
+            🎉 Celebrate
+        </h3>
 
-<div id="celebrateInsights">
+        <div id="celebrateInsights">
 
-Loading...
+            Loading...
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div class="insightCard warning">
 
-<h3>
+    <!-- FOLLOW UP -->
 
-⚠ Pastoral Follow-up
+    <div class="insightCard warning">
 
-</h3>
+        <h3>
+            ⚠ Pastoral Follow-up
+        </h3>
 
-<div id="followupInsights">
+        <div id="followupInsights">
 
-Loading...
+            Loading...
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div class="insightCard info">
 
-<h3>
+    <!-- OPPORTUNITIES -->
 
-💡 Growth Opportunities
+    <div class="insightCard info">
 
-</h3>
+        <h3>
+            💡 Growth Opportunities
+        </h3>
 
-<div id="opportunityInsights">
+        <div id="opportunityInsights">
 
-Loading...
+            Loading...
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div class="insightCard danger">
 
-<h3>
+    <!-- RISKS -->
 
-🚨 Operational Risks
+    <div class="insightCard danger">
 
-</h3>
+        <h3>
+            🚨 Operational Risks
+        </h3>
 
-<div id="riskInsights">
+        <div id="riskInsights">
 
-Loading...
+            Loading...
 
-</div>
+        </div>
 
-</div>
+    </div>
+
 
 </section>
-
-<!-- ===================================================== -->
-<!-- MISSION HEALTH INDICATORS -->
-<!-- ===================================================== -->
-
-
-
-<!-- ===================================================== -->
-<!-- MINISTRY SNAPSHOT -->
-<!-- ===================================================== -->
-
-
-
-<!-- ===================================================== -->
-<!-- PART 4 STARTS HERE -->
-<!-- ACTION CENTRE -->
-<!-- ===================================================== -->
-
-    <!-- ===================================================== -->
-<!-- ACTION CENTRE -->
-<!-- ===================================================== -->
-
 
 
 <!-- ===================================================== -->
@@ -865,282 +1185,472 @@ Loading...
 
 <section class="sectionHeader">
 
-<h2>👥 Participant Directory</h2>
+    <h2>
+        👥 Participant Directory
+    </h2>
 
-<p>
-
-Search and analyse every Missions participant.
-
-</p>
+    <p>
+        Search and analyse Missions participants.
+    </p>
 
 </section>
+
 
 <section class="card">
 
-<div class="tableToolbar">
 
-<input
-type="text"
-id="participantTableSearch"
-placeholder="Search participant...">
+    <div class="tableToolbar">
 
-<button onclick="exportParticipants()">
+        <input
+            type="text"
+            id="participantTableSearch"
+            placeholder="Search participant...">
 
-Export
 
-</button>
+        <button onclick="exportParticipants()">
 
-</div>
+            Export
 
-<div class="tableWrapper">
+        </button>
 
-<table class="reportTable">
+    </div>
 
-<thead>
 
-<tr>
+    <div class="tableWrapper">
 
-<th>Name</th>
+        <table class="reportTable">
 
-<th>Church</th>
+            <thead>
 
-<th>Age</th>
+                <tr>
 
-<th>Referral</th>
+                    <th>
+                        Name
+                    </th>
 
-<th>Events</th>
+                    <th>
+                        Church
+                    </th>
 
-<th>Attendance %</th>
+                    <th>
+                        Age
+                    </th>
 
-<th>Journey Stage</th>
+                    <th>
+                        Events
+                    </th>
 
-<th>Latest Event</th>
+                    <th>
+                        Attendance %
+                    </th>
 
-</tr>
+                    <th>
+                        Journey Stage
+                    </th>
 
-</thead>
+                    <th>
+                        Status
+                    </th>
 
-<tbody id="participantSummaryTable">
+                </tr>
 
-</tbody>
+            </thead>
 
-</table>
 
-</div>
+            <tbody
+                id="participantSummaryTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
 
 </section>
 
+
 <!-- ===================================================== -->
-<!-- TOP RANKINGS -->
+<!-- MINISTRY RANKINGS -->
 <!-- ===================================================== -->
 
 <section class="sectionHeader">
 
-<h2>🏆 Ministry Rankings</h2>
+    <h2>
+        🏆 Ministry Rankings
+    </h2>
 
-<p>
-
-Recognising the strongest areas of Missions engagement.
-
-</p>
+    <p>
+        Recognising the strongest areas of Missions engagement.
+    </p>
 
 </section>
+
 
 <section class="analyticsGrid">
 
-<div class="card">
 
-<h3>
+    <!-- TOP PARTICIPANTS -->
 
-⭐ Most Active Participants
+    <div class="card">
 
-</h3>
+        <h3>
+            ⭐ Most Active Participants
+        </h3>
 
-<table class="miniTable">
 
-<thead>
+        <table class="miniTable">
 
-<tr>
+            <thead>
 
-<th>Name</th>
+                <tr>
 
-<th>Events</th>
+                    <th>
+                        Name
+                    </th>
 
-</tr>
+                    <th>
+                        Events
+                    </th>
 
-</thead>
+                </tr>
 
-<tbody id="topMissionaries">
+            </thead>
 
-</tbody>
 
-</table>
+            <tbody
+                id="topMissionaries">
 
-</div>
+            </tbody>
 
-<div class="card">
+        </table>
 
-<h3>
+    </div>
 
-⛪ Top Sending Churches
 
-</h3>
+    <!-- TOP CHURCHES -->
 
-<table class="miniTable">
+    <div class="card">
 
-<thead>
+        <h3>
+            ⛪ Top Sending Churches
+        </h3>
 
-<tr>
 
-<th>Church</th>
+        <table class="miniTable">
 
-<th>Participants</th>
+            <thead>
 
-</tr>
+                <tr>
 
-</thead>
+                    <th>
+                        Church
+                    </th>
 
-<tbody id="topChurches">
+                    <th>
+                        Participants
+                    </th>
 
-</tbody>
+                </tr>
 
-</table>
+            </thead>
 
-</div>
 
-<div class="card">
+            <tbody
+                id="topChurches">
 
-<h3>
+            </tbody>
 
-📅 Most Popular Events
+        </table>
 
-</h3>
+    </div>
 
-<table class="miniTable">
 
-<thead>
+    <!-- TOP EVENTS -->
 
-<tr>
+    <div class="card">
 
-<th>Event</th>
+        <h3>
+            📅 Most Popular Events
+        </h3>
 
-<th>Participants</th>
 
-</tr>
+        <table class="miniTable">
 
-</thead>
+            <thead>
 
-<tbody id="topEvents">
+                <tr>
 
-</tbody>
+                    <th>
+                        Event
+                    </th>
 
-</table>
+                    <th>
+                        Participants
+                    </th>
 
-</div>
+                </tr>
 
+            </thead>
+
+
+            <tbody
+                id="topEvents">
+
+            </tbody>
+
+        </table>
+
+    </div>
 
 
 </section>
 
-<!-- ===================================================== -->
-<!-- DATA QUALITY -->
-<!-- ===================================================== -->
-
-
 
 <!-- ===================================================== -->
-<!-- DASHBOARD INFORMATION -->
-<!-- ===================================================== -->
-
-
-
-<!-- ===================================================== -->
-<!-- DRILL DOWN MODAL -->
+<!-- EXISTING DETAILS MODAL -->
 <!-- ===================================================== -->
 
 <div
-id="detailsModal"
-class="modal hidden">
+    id="detailsModal"
+    class="modal hidden">
 
-<div class="modalContent">
 
-<div class="modalHeader">
+    <div class="modalContent">
 
-<h2 id="modalTitle">
 
-Details
+        <div class="modalHeader">
 
-</h2>
+            <h2 id="modalTitle">
+                Details
+            </h2>
 
-<button
-class="closeButton"
-onclick="closeModal()">
 
-✕
+            <button
+                class="closeButton"
+                onclick="closeModal()">
 
-</button>
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <div id="modalBody">
+
+            Loading...
+
+        </div>
+
+
+    </div>
 
 </div>
 
-<div id="modalBody">
-
-Loading...
-
-</div>
-
-</div>
-
-</div>
 
 <!-- ===================================================== -->
-<!-- LOADING -->
+<!-- MISSIONAL JOURNEY MODAL -->
 <!-- ===================================================== -->
 
 <div
-id="loadingOverlay"
-class="loadingOverlay hidden">
+    id="journeyModal"
+    class="modal hidden">
 
-<div class="loadingCard">
 
-<div class="loader"></div>
+    <div class="modalContent journeyModalContent">
 
-<div class="loadingText">
 
-Loading Mission Intelligence...
+        <!-- HEADER -->
+
+        <div class="modalHeader">
+
+
+            <div>
+
+                <h2 id="journeyPersonName">
+                    Missional Journey
+                </h2>
+
+
+                <p id="journeyPersonMeta">
+                </p>
+
+            </div>
+
+
+            <button
+                class="closeButton"
+                onclick="closeJourneyModal()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="journeySummary">
+
+
+            <div class="journeyStat">
+
+                <span>
+                    Missions Events
+                </span>
+
+                <strong
+                    id="journeyEventCount">
+
+                    0
+
+                </strong>
+
+            </div>
+
+
+            <div class="journeyStat">
+
+                <span>
+                    Mission Trips
+                </span>
+
+                <strong
+                    id="journeyTripCount">
+
+                    0
+
+                </strong>
+
+            </div>
+
+
+            <div class="journeyStat">
+
+                <span>
+                    Total Activities
+                </span>
+
+                <strong
+                    id="journeyTotalActivities">
+
+                    0
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- JOURNEY TIMELINE -->
+
+        <div class="journeyTimeline">
+
+            <h3>
+                Journey Timeline
+            </h3>
+
+
+            <div
+                id="journeyTimelineList">
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="journeyActions">
+
+            <button
+                onclick="exportMissionalJourney()">
+
+                📄 Export Journey
+
+            </button>
+
+
+            <button
+                onclick="closeJourneyModal()">
+
+                Close
+
+            </button>
+
+        </div>
+
+
+    </div>
 
 </div>
 
-</div>
+
+<!-- ===================================================== -->
+<!-- LOADING OVERLAY -->
+<!-- ===================================================== -->
+
+<div
+    id="loadingOverlay"
+    class="loadingOverlay hidden">
+
+
+    <div class="loadingCard">
+
+
+        <div class="loader">
+        </div>
+
+
+        <div class="loadingText">
+
+            Loading Mission Intelligence...
+
+        </div>
+
+
+    </div>
 
 </div>
+
 
 </main>
 
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
 <footer>
 
-<div class="footer">
+    <div class="footer">
 
-<strong>COOS Missions Portal</strong>
+        <strong>
+            COOS Missions Portal
+        </strong>
 
-&nbsp; | &nbsp;
+        &nbsp; | &nbsp;
 
-Mission Intelligence Centre
+        Mission Intelligence Centre
 
-&nbsp; | &nbsp;
+        &nbsp; | &nbsp;
 
-Last Updated:
+        Last Updated:
 
-<span id="lastRefresh">
+        <span id="lastRefresh">
 
-Loading...
+            Loading...
 
-</span>
+        </span>
 
-</div>
+    </div>
 
 </footer>
+
 
 </body>
 
 </html>
-    
