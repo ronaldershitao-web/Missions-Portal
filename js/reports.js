@@ -5235,6 +5235,18 @@ function renderEventTopLines() {
 
     console.log("=== RENDER EVENT TOP LINES ===");
 
+console.log(
+    "EVENT DATA KEYS:",
+    Object.keys(
+        Dashboard.data?.events || {}
+    )
+);
+
+console.log(
+    "EVENT DATA FULL:",
+    Dashboard.data?.events
+);
+   
     console.log(
         "Dashboard.data:",
         Dashboard.data
