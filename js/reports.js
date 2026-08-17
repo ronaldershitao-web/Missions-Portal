@@ -413,6 +413,8 @@ function renderDashboard() {
 
     updateFilterResultCount();
 
+   renderMissionTripLocationSummary();
+
 }
 
 
@@ -5220,6 +5222,89 @@ function setupFilters() {
 function setupParticipantSearchLegacy() {
 
     setupParticipantSearch();
+
+}
+
+/* ==========================================================
+   MISSION TRIP SUMMARY BY LOCATION
+========================================================== */
+
+function renderMissionTripLocationSummary() {
+
+    const tbody =
+        document.getElementById(
+            "missionTripLocationSummaryTable"
+        );
+
+
+    if (!tbody)
+        return;
+
+
+    tbody.innerHTML = "";
+
+
+    const summary =
+        Dashboard.data
+            ?.missionTrips
+            ?.tripSummary ||
+        [];
+
+
+    if (!summary.length) {
+
+        renderEmptyRow(
+            tbody,
+            3,
+            "No mission trip location data available."
+        );
+
+        return;
+
+    }
+
+
+    summary.forEach(
+        location => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${escapeHtml(
+                        location.location ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        location.totalTeams ||
+                        0
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        location.totalParticipants ||
+                        0
+                    )}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
 
 }
 
