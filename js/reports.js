@@ -1584,9 +1584,8 @@ function renderParticipantJourneySummary() {
 
     const tbody =
         document.getElementById(
-            "participantJourneySummaryTable"
+            "participantSummaryTable"
         );
-
 
     if (!tbody)
         return;
@@ -1601,17 +1600,12 @@ function renderParticipantJourneySummary() {
         [];
 
 
-    /*
-       A-Z by participant name
-    */
-
     const sorted =
         [...people].sort(
             (a, b) =>
                 String(
                     a.name || ""
-                )
-                .localeCompare(
+                ).localeCompare(
                     String(
                         b.name || ""
                     ),
@@ -1628,8 +1622,8 @@ function renderParticipantJourneySummary() {
 
         renderEmptyRow(
             tbody,
-            6,
-            "No participant journey data."
+            4,
+            "No participant data."
         );
 
         return;
@@ -1637,86 +1631,70 @@ function renderParticipantJourneySummary() {
     }
 
 
-    sorted
-        .slice(0, 20)
-        .forEach(
-            person => {
+    sorted.forEach(
+        person => {
 
-                const tr =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                tr.innerHTML = `
-
-                    <td>
-                        ${escapeHtml(
-                            person.name ||
-                            "Unnamed"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            person.church ||
-                            "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatNumber(
-                            person.events ||
-                            0
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatNumber(
-                            person.attended ||
-                            0
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatNumber(
-                            person.missionTrips ||
-                            0
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatNumber(
-                            person.totalEngagement ||
-                            0
-                        )}
-                    </td>
-
-                `;
-
-
-                tr.style.cursor =
-                    "pointer";
-
-
-                tr.addEventListener(
-                    "click",
-                    () =>
-                        openParticipantJourney(
-                            person.personKey ||
-                            person.email ||
-                            person.mobile ||
-                            person.name
-                        )
+            const tr =
+                document.createElement(
+                    "tr"
                 );
 
 
-                tbody.appendChild(
-                    tr
-                );
+            tr.innerHTML = `
 
-            }
-        );
+                <td>
+                    ${escapeHtml(
+                        person.name ||
+                        "Unnamed"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        person.church ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        person.events ||
+                        0
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        person.missionTrips ||
+                        0
+                    )}
+                </td>
+
+            `;
+
+
+            tr.style.cursor =
+                "pointer";
+
+
+            tr.addEventListener(
+                "click",
+                () =>
+                    openParticipantJourney(
+                        person.personKey ||
+                        person.email ||
+                        person.mobile ||
+                        person.name
+                    )
+            );
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
 
 }
 
