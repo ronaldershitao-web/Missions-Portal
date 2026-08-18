@@ -412,6 +412,7 @@ function renderDashboard() {
     ------------------------------------------------------ */
 
     updateFilterResultCount();
+   renderMissionTripSummary();
 
    renderMissionTripLocationSummary();
 
@@ -505,15 +506,24 @@ function renderKPIs() {
     );
 
 
-    setText(
-        "kpiAverageEvent",
-        formatNumber(
-            Dashboard.data
-                ?.events
-                ?.averages
-                ?.average || 0
-        )
-    );
+    const averageEventSize =
+    Dashboard.data
+        ?.events
+        ?.averages
+        ?.average ??
+    Dashboard.data
+        ?.events
+        ?.analytics
+        ?.averages
+        ?.average ??
+    0;
+
+setText(
+    "kpiAverageEvent",
+    formatNumber(
+        averageEventSize
+    )
+);
 
 
     /*
@@ -555,34 +565,35 @@ function renderKPIs() {
        Mission Trip KPIs
     */
 
-    const mission =
-        Dashboard.data?.missionTrips?.summary;
+    const missionData =
+    Dashboard.missionData ||
+    Dashboard.data?.missionTrips ||
+    {};
 
+const mission =
+    missionData.summary ||
+    {};
 
-    if (mission) {
+setText(
+    "kpiMissionTrips",
+    formatNumber(
+        mission.totalTrips || 0
+    )
+);
 
-        setText(
-            "kpiMissionTrips",
-            formatNumber(
-                mission.totalTrips
-            )
-        );
+setText(
+    "kpiTrippers",
+    formatNumber(
+        mission.uniqueMissionaries || 0
+    )
+);
 
-
-        setText(
-            "kpiTrippers",
-            formatNumber(
-                mission.uniqueMissionaries
-            )
-        );
-
-
-        setText(
-            "kpiAvgTeam",
-            formatNumber(
-                mission.averageParticipants
-            )
-        );
+setText(
+    "kpiAvgTeam",
+    formatNumber(
+        mission.averageParticipants || 0
+    )
+);
 
     }
 
@@ -5532,5 +5543,95 @@ async function loadUnifiedParticipants() {
         return [];
 
     }
+
+}
+
+/* ==========================================================
+   MISSION TRIP SUMMARY
+========================================================== */
+
+function renderMissionTripSummary() {
+
+    const tbody =
+        document.getElementById(
+            "missionTripSummaryTable"
+        );
+
+    if (!tbody)
+        return;
+
+    tbody.innerHTML = "";
+
+    const trips =
+        Dashboard.missionData
+            ?.summary
+            ?.trips ||
+        Dashboard.data
+            ?.missionTrips
+            ?.summary
+            ?.trips ||
+        [];
+
+    if (!trips.length) {
+
+        renderEmptyRow(
+            tbody,
+            4,
+            "No mission trip data available."
+        );
+
+        return;
+
+    }
+
+
+    trips.forEach(
+        trip => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${escapeHtml(
+                        trip.tripName ||
+                        trip.tripCode ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        trip.location ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${formatDate(
+                        trip.startDate
+                    )}
+                </td>
+
+                <td>
+                    ${formatNumber(
+                        trip.participants ||
+                        0
+                    )}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
 
 }
