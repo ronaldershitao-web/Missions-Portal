@@ -1595,9 +1595,9 @@ function renderParticipantJourneySummary() {
 
 
     const people =
-        Dashboard.data
-            ?.participantJourney ||
-        [];
+    Dashboard.data
+        ?.participants ||
+    [];
 
 
     const sorted =
