@@ -1595,9 +1595,10 @@ function renderParticipantJourneySummary() {
 
 
     const people =
-    Dashboard.data
-        ?.participantJourney ||
-    [];
+        Dashboard.data
+            ?.tables
+            ?.participantDirectory ||
+        [];
 
 
     const sorted =
@@ -1681,7 +1682,7 @@ function renderParticipantJourneySummary() {
                 "click",
                 () =>
                     openParticipantJourney(
-                        person.personKey ||
+                        person.personID ||
                         person.email ||
                         person.mobile ||
                         person.name
