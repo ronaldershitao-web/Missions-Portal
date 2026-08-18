@@ -1595,10 +1595,10 @@ function renderParticipantJourneySummary() {
 
 
     const people =
-    Dashboard.data
-        ?.tables
-        ?.participantDirectory ||
-    [];
+        Dashboard.data
+            ?.tables
+            ?.participantSummary ||
+        [];
 
 
     const sorted =
