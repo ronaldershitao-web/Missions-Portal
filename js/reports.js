@@ -1596,7 +1596,7 @@ function renderParticipantJourneySummary() {
 
     const people =
     Dashboard.data
-        ?.participants ||
+        ?.participantJourney ||
     [];
 
 
