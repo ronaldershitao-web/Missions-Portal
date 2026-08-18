@@ -1156,11 +1156,12 @@ function renderParticipantDirectory() {
                         event.stopPropagation();
 
                         openParticipantJourney(
-                            person.personKey ||
-                            person.email ||
-                            person.mobile ||
-                            person.name
-                        );
+    person.personID ||
+    person.personKey ||
+    person.email ||
+    person.mobile ||
+    person.name
+);
 
                     }
                 );
@@ -1181,11 +1182,12 @@ function renderParticipantDirectory() {
                 () => {
 
                     openParticipantJourney(
-                        person.personKey ||
-                        person.email ||
-                        person.mobile ||
-                        person.name
-                    );
+    person.personID ||
+    person.personKey ||
+    person.email ||
+    person.mobile ||
+    person.name
+);
 
                 }
             );
@@ -1472,11 +1474,12 @@ function renderParticipantSearchResults(
                 () => {
 
                     openParticipantJourney(
-                        person.personKey ||
-                        person.email ||
-                        person.mobile ||
-                        person.name
-                    );
+    person.personID ||
+    person.personKey ||
+    person.email ||
+    person.mobile ||
+    person.name
+);
 
                 }
             );
