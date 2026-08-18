@@ -1582,10 +1582,49 @@ async function openParticipantJourney(
 
 function renderParticipantJourneySummary() {
 
+    console.log(
+        "=== PARTICIPANT TABLE RENDER START ==="
+    );
+
+    console.log(
+        "Dashboard:",
+        Dashboard
+    );
+
+    console.log(
+        "Dashboard.data:",
+        Dashboard.data
+    );
+
+    console.log(
+        "Dashboard.data.tables:",
+        Dashboard.data?.tables
+    );
+
+    console.log(
+        "Dashboard.data.tables.participantSummary:",
+        Dashboard.data?.tables?.participantSummary
+    );
+
+    console.log(
+        "Dashboard.data.participants:",
+        Dashboard.data?.participants
+    );
+
+    console.log(
+        "Dashboard.data.participants.directory:",
+        Dashboard.data?.participants?.directory
+    );
+
     const tbody =
         document.getElementById(
             "participantSummaryTable"
         );
+
+    console.log(
+        "PARTICIPANT TBODY:",
+        tbody
+    );
 
     if (!tbody)
         return;
