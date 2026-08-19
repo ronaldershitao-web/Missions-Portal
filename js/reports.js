@@ -233,14 +233,14 @@ async function loadDashboard() {
     */
 
     Dashboard.missionData =
-        payload.missionTrips ||
+        
         Dashboard.data.missionTrips ||
         null;
 
 
     console.log(
         "MISSION TRIP DATA:",
-        Dashboard.missionData
+       Dashboard.data.missionTrips
     );
 
 
