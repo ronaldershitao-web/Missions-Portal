@@ -5194,7 +5194,7 @@ function renderMissionTripLocationSummary() {
         Dashboard.data
             ?.missionTrips
             ?.summary
-            ?.locationSummary ||
+            ?.missionTriplocationSummary ||
         [];
 
 
