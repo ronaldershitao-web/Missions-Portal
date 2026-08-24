@@ -1508,68 +1508,58 @@ function renderParticipantSearchResults(
    OPEN PARTICIPANT JOURNEY
 ========================================================== */
 
-async function openParticipantJourney(
-    identifier
-) {
+async function openParticipantJourney(identifier) {
 
-    if (!identifier)
-        return;
+  try {
 
-
-    showLoading();
-
-
-    try {
-
-        const result =
-            await API.post(
-                "getParticipantDetails",
-                {
-                    identifier:
-                        identifier
-                }
-            );
-
-
-        if (
-            !result?.success
-        ) {
-
-            throw new Error(
-                result?.message ||
-                "Unable to load participant journey."
-            );
-
+    const response =
+      await API.post(
+        "getParticipantDetails",
+        {
+          identifier: identifier
         }
+      );
 
 
-        renderJourneyModal(
-            result.data ||
-            {}
-        );
+    /*
+     * Depending on your API wrapper,
+     * response may already be the payload.
+     */
 
-    }
-
-    catch (error) {
-
-        console.error(
-            "JOURNEY ERROR:",
-            error
-        );
+    const result =
+      response.data || response;
 
 
-        showError(
-            error.message ||
-            "Unable to load participant journey."
-        );
+    if (!result.found) {
+
+      alert("Participant not found.");
+
+      return;
 
     }
 
-    finally {
 
-        hideLoading();
+    Dashboard.data.participantJourney =
+      result;
 
-    }
+
+    renderParticipantJourney(
+      result
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "PARTICIPANT JOURNEY ERROR:",
+      error
+    );
+
+    alert(
+      "Unable to load participant journey."
+    );
+
+  }
 
 }
 
@@ -1578,164 +1568,131 @@ async function openParticipantJourney(
    PARTICIPANT JOURNEY SUMMARY
 ========================================================== */
 
-function renderParticipantJourneySummary() {
+function renderParticipantJourney(data) {
 
-    console.log(
-        "=== PARTICIPANT TABLE RENDER START ==="
+  if (!data || !data.found) {
+    return;
+  }
+
+
+  const participant =
+    data.participant || {};
+
+  const summary =
+    data.summary || {};
+
+  const journal =
+    data.journal || [];
+
+
+  /*
+   * ----------------------------------------------------------
+   * BASIC INFORMATION
+   * ----------------------------------------------------------
+   */
+
+  const name =
+    participant.name || "—";
+
+  const contact =
+    participant.mobile ||
+    participant.email ||
+    "—";
+
+  const church =
+    participant.church || "—";
+
+
+  /*
+   * ----------------------------------------------------------
+   * RENDER PROFILE
+   * ----------------------------------------------------------
+   */
+
+  const nameElement =
+    document.getElementById(
+      "participantJourneyName"
     );
 
-    console.log(
-        "Dashboard:",
-        Dashboard
+  const contactElement =
+    document.getElementById(
+      "participantJourneyContact"
     );
 
-    console.log(
-        "Dashboard.data:",
-        Dashboard.data
+  const churchElement =
+    document.getElementById(
+      "participantJourneyChurch"
     );
 
-    console.log(
-        "Dashboard.data.tables:",
-        Dashboard.data?.tables
+
+  if (nameElement) {
+    nameElement.textContent = name;
+  }
+
+  if (contactElement) {
+    contactElement.textContent = contact;
+  }
+
+  if (churchElement) {
+    churchElement.textContent = church;
+  }
+
+
+  /*
+   * ----------------------------------------------------------
+   * ENGAGEMENT SUMMARY
+   * ----------------------------------------------------------
+   */
+
+  const missionElement =
+    document.getElementById(
+      "participantJourneyMissionTrips"
     );
 
-    console.log(
-        "Dashboard.data.tables.participantSummary:",
-        Dashboard.data?.tables?.participantSummary
+  const eventsElement =
+    document.getElementById(
+      "participantJourneyEvents"
     );
 
-    console.log(
-        "Dashboard.data.participants:",
-        Dashboard.data?.participants
+
+  if (missionElement) {
+    missionElement.textContent =
+      summary.missionTrips || 0;
+  }
+
+  if (eventsElement) {
+    eventsElement.textContent =
+      summary.events || 0;
+  }
+
+
+  /*
+   * ----------------------------------------------------------
+   * CHRONOLOGICAL ENGAGEMENT
+   * ----------------------------------------------------------
+   */
+
+  renderParticipantChronology(
+    journal
+  );
+
+
+  /*
+   * ----------------------------------------------------------
+   * SHOW PANEL / MODAL
+   * ----------------------------------------------------------
+   */
+
+  const panel =
+    document.getElementById(
+      "participantJourneyPanel"
     );
 
-    console.log(
-        "Dashboard.data.participants.directory:",
-        Dashboard.data?.participants?.directory
-    );
-
-    const tbody =
-        document.getElementById(
-            "participantSummaryTable"
-        );
-
-    console.log(
-        "PARTICIPANT TBODY:",
-        tbody
-    );
-
-    if (!tbody)
-        return;
-
-
-    tbody.innerHTML = "";
-
-
-    const people =
-        Dashboard.data
-            ?.tables
-            ?.participantSummary ||
-        [];
-
-
-    const sorted =
-        [...people].sort(
-            (a, b) =>
-                String(
-                    a.name || ""
-                ).localeCompare(
-                    String(
-                        b.name || ""
-                    ),
-                    undefined,
-                    {
-                        sensitivity:
-                            "base"
-                    }
-                )
-        );
-
-
-    if (!sorted.length) {
-
-        renderEmptyRow(
-            tbody,
-            4,
-            "No participant data."
-        );
-
-        return;
-
-    }
-
-
-    sorted.forEach(
-        person => {
-
-            const tr =
-                document.createElement(
-                    "tr"
-                );
-
-
-            tr.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        person.name ||
-                        "Unnamed"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        person.church ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${formatNumber(
-                        person.events ||
-                        0
-                    )}
-                </td>
-
-                <td>
-                    ${formatNumber(
-                        person.missionTrips ||
-                        0
-                    )}
-                </td>
-
-            `;
-
-
-            tr.style.cursor =
-                "pointer";
-
-
-            tr.addEventListener(
-                "click",
-                () =>
-                    openParticipantJourney(
-                        person.personID ||
-                        person.email ||
-                        person.mobile ||
-                        person.name
-                    )
-            );
-
-
-            tbody.appendChild(
-                tr
-            );
-
-        }
-    );
+  if (panel) {
+    panel.style.display = "";
+  }
 
 }
-
 
 /* ==========================================================
    JOURNEY MODAL
@@ -5651,5 +5608,135 @@ function renderMissionTripSummary() {
 
         }
     );
+
+}
+
+function renderParticipantChronology(journal) {
+
+  const tbody =
+    document.getElementById(
+      "participantJourneyTableBody"
+    );
+
+
+  if (!tbody) {
+    return;
+  }
+
+
+  tbody.innerHTML = "";
+
+
+  if (!journal || !journal.length) {
+
+    const row =
+      document.createElement("tr");
+
+    row.innerHTML = `
+      <td colspan="4" class="empty-state">
+        No chronological engagement found.
+      </td>
+    `;
+
+    tbody.appendChild(row);
+
+    return;
+
+  }
+
+
+  journal.forEach(entry => {
+
+    const row =
+      document.createElement("tr");
+
+
+    /*
+     * DATE
+     */
+
+    const date =
+      entry.displayDate ||
+      formatParticipantJourneyDate(
+        entry.date
+      ) ||
+      "—";
+
+
+    /*
+     * EVENT / TRIP
+     */
+
+    const eventOrTrip =
+      entry.eventOrTrip ||
+      "—";
+
+
+    /*
+     * DESCRIPTION
+     */
+
+    const description =
+      entry.description ||
+      "—";
+
+
+    /*
+     * LOCATION
+     */
+
+    const location =
+      entry.location ||
+      "—";
+
+
+    row.innerHTML = `
+
+      <td>
+        ${escapeHtml(date)}
+      </td>
+
+      <td>
+        ${escapeHtml(eventOrTrip)}
+      </td>
+
+      <td>
+        ${escapeHtml(description)}
+      </td>
+
+      <td>
+        ${escapeHtml(location)}
+      </td>
+
+    `;
+
+
+    tbody.appendChild(row);
+
+  });
+
+}
+
+function formatParticipantJourneyDate(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
 
 }
