@@ -5189,11 +5189,13 @@ function renderMissionTripLocationSummary() {
 
 
     const summary =
-        Dashboard.data
-            ?.missionTrips
-            ?.summary
-            ?.missionTriplocationSummary ||
-        [];
+    Dashboard.data
+        ?.missionTrips
+        ?.summary
+        ?.data
+        ?.missionTripLocationSummary || [];
+
+console.log("MISSION TRIP LOCATION SUMMARY:", summary);
 
 
     if (!summary.length) {
