@@ -243,6 +243,11 @@ async function loadDashboard() {
        Dashboard.data.missionTrips
     );
 
+   console.log(
+  "=== MISSION TRIP DEBUG ===",
+  Dashboard.missionData?.summary?.debug
+);
+
 
     /*
        Preserve participant source
