@@ -378,7 +378,8 @@ function renderDashboard() {
     renderParticipantDirectory();
 
 
-    renderParticipantJourneySummary();
+    renderParticipantJourney();
+
 
 
     /* ------------------------------------------------------
