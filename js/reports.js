@@ -512,16 +512,8 @@ function renderKPIs() {
 
 
     const averageEventSize =
-    Dashboard.data
-        ?.events
-        ?.averages
-        ?.average ??
-    Dashboard.data
-        ?.events
-        ?.analytics
-        ?.averages
-        ?.average ??
-    0;
+  Dashboard.data?.averages ?? 0;
+    
 
 setText(
     "kpiAverageEvent",
@@ -575,9 +567,11 @@ setText(
     Dashboard.data?.missionTrips ||
     {};
 
+const missionResponse =
+    missionData.summary || {};
+
 const mission =
-    missionData.summary ||
-    {};
+    missionResponse.data || {};
 
 setText(
     "kpiMissionTrips",
