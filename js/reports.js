@@ -512,8 +512,7 @@ function renderKPIs() {
 
 
     const averageEventSize =
-  Dashboard.data?.averages ?? 0;
-    
+    Dashboard.data?.averages.average || 0;
 
 setText(
     "kpiAverageEvent",
@@ -5299,8 +5298,8 @@ function renderEventTopLines() {
 
     const topLines =
         Dashboard.data
-            ?.events
-            ?.topLines ||
+            ?.tables
+            ?.eventTopLines ||
         [];
 
 
