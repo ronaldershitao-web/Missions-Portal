@@ -1790,27 +1790,3 @@ function showSuccess(result){
 
 </html>
 ```
-
-The critical changes are:
-
-```javascript
-async function handleCreateEvent(){
-```
-
-and:
-
-```html
-onclick="handleCreateEvent()"
-```
-
-while this remains:
-
-```javascript
-runScript("createEvent", {...})
-```
-
-So your frontend is now calling:
-
-**`handleCreateEvent()` → `API.post("createEvent")` → `doPost()` → `case "createEvent"` → backend `createEvent()`**
-
-This separates the **browser function name** from the **Apps Script action/backend function name**, which is what was causing your current error.
