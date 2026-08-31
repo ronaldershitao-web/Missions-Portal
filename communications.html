@@ -3130,6 +3130,7 @@ async function preparePublicityWhatsApp(
 }
 
 
+
 /* =========================================================
    MANUAL WHATSAPP PUBLICITY
 ========================================================= */
@@ -3138,7 +3139,6 @@ async function openManualPublicityWhatsApp(index){
 
     const person =
         publicityAudience[index];
-
 
     if(!person)
         return;
@@ -3153,6 +3153,10 @@ async function openManualPublicityWhatsApp(index){
         .toUpperCase();
 
 
+    /*
+        Do not allow publicity to be sent twice.
+    */
+
     if(status === "SENT"){
 
         alert(
@@ -3160,7 +3164,6 @@ async function openManualPublicityWhatsApp(index){
         );
 
         return;
-
     }
 
 
@@ -3177,7 +3180,6 @@ async function openManualPublicityWhatsApp(index){
         );
 
         return;
-
     }
 
 
@@ -3194,7 +3196,6 @@ async function openManualPublicityWhatsApp(index){
         );
 
         return;
-
     }
 
 
@@ -3206,8 +3207,8 @@ async function openManualPublicityWhatsApp(index){
 
 
     /*
-        Notify backend that this WhatsApp
-        communication is being prepared.
+        Notify backend that WhatsApp is being prepared.
+        This records OPENED.
     */
 
     await preparePublicityWhatsApp(
@@ -3215,6 +3216,10 @@ async function openManualPublicityWhatsApp(index){
         message
     );
 
+
+    /*
+        Generate WhatsApp URL.
+    */
 
     const url =
         "https://wa.me/" +
@@ -3225,6 +3230,10 @@ async function openManualPublicityWhatsApp(index){
         );
 
 
+    /*
+        Open WhatsApp.
+    */
+
     window.open(
         url,
         "_blank"
@@ -3232,28 +3241,10 @@ async function openManualPublicityWhatsApp(index){
 
 
     /*
-        Opening WhatsApp does NOT mean SENT.
-
-        User must confirm after manually
-        pressing Send.
+        IMPORTANT:
+        Publicity is now immediately marked SENT
+        when the WhatsApp button is pressed.
     */
-
-    const sent =
-        confirm(
-`
-WhatsApp has been opened for ${getPersonName(person)}.
-
-Please attach the publicity poster if required
-and press Send.
-
-Did you send the message?
-`
-        );
-
-
-    if(!sent)
-        return;
-
 
     await markCommunicationSent(
         person,
@@ -3263,6 +3254,8 @@ Did you send the message?
     );
 
 }
+```
+
 
 
 /* =========================================================
