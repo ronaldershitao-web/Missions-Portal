@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,16 +31,12 @@ body{
 /* ================= HEADER ================= */
 
 .header{
-
     background:#1e3a8a;
     color:white;
-
     padding:18px 30px;
-
     display:flex;
     justify-content:space-between;
     align-items:center;
-
 }
 
 .header h2{
@@ -47,446 +44,272 @@ body{
 }
 
 .backBtn{
-
     background:white;
     color:#1e3a8a;
-
     border:none;
-
     padding:10px 16px;
-
     border-radius:6px;
-
     cursor:pointer;
-
     font-weight:bold;
-
 }
 
 /* ================= CONTAINER ================= */
 
 .container{
-
     max-width:1100px;
-
     margin:25px auto;
-
     padding:0 20px;
-
 }
 
 /* ================= CARD ================= */
 
 .card{
-
     background:white;
-
     border-radius:10px;
-
     padding:25px;
-
     margin-bottom:20px;
-
     box-shadow:0 2px 6px rgba(0,0,0,.08);
-
 }
 
 .card h2{
-
     margin-top:0;
-
     color:#1e3a8a;
-
 }
 
 .cardDescription{
-
     color:#666;
-
     margin-bottom:20px;
-
 }
 
 /* ================= FORM GRID ================= */
 
 .formGrid{
-
     display:grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
+    grid-template-columns:repeat(2,1fr);
     gap:18px;
-
 }
 
 .formGroup{
-
     display:flex;
-
     flex-direction:column;
-
 }
 
 .formGroup.full{
-
-    grid-column:
-        1 / -1;
-
+    grid-column:1 / -1;
 }
 
 label{
-
     font-weight:bold;
-
     margin-bottom:7px;
-
 }
 
 .required{
-
     color:#dc2626;
-
 }
 
 input,
 select,
 textarea{
-
     width:100%;
-
     padding:11px;
-
     border:1px solid #ccc;
-
     border-radius:6px;
-
     font-size:14px;
-
 }
 
 textarea{
-
     min-height:100px;
-
     resize:vertical;
-
 }
 
 /* ================= HEADER IMAGE ================= */
 
 .imageUpload{
-
     border:2px dashed #cbd5e1;
-
     border-radius:8px;
-
     padding:25px;
-
     text-align:center;
-
     background:#f8fafc;
-
     cursor:pointer;
-
 }
 
 .imageUpload:hover{
-
     background:#f1f5f9;
-
 }
 
 .imagePreview{
-
     max-width:100%;
-
     max-height:220px;
-
     margin-top:15px;
-
     border-radius:8px;
-
     display:none;
-
 }
 
 /* ================= QUESTIONS ================= */
 
 .questionCard{
-
     border:1px solid #ddd;
-
     border-radius:8px;
-
     padding:18px;
-
     margin-bottom:15px;
-
     background:#fafafa;
-
 }
 
 .questionHeader{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
     margin-bottom:15px;
-
 }
 
 .questionNumber{
-
     font-weight:bold;
-
     color:#1e3a8a;
-
 }
 
 .removeBtn{
-
     background:#dc2626;
-
     color:white;
-
     border:none;
-
     padding:7px 10px;
-
     border-radius:5px;
-
     cursor:pointer;
-
 }
 
 .addQuestionBtn{
-
     background:#2563eb;
-
     color:white;
-
     border:none;
-
     padding:10px 16px;
-
     border-radius:6px;
-
     cursor:pointer;
-
 }
 
 /* ================= ACTIONS ================= */
 
 .actions{
-
     display:flex;
-
     justify-content:flex-end;
-
     gap:10px;
-
     margin-top:20px;
-
 }
 
 .cancelBtn{
-
     background:#6b7280;
-
     color:white;
-
     border:none;
-
     padding:12px 20px;
-
     border-radius:6px;
-
     cursor:pointer;
-
 }
 
 .createBtn{
-
     background:#16a34a;
-
     color:white;
-
     border:none;
-
     padding:12px 24px;
-
     border-radius:6px;
-
     cursor:pointer;
-
     font-weight:bold;
-
 }
 
 .createBtn:disabled{
-
     background:#9ca3af;
-
     cursor:not-allowed;
-
 }
 
 /* ================= SUCCESS ================= */
 
 .successCard{
-
     display:none;
-
     background:white;
-
     border-radius:10px;
-
     padding:30px;
-
     margin-bottom:20px;
-
     box-shadow:0 2px 6px rgba(0,0,0,.08);
-
 }
 
 .successCard h2{
-
     color:#16a34a;
-
 }
 
 .resultGrid{
-
     display:grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
+    grid-template-columns:repeat(2,1fr);
     gap:15px;
-
     margin-top:20px;
-
 }
 
 .resultBox{
-
     border:1px solid #ddd;
-
     border-radius:8px;
-
     padding:15px;
-
 }
 
 .resultBox label{
-
     display:block;
-
     color:#666;
-
     font-size:12px;
-
 }
 
 .resultBox a{
-
     word-break:break-all;
-
 }
 
 .qrBox{
-
     text-align:center;
-
     margin-top:25px;
-
 }
 
 .qrBox img{
-
     width:220px;
-
     height:220px;
-
     object-fit:contain;
-
     border:1px solid #ddd;
-
     padding:10px;
-
 }
 
 /* ================= LOADING ================= */
 
 .loading{
-
     display:none;
-
     position:fixed;
-
     inset:0;
-
     background:rgba(255,255,255,.75);
-
     justify-content:center;
-
     align-items:center;
-
     z-index:999;
-
 }
 
 .loadingBox{
-
     background:white;
-
     padding:25px 35px;
-
     border-radius:10px;
-
     box-shadow:0 4px 15px rgba(0,0,0,.2);
-
     text-align:center;
-
 }
 
 .spinner{
-
     width:35px;
-
     height:35px;
-
     border:4px solid #ddd;
-
     border-top:4px solid #1e3a8a;
-
     border-radius:50%;
-
     animation:spin 1s linear infinite;
-
     margin:0 auto 15px;
-
 }
 
 @keyframes spin{
-
     to{
         transform:rotate(360deg);
     }
-
 }
 
 @media(max-width:700px){
 
     .formGrid,
     .resultGrid{
-
         grid-template-columns:1fr;
-
     }
 
 }
@@ -495,11 +318,12 @@ textarea{
 
 </head>
 
-
 <body>
 
 
-<!-- ================= HEADER ================= -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <div class="header">
 
@@ -519,7 +343,9 @@ textarea{
 <div class="container">
 
 
-<!-- ================= SUCCESS ================= -->
+<!-- =====================================================
+     SUCCESS
+===================================================== -->
 
 <div
     class="successCard"
@@ -531,7 +357,6 @@ textarea{
         The Google Form has been created and the event has
         been added to the Event Registry as ACTIVE.
     </p>
-
 
     <div class="resultGrid">
 
@@ -559,7 +384,8 @@ textarea{
 
             <a
                 id="resultFormUrl"
-                target="_blank">
+                target="_blank"
+                rel="noopener">
 
                 Open Form
 
@@ -574,7 +400,8 @@ textarea{
 
             <a
                 id="resultResponderUrl"
-                target="_blank">
+                target="_blank"
+                rel="noopener">
 
                 Open Registration Form
 
@@ -608,7 +435,9 @@ textarea{
 </div>
 
 
-<!-- ================= EVENT DETAILS ================= -->
+<!-- =====================================================
+     EVENT DETAILS
+===================================================== -->
 
 <div
     class="card"
@@ -627,7 +456,7 @@ textarea{
     <div class="formGrid">
 
 
-        <!-- Event Date -->
+        <!-- EVENT DATE -->
 
         <div class="formGroup">
 
@@ -646,7 +475,7 @@ textarea{
         </div>
 
 
-        <!-- Event Name -->
+        <!-- EVENT NAME -->
 
         <div class="formGroup">
 
@@ -666,7 +495,7 @@ textarea{
         </div>
 
 
-        <!-- Event Type -->
+        <!-- EVENT TYPE -->
 
         <div class="formGroup">
 
@@ -718,14 +547,12 @@ textarea{
         </div>
 
 
-        <!-- Event Description -->
+        <!-- EVENT DESCRIPTION -->
 
         <div class="formGroup full">
 
             <label>
-
                 Event Description
-
             </label>
 
             <textarea
@@ -734,16 +561,16 @@ textarea{
 
         </div>
 
-
     </div>
 
 </div>
 
 
-<!-- ================= FORM HEADER ================= -->
+<!-- =====================================================
+     GOOGLE FORM HEADER
+===================================================== -->
 
-<div
-    class="card">
+<div class="card">
 
     <h2>Google Form Header</h2>
 
@@ -784,17 +611,18 @@ textarea{
 </div>
 
 
-<!-- ================= STANDARD PARAMETERS ================= -->
+<!-- =====================================================
+     STANDARD PARAMETERS
+===================================================== -->
 
-<div
-    class="card">
+<div class="card">
 
     <h2>Registration Information</h2>
 
     <p class="cardDescription">
 
-        These are the standard registration fields that will
-        be included in every Event Form.
+        These standard registration fields will be included
+        in every Event Form.
 
     </p>
 
@@ -804,7 +632,10 @@ textarea{
 
         <div class="formGroup">
 
-            <label>Name <span class="required">*</span></label>
+            <label>
+                Name
+                <span class="required">*</span>
+            </label>
 
             <input
                 value="Name"
@@ -815,7 +646,10 @@ textarea{
 
         <div class="formGroup">
 
-            <label>Email Address <span class="required">*</span></label>
+            <label>
+                Email Address
+                <span class="required">*</span>
+            </label>
 
             <input
                 value="Email Address"
@@ -826,7 +660,10 @@ textarea{
 
         <div class="formGroup">
 
-            <label>Contact Number <span class="required">*</span></label>
+            <label>
+                Contact Number
+                <span class="required">*</span>
+            </label>
 
             <input
                 value="Contact Number"
@@ -837,7 +674,9 @@ textarea{
 
         <div class="formGroup">
 
-            <label>Church</label>
+            <label>
+                Church
+            </label>
 
             <input
                 value="Church"
@@ -848,7 +687,9 @@ textarea{
 
         <div class="formGroup">
 
-            <label>Referral Source</label>
+            <label>
+                Referral Source
+            </label>
 
             <input
                 value="How did you hear about this event?"
@@ -859,7 +700,10 @@ textarea{
 
         <div class="formGroup">
 
-            <label>PDPA Consent <span class="required">*</span></label>
+            <label>
+                PDPA Consent
+                <span class="required">*</span>
+            </label>
 
             <input
                 value="PDPA Consent"
@@ -872,18 +716,19 @@ textarea{
 </div>
 
 
-<!-- ================= CUSTOM QUESTIONS ================= -->
+<!-- =====================================================
+     CUSTOM QUESTIONS
+===================================================== -->
 
-<div
-    class="card">
+<div class="card">
 
     <h2>Event-Specific Questions</h2>
 
     <p class="cardDescription">
 
         Add questions that are specific to this event.
-        These will be created as additional questions in
-        the Google Form.
+        These will be added to the Google Form after the
+        standard registration fields.
 
     </p>
 
@@ -903,14 +748,16 @@ textarea{
 </div>
 
 
-<!-- ================= CREATE ================= -->
+<!-- =====================================================
+     CREATE
+===================================================== -->
 
-<div
-    class="card">
+<div class="card">
 
     <div class="actions">
 
         <button
+            type="button"
             class="cancelBtn"
             onclick="window.location='event-management.html'">
 
@@ -919,10 +766,16 @@ textarea{
         </button>
 
 
+        <!-- IMPORTANT:
+             Do NOT call createEvent().
+             createEvent is a browser Document method.
+        -->
+
         <button
+            type="button"
             class="createBtn"
             id="createBtn"
-            onclick="createEvent()">
+            onclick="handleCreateEvent()">
 
             🚀 Create Event
 
@@ -936,7 +789,9 @@ textarea{
 </div>
 
 
-<!-- ================= LOADING ================= -->
+<!-- =====================================================
+     LOADING
+===================================================== -->
 
 <div
     class="loading"
@@ -980,6 +835,7 @@ if(!user){
 
 
 if(
+    user &&
     !["Admin","Intern"].includes(
         user.role
     )
@@ -1046,7 +902,7 @@ function hideLoading(){
 
 
 /*****************************************************
- * HEADER IMAGE PREVIEW
+ * HEADER IMAGE
  *****************************************************/
 
 let headerImageData = null;
@@ -1070,9 +926,7 @@ document
 
 
             if(
-                !file.type.startsWith(
-                    "image/"
-                )
+                !file.type.startsWith("image/")
             ){
 
                 alert(
@@ -1085,9 +939,7 @@ document
 
 
             /*
-             * Convert image to Base64.
-             *
-             * This will be sent to Apps Script.
+             * Convert the image into Base64.
              */
 
             const reader =
@@ -1097,20 +949,19 @@ document
             reader.onload =
                 function(e){
 
-                    headerImageData =
-                        {
+                    headerImageData = {
 
-                            name:
-                                file.name,
+                        name:
+                            file.name,
 
-                            mimeType:
-                                file.type,
+                        mimeType:
+                            file.type,
 
-                            data:
-                                e.target.result
+                        data:
+                            e.target.result
                                 .split(",")[1]
 
-                        };
+                    };
 
 
                     const preview =
@@ -1149,16 +1000,13 @@ function addQuestion(){
 
 
     const container =
-        document
-            .getElementById(
-                "questionsContainer"
-            );
+        document.getElementById(
+            "questionsContainer"
+        );
 
 
     const card =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     card.className =
@@ -1193,11 +1041,14 @@ function addQuestion(){
 
         <div class="formGrid">
 
+
             <div class="formGroup full">
 
                 <label>
+
                     Question
                     <span class="required">*</span>
+
                 </label>
 
                 <input
@@ -1282,17 +1133,20 @@ Enter one option per line."></textarea>
 
             </div>
 
+
         </div>
 
     `;
 
 
-    container.appendChild(
-        card
-    );
+    container.appendChild(card);
 
 }
 
+
+/*****************************************************
+ * REMOVE QUESTION
+ *****************************************************/
 
 function removeQuestion(button){
 
@@ -1313,6 +1167,10 @@ function removeQuestion(button){
 
 }
 
+
+/*****************************************************
+ * RENUMBER QUESTIONS
+ *****************************************************/
 
 function renumberQuestions(){
 
@@ -1365,6 +1223,11 @@ function collectQuestions(){
                 ).value.trim();
 
 
+            /*
+             * Ignore completely blank
+             * question cards.
+             */
+
             if(!text){
 
                 return;
@@ -1414,11 +1277,14 @@ function collectQuestions(){
                 title:
                     text,
 
-                type,
+                type:
+                    type,
 
-                required,
+                required:
+                    required,
 
-                options
+                options:
+                    options
 
             });
 
@@ -1432,7 +1298,7 @@ function collectQuestions(){
 
 
 /*****************************************************
- * VALIDATE
+ * VALIDATE EVENT
  *****************************************************/
 
 function validateEvent(){
@@ -1450,7 +1316,8 @@ function validateEvent(){
             .getElementById(
                 "eventName"
             )
-            .value.trim();
+            .value
+            .trim();
 
 
     const eventType =
@@ -1494,6 +1361,84 @@ function validateEvent(){
     }
 
 
+    /*
+     * Validate custom questions.
+     */
+
+    const cards =
+        document.querySelectorAll(
+            ".questionCard"
+        );
+
+
+    for(
+        let i = 0;
+        i < cards.length;
+        i++
+    ){
+
+        const text =
+            cards[i]
+                .querySelector(
+                    ".questionText"
+                )
+                .value
+                .trim();
+
+
+        if(!text){
+
+            alert(
+                "Please complete Question " +
+                (i + 1) +
+                " or remove it."
+            );
+
+            return false;
+
+        }
+
+
+        const type =
+            cards[i]
+                .querySelector(
+                    ".questionType"
+                )
+                .value;
+
+
+        const optionsText =
+            cards[i]
+                .querySelector(
+                    ".questionOptions"
+                )
+                .value
+                .trim();
+
+
+        if(
+            [
+                "MULTIPLE_CHOICE",
+                "CHECKBOX",
+                "DROPDOWN"
+            ].includes(type)
+            &&
+            !optionsText
+        ){
+
+            alert(
+                "Please provide options for Question " +
+                (i + 1) +
+                "."
+            );
+
+            return false;
+
+        }
+
+    }
+
+
     return true;
 
 }
@@ -1501,9 +1446,23 @@ function validateEvent(){
 
 /*****************************************************
  * CREATE EVENT
+ *
+ * IMPORTANT:
+ *
+ * This function is intentionally called
+ * handleCreateEvent().
+ *
+ * Do NOT name it createEvent().
+ *
+ * createEvent() is already a native browser
+ * Document method.
  *****************************************************/
 
-async function createEvent(){
+async function handleCreateEvent(){
+
+    /*
+     * Validate before doing anything.
+     */
 
     if(!validateEvent()){
 
@@ -1511,6 +1470,10 @@ async function createEvent(){
 
     }
 
+
+    /*
+     * Collect event details.
+     */
 
     const eventDate =
         document
@@ -1525,7 +1488,8 @@ async function createEvent(){
             .getElementById(
                 "eventName"
             )
-            .value.trim();
+            .value
+            .trim();
 
 
     const eventType =
@@ -1541,12 +1505,21 @@ async function createEvent(){
             .getElementById(
                 "eventDescription"
             )
-            .value.trim();
+            .value
+            .trim();
 
+
+    /*
+     * Collect custom questions.
+     */
 
     const questions =
         collectQuestions();
 
+
+    /*
+     * Confirmation.
+     */
 
     const confirmed =
         confirm(
@@ -1565,8 +1538,13 @@ async function createEvent(){
             eventType +
             "\n\n" +
 
-            "A Google Form and response spreadsheet " +
-            "will be created."
+            "This will create:\n" +
+            "• Google Form\n" +
+            "• Response Spreadsheet\n" +
+            "• QR Code\n" +
+            "• ACTIVE Event Registry record\n\n" +
+
+            "Continue?"
 
         );
 
@@ -1594,21 +1572,34 @@ async function createEvent(){
 
     try{
 
+        /*
+         * IMPORTANT:
+         *
+         * The API action is still "createEvent".
+         *
+         * Only the frontend JavaScript function was
+         * renamed to handleCreateEvent().
+         */
 
         const result =
             await runScript(
                 "createEvent",
                 {
 
-                    eventDate,
+                    eventDate:
+                        eventDate,
 
-                    eventName,
+                    eventName:
+                        eventName,
 
-                    eventType,
+                    eventType:
+                        eventType,
 
-                    eventDescription,
+                    eventDescription:
+                        eventDescription,
 
-                    questions,
+                    questions:
+                        questions,
 
                     headerImage:
                         headerImageData,
@@ -1628,11 +1619,11 @@ async function createEvent(){
             result
         );
 
-
     }
     catch(err){
 
         console.error(
+            "CREATE EVENT ERROR:",
             err
         );
 
@@ -1642,7 +1633,10 @@ async function createEvent(){
 
         alert(
             "Unable to create event:\n\n" +
-            err.message
+            (
+                err.message ||
+                err
+            )
         );
 
 
@@ -1660,17 +1654,8 @@ async function createEvent(){
 
 function showSuccess(result){
 
-    document
-        .getElementById(
-            "eventFormCard"
-        )
-        .style.display =
-            "none";
-
-
     /*
-     * Hide the other configuration
-     * cards.
+     * Hide every configuration card.
      */
 
     document
@@ -1698,6 +1683,10 @@ function showSuccess(result){
         "block";
 
 
+    /*
+     * Event name.
+     */
+
     document
         .getElementById(
             "resultEventName"
@@ -1706,6 +1695,10 @@ function showSuccess(result){
             result.eventName ||
             "";
 
+
+    /*
+     * Spreadsheet ID.
+     */
 
     document
         .getElementById(
@@ -1716,11 +1709,19 @@ function showSuccess(result){
             "";
 
 
+    /*
+     * Form URL.
+     */
+
     const formUrl =
         result.formUrl ||
         result.editUrl ||
         "";
 
+
+    /*
+     * Responder URL.
+     */
 
     const responderUrl =
         result.responderUrl ||
@@ -1739,6 +1740,10 @@ function showSuccess(result){
         formUrl;
 
 
+    /*
+     * Responder link.
+     */
+
     const responderLink =
         document
             .getElementById(
@@ -1749,6 +1754,10 @@ function showSuccess(result){
     responderLink.href =
         responderUrl;
 
+
+    /*
+     * QR Code.
+     */
 
     const qr =
         document
@@ -1762,6 +1771,15 @@ function showSuccess(result){
         qr.src =
             result.qrUrl;
 
+        qr.style.display =
+            "inline-block";
+
+    }
+    else{
+
+        qr.style.display =
+            "none";
+
     }
 
 }
@@ -1771,3 +1789,28 @@ function showSuccess(result){
 </body>
 
 </html>
+```
+
+The critical changes are:
+
+```javascript
+async function handleCreateEvent(){
+```
+
+and:
+
+```html
+onclick="handleCreateEvent()"
+```
+
+while this remains:
+
+```javascript
+runScript("createEvent", {...})
+```
+
+So your frontend is now calling:
+
+**`handleCreateEvent()` → `API.post("createEvent")` → `doPost()` → `case "createEvent"` → backend `createEvent()`**
+
+This separates the **browser function name** from the **Apps Script action/backend function name**, which is what was causing your current error.
