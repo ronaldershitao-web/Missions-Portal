@@ -3135,6 +3135,10 @@ async function preparePublicityWhatsApp(
    MANUAL WHATSAPP PUBLICITY
 ========================================================= */
 
+/* =========================================================
+   MANUAL WHATSAPP PUBLICITY
+========================================================= */
+
 async function openManualPublicityWhatsApp(index){
 
     const person =
@@ -3153,14 +3157,11 @@ async function openManualPublicityWhatsApp(index){
         .toUpperCase();
 
 
-    /*
-        Do not allow publicity to be sent twice.
-    */
-
     if(status === "SENT"){
 
         alert(
-            `${getPersonName(person)} has already received publicity for this event.`
+            getPersonName(person) +
+            " has already received publicity for this event."
         );
 
         return;
@@ -3176,7 +3177,8 @@ async function openManualPublicityWhatsApp(index){
     if(!phone){
 
         alert(
-            `${getPersonName(person)} does not have a valid mobile number.`
+            getPersonName(person) +
+            " does not have a valid mobile number."
         );
 
         return;
@@ -3207,8 +3209,7 @@ async function openManualPublicityWhatsApp(index){
 
 
     /*
-        Notify backend that WhatsApp is being prepared.
-        This records OPENED.
+        Record that WhatsApp publicity was prepared.
     */
 
     await preparePublicityWhatsApp(
@@ -3218,7 +3219,7 @@ async function openManualPublicityWhatsApp(index){
 
 
     /*
-        Generate WhatsApp URL.
+        Open WhatsApp.
     */
 
     const url =
@@ -3230,10 +3231,6 @@ async function openManualPublicityWhatsApp(index){
         );
 
 
-    /*
-        Open WhatsApp.
-    */
-
     window.open(
         url,
         "_blank"
@@ -3241,9 +3238,8 @@ async function openManualPublicityWhatsApp(index){
 
 
     /*
-        IMPORTANT:
-        Publicity is now immediately marked SENT
-        when the WhatsApp button is pressed.
+        Immediately mark Publicity as SENT
+        after the WhatsApp button is pressed.
     */
 
     await markCommunicationSent(
@@ -3254,7 +3250,8 @@ async function openManualPublicityWhatsApp(index){
     );
 
 }
-```
+
+
 
 
 
