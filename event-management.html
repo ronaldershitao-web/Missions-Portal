@@ -377,35 +377,38 @@ onclick="window.location='dashboard.html'">
 
 <div class="controls">
 
-<input
+    <input
+        id="searchBox"
+        placeholder="Search Event Name...">
 
-id="searchBox"
+    <select id="statusFilter">
 
-placeholder="Search Event Name...">
+        <option value="ALL">
+            All Status
+        </option>
 
-<select id="statusFilter">
+        <option value="ACTIVE">
+            Active
+        </option>
 
-<option value="ALL">
+        <option value="CLOSED">
+            Closed
+        </option>
 
-All Status
+    </select>
 
-</option>
+    <button
+        class="actionBtn manageBtn"
+        onclick="openAddEvent()"
+        style="padding:10px 16px;font-size:14px;">
 
-<option value="ACTIVE">
+        ➕ Add Event
 
-Active
-
-</option>
-
-<option value="CLOSED">
-
-Closed
-
-</option>
-
-</select>
+    </button>
 
 </div>
+
+    
 
 <div class="tableCard">
 
@@ -1076,6 +1079,12 @@ async function reopenEvent(id){
 
 window.location.href=
 `walkin.html?event=${currentEvent}`;
+
+}
+
+    function openAddEvent(){
+
+    window.location.href = "add-event.html";
 
 }
 
