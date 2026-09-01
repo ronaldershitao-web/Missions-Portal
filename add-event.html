@@ -1878,68 +1878,89 @@ document
 
 
 const formUrl =
-    result.formUrl ||
-    result.editUrl ||
-    "";
-
+  result.formUrl ||
+  result.editUrl ||
+  "";
 
 const responderUrl =
-    result.responderUrl ||
-    result.formUrl ||
-    "";
+  result.responderUrl ||
+  "";
 
-
-const formLink =
-    document
-        .getElementById(
-            "resultFormUrl"
-        );
-
-
-formLink.href =
-    formUrl;
-
-
-const responderLink =
-    document
-        .getElementById(
-            "resultResponderUrl"
-        );
-
-
-responderLink.href =
-    responderUrl;
+console.log("FORM URL:", formUrl);
+console.log("REGISTRATION URL:", responderUrl);
 
 
 /*
- * Generate QR code from responder URL.
- *
- * Uses Google Chart-compatible QR endpoint.
+ * GOOGLE FORM EDITOR
  */
+const formLink =
+  document.getElementById(
+    "resultFormUrl"
+  );
 
+formLink.href =
+  formUrl;
+
+formLink.textContent =
+  "Open Google Form";
+
+formLink.target =
+  "_blank";
+
+formLink.rel =
+  "noopener";
+
+
+/*
+ * PUBLIC REGISTRATION FORM
+ */
+const responderLink =
+  document.getElementById(
+    "resultResponderUrl"
+  );
+
+responderLink.href =
+  responderUrl;
+
+responderLink.textContent =
+  "Open Registration Form";
+
+responderLink.target =
+  "_blank";
+
+responderLink.rel =
+  "noopener";
+
+
+/*
+ * QR CODE
+ *
+ * QR MUST point to the public
+ * registration form.
+ */
 const qr =
-    document
-        .getElementById(
-            "resultQr"
-        );
-
+  document.getElementById(
+    "resultQr"
+  );
 
 if(responderUrl){
 
-    qr.src =
-        "https://quickchart.io/qr?size=300&text=" +
-        encodeURIComponent(
-            responderUrl
-        );
+  qr.src =
+    "https://quickchart.io/qr?size=300&text=" +
+    encodeURIComponent(
+      responderUrl
+    );
 
-    qr.style.display =
-        "inline-block";
+  qr.style.display =
+    "inline-block";
 
 }
 else{
 
-    qr.style.display =
-        "none";
+  qr.removeAttribute("src");
+
+  qr.style.display =
+    "none";
 
 }
 
