@@ -1825,147 +1825,259 @@ catch(err){
 * SHOW SUCCESS
   *****************************************************/
 
-function showSuccess(result){
 
+function showSuccess(result) {
 
-console.log(
-    "CREATE EVENT SUCCESS:",
-    result
-);
-
-
-document
-    .querySelectorAll(
-        ".card"
-    )
-    .forEach(
-        function(card){
-
-            card.style.display =
-                "none";
-
-        }
+    console.log(
+        "CREATE EVENT SUCCESS:",
+        result
     );
 
 
-const success =
+    /***************************************************
+     * HIDE EVENT CREATION CARDS
+     ***************************************************/
+
     document
-        .getElementById(
+        .querySelectorAll(".card")
+        .forEach(function(card) {
+
+            card.style.display = "none";
+
+        });
+
+
+    /***************************************************
+     * SHOW SUCCESS CARD
+     ***************************************************/
+
+    const success =
+        document.getElementById(
             "successCard"
         );
 
 
-success.style.display =
-    "block";
+    success.style.display =
+        "block";
 
 
-document
-    .getElementById(
-        "resultEventName"
-    )
-    .textContent =
+    /***************************************************
+     * EVENT NAME
+     ***************************************************/
+
+    const eventName =
         result.eventName ||
         "";
 
 
-document
-    .getElementById(
-        "resultSpreadsheetId"
-    )
-    .textContent =
+    document
+        .getElementById(
+            "resultEventName"
+        )
+        .textContent =
+            eventName;
+
+
+    /***************************************************
+     * SPREADSHEET ID
+     ***************************************************/
+
+    const spreadsheetId =
         result.spreadsheetId ||
+        result.sourceSpreadsheetId ||
         "";
 
 
-const formUrl =
-  result.formUrl ||
-  result.editUrl ||
-  "";
-
-const responderUrl =
-  result.responderUrl ||
-  "";
-
-console.log("FORM URL:", formUrl);
-console.log("REGISTRATION URL:", responderUrl);
+    document
+        .getElementById(
+            "resultSpreadsheetId"
+        )
+        .textContent =
+            spreadsheetId;
 
 
-/*
- * GOOGLE FORM EDITOR
- */
-const formLink =
-  document.getElementById(
-    "resultFormUrl"
-  );
+    /***************************************************
+     * GOOGLE FORM EDITOR URL
+     ***************************************************/
 
-formLink.href =
-  formUrl;
-
-formLink.textContent =
-  "Open Google Form";
-
-formLink.target =
-  "_blank";
-
-formLink.rel =
-  "noopener";
+    const editUrl =
+        result.editUrl ||
+        result.formUrl ||
+        "";
 
 
-/*
- * PUBLIC REGISTRATION FORM
- */
-const responderLink =
-  document.getElementById(
-    "resultResponderUrl"
-  );
-
-responderLink.href =
-  responderUrl;
-
-responderLink.textContent =
-  "Open Registration Form";
-
-responderLink.target =
-  "_blank";
-
-responderLink.rel =
-  "noopener";
-
-
-/*
- * QR CODE
- *
- * QR MUST point to the public
- * registration form.
- */
-const qr =
-  document.getElementById(
-    "resultQr"
-  );
-
-if(responderUrl){
-
-  qr.src =
-    "https://quickchart.io/qr?size=300&text=" +
-    encodeURIComponent(
-      responderUrl
+    console.log(
+        "GOOGLE FORM EDIT URL:",
+        editUrl
     );
 
-  qr.style.display =
-    "inline-block";
+
+    const formLink =
+        document.getElementById(
+            "resultFormUrl"
+        );
+
+
+    if (editUrl) {
+
+        formLink.href =
+            editUrl;
+
+        formLink.textContent =
+            "Open Google Form";
+
+        formLink.target =
+            "_blank";
+
+        formLink.rel =
+            "noopener noreferrer";
+
+        formLink.style.display =
+            "inline";
+
+    }
+    else {
+
+        formLink.removeAttribute(
+            "href"
+        );
+
+        formLink.textContent =
+            "Google Form URL unavailable";
+
+    }
+
+
+    /***************************************************
+     * PUBLIC REGISTRATION URL
+     ***************************************************/
+
+    const responderUrl =
+        result.registrationUrl ||
+        result.responderUrl ||
+        "";
+
+
+    console.log(
+        "REGISTRATION URL:",
+        responderUrl
+    );
+
+
+    const responderLink =
+        document.getElementById(
+            "resultResponderUrl"
+        );
+
+
+    if (responderUrl) {
+
+        responderLink.href =
+            responderUrl;
+
+        responderLink.textContent =
+            "Open Registration Form";
+
+        responderLink.target =
+            "_blank";
+
+        responderLink.rel =
+            "noopener noreferrer";
+
+        responderLink.style.display =
+            "inline";
+
+    }
+    else {
+
+        responderLink.removeAttribute(
+            "href"
+        );
+
+        responderLink.textContent =
+            "Registration URL unavailable";
+
+    }
+
+
+    /***************************************************
+     * QR CODE
+     *
+     * QR MUST contain the PUBLIC REGISTRATION URL.
+     ***************************************************/
+
+    const qr =
+        document.getElementById(
+            "resultQr"
+        );
+
+
+    if (responderUrl) {
+
+        qr.src =
+            "https://quickchart.io/qr?size=300&text=" +
+            encodeURIComponent(
+                responderUrl
+            );
+
+
+        qr.alt =
+            "Registration QR Code for " +
+            eventName;
+
+
+        qr.style.display =
+            "inline-block";
+
+    }
+    else {
+
+        qr.removeAttribute(
+            "src"
+        );
+
+
+        qr.alt =
+            "Registration QR Code unavailable";
+
+
+        qr.style.display =
+            "none";
+
+    }
+
+
+    /***************************************************
+     * DEBUG
+     ***************************************************/
+
+    console.log(
+        "SUCCESS DISPLAY:",
+        {
+            eventName:
+                eventName,
+
+            spreadsheetId:
+                spreadsheetId,
+
+            editUrl:
+                editUrl,
+
+            responderUrl:
+                responderUrl,
+
+            qrUrl:
+                responderUrl
+                    ? "https://quickchart.io/qr?size=300&text=" +
+                      encodeURIComponent(responderUrl)
+                    : ""
+
+        }
+    );
 
 }
-else{
-
-  qr.removeAttribute("src");
-
-  qr.style.display =
-    "none";
-
-}
 
 
-}
 
 </script>
 
