@@ -1,1175 +1,3061 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Missions Portal - Dashboard</title>
-  <link 
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-rel="stylesheet">
 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Missions Management System</title>
+
+  <!-- =====================================================
+       BOOTSTRAP
+  ====================================================== -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- =====================================================
+       BOOTSTRAP ICONS
+  ====================================================== -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- =====================================================
+       GOOGLE IDENTITY SERVICES
+  ====================================================== -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="./js/config.js"></script>
 
-<script src="./js/api.js"></script>
+  <!-- =====================================================
+       YOUR CONFIG / API / AUTH
+  ====================================================== -->
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
 
-<script src="./js/auth.js"></script>
+
   <style>
-    
+
+    /* =====================================================
+       GENERAL
+    ====================================================== */
+
     body {
+      background: #f5f7fa;
+      font-family: Arial, Helvetica, sans-serif;
       margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
+      padding: 0;
     }
 
-    /* SIDEBAR */
+    .hidden {
+      display: none !important;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+    }
+
+
+    /* =====================================================
+       SIDEBAR
+    ====================================================== */
+
     .sidebar {
-      width: 220px;
-      background: #1e3a8a;
+      width: 250px;
+      min-height: 100vh;
+      background: #1f2937;
       color: white;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 1000;
     }
 
-    .sidebar h2 {
+    .sidebar-header {
+      padding: 22px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-header h4 {
+      margin: 0;
       font-size: 18px;
+      font-weight: 600;
+    }
+
+    .sidebar-header small {
+      color: #9ca3af;
+    }
+
+    .sidebar-menu {
+      padding: 15px 10px;
+    }
+
+    .sidebar-menu button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      color: #d1d5db;
+      padding: 11px 14px;
+      border-radius: 7px;
+      margin-bottom: 4px;
+      transition: 0.2s;
+    }
+
+    .sidebar-menu button:hover {
+      background: #374151;
+      color: white;
+    }
+
+    .sidebar-menu button.active {
+      background: #4b5563;
+      color: white;
+    }
+
+    .sidebar-menu i {
+      width: 22px;
+      margin-right: 7px;
+    }
+
+
+    /* =====================================================
+       MAIN CONTENT
+    ====================================================== */
+
+    .main-content {
+      margin-left: 250px;
+      min-height: 100vh;
+      padding: 25px;
+    }
+
+    .topbar {
+      background: white;
+      border-radius: 10px;
+      padding: 16px 20px;
       margin-bottom: 20px;
-    }
-
-    .nav-item {
-      padding: 10px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .nav-item:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    /* MAIN */
-    .main {
-      flex: 1;
-      padding: 20px;
-      background: #f4f6f8;
-    }
-
-    .header {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
+    .topbar-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .welcome-user {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+
+    /* =====================================================
+       CARDS
+    ====================================================== */
+
     .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
       background: white;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
+      border-bottom: 1px solid #e5e7eb;
     }
 
-    .hidden {
-      display: none;
+
+    /* =====================================================
+       USER TABLE
+    ====================================================== */
+
+    #usersTable td,
+    #usersTable th {
+      vertical-align: middle;
     }
 
-    .logout-btn {
-      background: red;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
+    .user-actions {
+      white-space: nowrap;
     }
 
-    /* INTERN GRID */
-    .intern-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-top: 15px;
+    .status-badge {
+      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: 20px;
     }
 
-    .task-card {
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      border-left: 5px solid #1e3a8a;
-    }
 
-    .task-card button {
-      margin-top: 10px;
-      padding: 8px 12px;
-      border: none;
-      background: #1e3a8a;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    /* =====================================================
+       MOBILE
+    ====================================================== */
 
-    .task-card button:hover {
-      background: #163172;
+    @media (max-width: 768px) {
+
+      .sidebar {
+        width: 210px;
+      }
+
+      .main-content {
+        margin-left: 210px;
+        padding: 15px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
     }
 
   </style>
+
 </head>
+
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<div class="page-wrapper">
 
-  <h2>Missions Portal</h2>
 
-  <div class="nav-item" onclick="showSection('home')">Home</div>
+  <!-- =====================================================
+       SIDEBAR
+  ====================================================== -->
 
-  <div class="nav-item admin-only" onclick="showSection('admin')">
-    User Access Control
-  </div>
+  <aside class="sidebar">
 
-<div class="nav-item pastoral-only" onclick="openEventManager()">
-    Event Management
-</div>
+    <div class="sidebar-header">
 
-  <div class="nav-item intern-only" onclick="openReminderCentre()()">
-    Reminder Management
-</div>
+      <h4>
+        <i class="bi bi-globe2"></i>
+        Missions Management
+      </h4>
 
-<div class="nav-item intern-only" onclick="showSection('migration')">
-    Data Migrations
-</div>
-
-  <div class="nav-item pastoral-only" onclick="openReports()">
-    Missions Intelligence Center
-  </div>
-
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-  <div class="header">
-    <h2 id="welcomeText">Welcome</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
-  <!-- HOME -->
-  <div id="home" class="card">
-    <h3>Dashboard Home</h3>
-    <p>Overview of ministry activity will go here.</p>
-  </div>
-
-  <!-- INTERN -->
-  <div id="intern" class="card hidden intern-only">
-
-    <h3>Intern Workspace</h3>
-    <p>Welcome Intern. Execute your assigned tasks below.</p>
-
-    <div class="intern-grid">
-
-    <!-- DATA MIGRATION -->
-   
-    
-
-    <!-- COMMUNICATION -->
-
-    <div class="task-card">
-
-        <h3>💬 Communications</h3>
-
-        <p>Send personalised reminders and follow-up messages.</p>
-
-        <button onclick="openReminderCentre()">
-            Reminder Centre
-        </button>
+      <small>
+        Missions Portal
+      </small>
 
     </div>
 
-    <!-- REPORTS -->
 
-    <div class="task-card">
+    <div class="sidebar-menu">
 
-        <h3>📊 Reports</h3>
+      <!-- HOME -->
+      <button
+        type="button"
+        onclick="showSection('home')"
+        class="active"
+      >
+        <i class="bi bi-house"></i>
+        Home
+      </button>
 
-        <p>Attendance, registration and ministry analytics.</p>
 
-        <button onclick="openReports()">
-            View Reports
-        </button>
+      <!-- USER ACCESS CONTROL -->
+      <button
+        type="button"
+        onclick="showSection('admin')"
+        class="admin-only"
+      >
+        <i class="bi bi-people"></i>
+        User Access Control
+      </button>
+
+
+      <!-- EVENT MANAGEMENT -->
+      <button
+        type="button"
+        onclick="showSection('events')"
+        class="pastoral-only"
+      >
+        <i class="bi bi-calendar-event"></i>
+        Event Management
+      </button>
+
+
+      <!-- REMINDER MANAGEMENT -->
+      <button
+        type="button"
+        onclick="openReminderCentre()"
+        class="intern-only"
+      >
+        <i class="bi bi-bell"></i>
+        Reminder Management
+      </button>
+
+
+      <!-- DATA MIGRATIONS -->
+      <button
+        type="button"
+        onclick="showSection('migrations')"
+        class="intern-only"
+      >
+        <i class="bi bi-arrow-repeat"></i>
+        Data Migrations
+      </button>
+
+
+      <!-- MISSIONS INTELLIGENCE -->
+      <button
+        type="button"
+        onclick="showSection('intelligence')"
+        class="pastoral-only"
+      >
+        <i class="bi bi-bar-chart-line"></i>
+        Missions Intelligence Center
+      </button>
+
+
+      <!-- LOGOUT -->
+      <button
+        type="button"
+        onclick="logout()"
+        class="mt-4"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        Logout
+      </button>
 
     </div>
 
-</div>
-  </div>
+  </aside>
 
-  <!-- ADMIN -->
-<div id="admin" class="card hidden admin-only">
 
-   <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <div>
-        <h3 class="mb-1">
-            User Access Control
-        </h3>
+  <!-- =====================================================
+       MAIN CONTENT
+  ====================================================== -->
 
-        <small class="text-muted">
-            Manage portal users, roles and access status
-        </small>
+  <main class="main-content">
+
+
+    <!-- ===================================================
+         TOP BAR
+    ==================================================== -->
+
+    <div class="topbar">
+
+      <div>
+
+        <h1
+          class="topbar-title"
+          id="pageTitle"
+        >
+          Dashboard
+        </h1>
+
+      </div>
+
+
+      <div class="welcome-user">
+
+        Welcome,
+        <strong id="welcomeUser">
+          User
+        </strong>
+
+      </div>
+
     </div>
 
-    <div class="d-flex gap-2">
-
-        <button 
-            class="btn btn-primary"
-            onclick="showNewUserModal()">
-
-            <i class="bi bi-person-plus"></i>
-            New User
-
-        </button>
-
-        <button 
-            class="btn btn-outline-secondary"
-            onclick="loadUsers()">
-
-            <i class="bi bi-arrow-clockwise"></i>
-            Refresh
-
-        </button>
-
-    </div>
-
-</div>
 
 
-    <div class="shadow-sm">
+    <!-- ===================================================
+         HOME
+    ==================================================== -->
+
+    <section
+      id="home"
+      class="content-section"
+    >
+
+      <div class="card">
+
+        <div class="card-body p-4">
+
+          <h3>
+            <i class="bi bi-house-door"></i>
+            Welcome to Missions Management System
+          </h3>
+
+          <p class="text-muted mb-0">
+            Select a module from the menu to get started.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
 
 
+
+    <!-- ===================================================
+         USER ACCESS CONTROL
+    ==================================================== -->
+
+    <section
+      id="admin"
+      class="content-section hidden admin-only"
+    >
+
+      <div class="card">
+
+
+        <!-- HEADER -->
+        <div class="card-header p-3">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+              <h5 class="mb-1">
+
+                <i class="bi bi-shield-lock"></i>
+
+                User Access Control
+
+              </h5>
+
+              <small class="text-muted">
+
+                Manage users, roles and access status.
+
+              </small>
+
+            </div>
+
+
+            <div class="d-flex gap-2">
+
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="showNewUserModal()"
+              >
+
+                <i class="bi bi-person-plus"></i>
+
+                New User
+
+              </button>
+
+
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="loadUsers()"
+              >
+
+                <i class="bi bi-arrow-clockwise"></i>
+
+                Refresh
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- BODY -->
         <div class="card-body">
 
 
-            <div class="row mb-3">
+          <!-- SEARCH -->
 
+          <div class="row mb-3">
 
-                <div class="col-md-6">
+            <div class="col-md-6">
 
-                    <input 
-                    id="userSearch"
-                    class="form-control"
-                    placeholder="Search name or email..."
-                    onkeyup="filterUsers()">
+              <div class="input-group">
 
-                </div>
+                <span class="input-group-text">
 
+                  <i class="bi bi-search"></i>
 
-            </div>
+                </span>
 
+                <input
+                  type="text"
+                  id="userSearch"
+                  class="form-control"
+                  placeholder="Search name, email, role or status..."
+                  onkeyup="filterUsers()"
+                >
 
-
-            <div class="table-responsive">
-
-
-                <table class="table table-hover align-middle">
-
-
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th>Name</th>
-
-                            <th>Email</th>
-
-                            <th>Role</th>
-
-                            <th>Status</th>
-
-                            <th>Last Login</th>
-
-                            <th>Action</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="usersTable">
-
-
-                        <tr>
-
-                            <td colspan="6"
-                            class="text-center text-muted">
-
-                                Click refresh to load users
-
-                            </td>
-
-                        </tr>
-
-
-                    </tbody>
-
-
-                </table>
-
+              </div>
 
             </div>
+
+          </div>
+
+
+
+          <!-- TABLE -->
+
+          <div class="table-responsive">
+
+            <table
+              class="table table-hover align-middle"
+            >
+
+              <thead>
+
+                <tr>
+
+                  <th>Name</th>
+
+                  <th>Email</th>
+
+                  <th>Role</th>
+
+                  <th>Status</th>
+
+                  <th>Last Login</th>
+
+                  <th class="text-end">
+                    Action
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody id="usersTable">
+
+                <tr>
+
+                  <td
+                    colspan="6"
+                    class="text-center text-muted py-4"
+                  >
+
+                    Loading users...
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
 
 
         </div>
 
+      </div>
 
-    </div>
+    </section>
 
+
+
+    <!-- ===================================================
+         EVENT MANAGEMENT
+    ==================================================== -->
+
+    <section
+      id="events"
+      class="content-section hidden pastoral-only"
+    >
+
+      <div class="card">
+
+        <div class="card-body p-4">
+
+          <h4>
+
+            <i class="bi bi-calendar-event"></i>
+
+            Event Management
+
+          </h4>
+
+          <p class="text-muted">
+            Event management module.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         DATA MIGRATIONS
+    ==================================================== -->
+
+    <section
+      id="migrations"
+      class="content-section hidden intern-only"
+    >
+
+      <div class="card">
+
+        <div class="card-body p-4">
+
+          <h4>
+
+            <i class="bi bi-arrow-repeat"></i>
+
+            Data Migrations
+
+          </h4>
+
+          <p class="text-muted">
+            Data migration module.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         MISSIONS INTELLIGENCE
+    ==================================================== -->
+
+    <section
+      id="intelligence"
+      class="content-section hidden pastoral-only"
+    >
+
+      <div class="card">
+
+        <div class="card-body p-4">
+
+          <h4>
+
+            <i class="bi bi-bar-chart-line"></i>
+
+            Missions Intelligence Center
+
+          </h4>
+
+          <p class="text-muted">
+            Missions intelligence dashboard.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
 
 </div>
 
-  <!-- CELL -->
-  <!-- EVENT MANAGEMENT -->
 
-  <!-- EVENT MANAGEMENT -->
 
-<div id="event" class="card hidden cell-only">
+<!-- =======================================================
+     NEW / RESTORE USER MODAL
+======================================================== -->
 
-    <h3>📅 Event Management</h3>
+<div
+  class="modal fade"
+  id="newUserModal"
+  tabindex="-1"
+  aria-labelledby="newUserModalLabel"
+  aria-hidden="true"
+>
 
-    <p>Manage imported events.</p>
+  <div class="modal-dialog modal-dialog-centered">
 
-    <ul style="padding-left:18px;">
-        <li>View events</li>
-        <li>Sync registrations</li>
-        <li>Close events</li>
-        <li>View participant count</li>
-    </ul>
+    <div class="modal-content">
 
-    <button onclick="openEventManager()">
-        Open Event Manager
-    </button>
 
-</div>
+      <!-- MODAL HEADER -->
 
-  <!-- PASTORAL -->
-   <div id="migration" class="card hidden pastoral-only">
+      <div class="modal-header">
 
-        <h3>📥 Data Migration</h3>
+        <h5
+          class="modal-title"
+          id="newUserModalLabel"
+        >
 
-        <p>Import a Google Form response sheet into the Missions Portal.</p>
+          <i class="bi bi-person-plus"></i>
 
-        <input
-            id="sheetUrl"
-            placeholder="Paste Google Sheet URL"
-            style="width:100%;padding:8px;">
+          New User
 
-        <input
-            type="date"
-            id="importEventDate"
-            style="width:100%;padding:8px;margin-top:8px;">
+        </h5>
 
-        <select
-            id="importEventType"
-            style="width:100%;padding:8px;margin-top:8px;">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          onclick="closeNewUserModal()"
+        ></button>
 
-            <option value="FIRESIDE">Fireside Chat</option>
-            <option value="WORKSHOP">Workshop</option>
-            <option value="PRAYER">Prayer Meeting</option>
-          <option value="MISSION">Short Term Mission Trip</option>
+      </div>
 
-        </select>
 
-        <input
-            id="importEventName"
-            placeholder="Event Name"
-            style="width:100%;padding:8px;margin-top:8px;">
 
-        <button onclick="importSheet()">
-            Import Event
+      <!-- MODAL BODY -->
+
+      <div class="modal-body">
+
+
+        <!-- EMAIL -->
+
+        <div id="newUserEmailSection">
+
+          <label
+            for="newUserEmail"
+            class="form-label fw-semibold"
+          >
+
+            Google Account Email
+
+          </label>
+
+          <input
+            type="email"
+            id="newUserEmail"
+            class="form-control"
+            placeholder="user@gmail.com"
+            autocomplete="off"
+          >
+
+          <div class="form-text">
+
+            Enter the user's Google account email.
+
+          </div>
+
+        </div>
+
+
+
+        <!-- EXISTING USER WARNING -->
+
+        <div
+          id="existingUserWarning"
+          class="alert alert-warning mt-3 hidden"
+        >
+
+          <div class="d-flex">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            <div>
+
+              <strong id="existingUserTitle">
+                User already exists
+              </strong>
+
+              <div
+                id="existingUserMessage"
+                class="mt-1"
+              ></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- RESTORE USER PANEL -->
+
+        <div
+          id="restoreUserPanel"
+          class="hidden mt-3"
+        >
+
+          <div class="alert alert-info">
+
+            <div class="d-flex">
+
+              <i class="bi bi-person-check-fill me-2"></i>
+
+              <div>
+
+                <strong>
+                  Archived User Found
+                </strong>
+
+                <div class="small mt-1">
+
+                  This email belongs to a previously archived
+                  user. You can restore the user and assign a
+                  new authorization.
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- USER DETAILS -->
+
+          <div class="card bg-light border mb-3">
+
+            <div class="card-body">
+
+              <div class="row mb-2">
+
+                <div class="col-5 text-muted">
+                  Name
+                </div>
+
+                <div
+                  class="col-7 fw-semibold"
+                  id="restoreUserName"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="row mb-2">
+
+                <div class="col-5 text-muted">
+                  Email
+                </div>
+
+                <div
+                  class="col-7"
+                  id="restoreUserEmail"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="row">
+
+                <div class="col-5 text-muted">
+                  Previous Authorization
+                </div>
+
+                <div
+                  class="col-7"
+                  id="restoreUserPreviousRole"
+                >
+                  -
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- NEW AUTHORIZATION -->
+
+          <label
+            for="restoreUserRole"
+            class="form-label fw-semibold"
+          >
+
+            New Authorization
+
+          </label>
+
+          <select
+            id="restoreUserRole"
+            class="form-select"
+          >
+
+            <option value="">
+              Select authorization
+            </option>
+
+            <option value="Admin">
+              Administrator
+            </option>
+
+            <option value="Support">
+              Support
+            </option>
+
+            <option value="Pastor">
+              Pastor
+            </option>
+
+            <option value="Intern">
+              Intern
+            </option>
+
+          </select>
+
+
+          <div class="form-text">
+
+            The restored user will be set to
+            <strong>Active</strong>.
+
+          </div>
+
+        </div>
+
+
+
+        <!-- ERROR MESSAGE -->
+
+        <div
+          id="newUserError"
+          class="alert alert-danger mt-3 hidden"
+        ></div>
+
+
+        <!-- SUCCESS MESSAGE -->
+
+        <div
+          id="newUserSuccess"
+          class="alert alert-success mt-3 hidden"
+        ></div>
+
+
+      </div>
+
+
+
+      <!-- MODAL FOOTER -->
+
+      <div class="modal-footer">
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="closeNewUserModal()"
+        >
+
+          Cancel
+
         </button>
 
-    </div>
+
+        <!-- ADD NEW USER -->
+
+        <button
+          type="button"
+          id="addUserButton"
+          class="btn btn-primary"
+          onclick="addNewUser()"
+        >
+
+          <i class="bi bi-person-plus"></i>
+
+          Add User
+
+        </button>
 
 
-</div>
+        <!-- RESTORE USER -->
 
-  <div class="modal fade" id="newUserModal" tabindex="-1" aria-hidden="true">
+        <button
+          type="button"
+          id="restoreUserButton"
+          class="btn btn-success hidden"
+          onclick="restoreArchivedUser()"
+        >
 
-    <div class="modal-dialog modal-dialog-centered">
+          <i class="bi bi-person-check"></i>
 
-        <div class="modal-content">
+          Restore User
 
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Add New User
-                </h5>
+        </button>
 
-                <button 
-                    type="button" 
-                    class="btn-close" 
-                    data-bs-dismiss="modal">
-                </button>
-            </div>
 
-            <div class="modal-body">
+      </div>
 
-                <div class="mb-3">
-
-                    <label for="newUserEmail" class="form-label">
-                        Email Address
-                    </label>
-
-                    <input 
-                        type="email"
-                        class="form-control"
-                        id="newUserEmail"
-                        placeholder="user@example.com"
-                        required>
-
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-
-                <button 
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal">
-                    Cancel
-                </button>
-
-                <button 
-                    type="button"
-                    class="btn btn-primary"
-                    onclick="addNewUser()">
-                    <i class="bi bi-person-plus"></i>
-                    Add User
-                </button>
-
-            </div>
-
-        </div>
 
     </div>
 
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
 
+</div>
+
+
+
+<!-- =======================================================
+     JAVASCRIPT
+======================================================== -->
 
 <script>
 
-  // =========================
-  // LOAD USER
-  // =========================
-  const user = JSON.parse(localStorage.getItem("mp_user"));
 
-  if (!user) {
-    window.location.href = "index.html";
-  }
+/* =========================================================
+   CURRENT USER
+========================================================= */
 
-  document.getElementById("welcomeText").innerText =
-    `Welcome, ${user.name} (${user.role})`;
+let user = null;
 
-  // =========================
-  // ROLE ACCESS CONTROL (SCALABLE)
-  // =========================
-  function applyRoleAccess() {
+try {
 
-    const role = user.role;
+  user = JSON.parse(
+    localStorage.getItem("mp_user")
+  );
 
-    const hide = (selector) => {
-      document.querySelectorAll(selector).forEach(el => el.style.display = "none");
-    };
+} catch (error) {
 
-    // Admin only
-    if (role !== "Admin") {
-      hide(".admin-only");
-    }
-
-    // Cell + Admin
-    if (!["Admin", "Support"].includes(role)) {
-      hide(".cell-only");
-    }
-
-    // Pastor + Admin
-    if (!["Admin", ,"Support","Pastor"].includes(role)) {
-      hide(".pastoral-only");
-    }
-
-    if (!["Admin", "Pastor", "Support","Intern"].includes(role)) {
-    hide(".intern-only");
-}
-
-
-  }
-
-  applyRoleAccess();
-
-  // =========================
-  // NAVIGATION
-  // =========================
-  function showSection(id) {
-
-    document.querySelectorAll(
-        ".main > .card"
-    ).forEach(card => {
-        card.classList.add("hidden");
-    });
-
-
-    const section = document.getElementById(id);
-
-    if(section){
-        section.classList.remove("hidden");
-    }
-
-
-    // Auto load users when Admin opens
-    if(id === "admin"){
-        loadUsers();
-    }
+  console.error(
+    "Unable to read mp_user:",
+    error
+  );
 
 }
 
-  // =========================
-  // INTERN ACTIONS (STUBS)
-  // =========================
-  function openFormBuilder() {
-    alert("Form Builder module coming soon");
+
+/* =========================================================
+   PAGE INITIALISATION
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    initialiseDashboard();
+
   }
-
-  function openDataView() {
-    alert("Data Analysis module coming soon");
-  }
-
-  function openMaterialPrep() {
-    alert("Material Preparation module coming soon");
-  }
-
-  function openReminderTool() {
-    alert("Reminder Tool coming soon");
-  }
-
-async function importSheet() {
-
-    const url = document.getElementById("sheetUrl").value;
-    const eventDate = document.getElementById("importEventDate").value;
-    const eventType = document.getElementById("importEventType").value;
-    const eventName = document.getElementById("importEventName").value;
-
-    const user = JSON.parse(
-        localStorage.getItem("mp_user")
-    );
-
-    if (!url || !eventDate || !eventName) {
-
-        alert("Please complete all fields.");
-        return;
-
-    }
-
-    try {
-
-        let result;
-
-        // =====================================
-        // SHORT TERM MISSION TRIP
-        // =====================================
-        if (eventType === "MISSION") {
-
-            result = await API.post(
-                "importMissionTripSheet",
-                {
-                    url: url,
-                    missionDate: eventDate,
-                    eventName: eventName,
-                    importedBy: user.email
-                }
-            );
-
-        }
-
-        // =====================================
-        // GENERAL EVENTS
-        // =====================================
-        else {
-
-            result = await API.post(
-                "importExternalSheet",
-                {
-                    url: url,
-                    eventDate: eventDate,
-                    eventType: eventType,
-                    eventName: eventName,
-                    importedBy: user.email
-                }
-            );
-
-        }
-
-        console.log(result);
-
-        if (result.success) {
-
-            alert(result.message);
-
-        } else {
-
-            alert(result.message);
-
-        }
-
-    }
-    catch (err) {
-
-        console.error("IMPORT ERROR:", err);
-
-        alert(err.message || "Server error");
-
-    }
-
-}
-
-  function openEventManager() {
-
-    window.location.href = "event-management.html";
-
-}
-
-function openReminderCentre() {
-
-    window.location.href = "communications.html";
-
-}
-
-function openReports() {
-
-    window.location.href = "reports.html";
-
-}
-  // =========================
-  // LOGOUT
-  // =========================
-  function logout() {
-    localStorage.removeItem("mp_user");
-    window.location.href = "index.html";
-  }
-
-async function loadUsers(){
-
-    try {
-
-        const result = await API.post(
-            "getUsers",
-            {}
-        );
-
-
-        console.log("USER RESULT:", result);
-
-
-        if(!result.success){
-
-            alert(result.message);
-
-            return;
-
-        }
-
-
-        // Store globally for search/filter later
-       window.loadedUsers = result.data.users;
-
-
-// First load: hide Archived users
-const activeUsers = window.loadedUsers.filter(
-    user => user.status !== "Archived"
 );
 
 
-renderUsers(activeUsers);
 
-    }
-    catch(err){
+function initialiseDashboard() {
 
-        console.error(
-            "LOAD USERS ERROR:",
-            err
-        );
+  if (!user) {
+
+    window.location.href = "index.html";
+
+    return;
+
+  }
 
 
-        alert(
-            "Unable to load users"
-        );
+  const displayName =
+    user.name ||
+    user.email ||
+    "User";
 
-    }
+
+  const welcomeUser =
+    document.getElementById("welcomeUser");
+
+
+  if (welcomeUser) {
+
+    welcomeUser.textContent =
+      displayName;
+
+  }
+
+
+  applyRoleAccess();
+
+  showSection("home");
 
 }
 
 
-/* ==========================================
-   RENDER USER ACCESS TABLE
-========================================== */
 
-function renderUsers(users){
+/* =========================================================
+   ROLE ACCESS
+========================================================= */
 
+function applyRoleAccess() {
 
-   console.log("ENTERED renderUsers");
-    console.log("USERS:", users);
+  const role =
+    user?.role || "";
 
-    const tbody =
-    document.getElementById("usersTable");
 
-    console.log(
-        "tbody found:",
-        tbody
-    );
+  /*
+   * ADMIN
+   */
 
+  if (role !== "Admin") {
 
-    if(!tbody){
+    document
+      .querySelectorAll(".admin-only")
+      .forEach(el => {
 
-        console.error(
-            "usersTable element not found"
-        );
+        el.classList.add("hidden");
 
-        return;
+      });
 
-    }
+  }
 
 
-    tbody.innerHTML = "";
+  /*
+   * CELL / SUPPORT
+   */
 
+  if (!["Admin", "Support"].includes(role)) {
 
-    users.forEach(user=>{
+    document
+      .querySelectorAll(".cell-only")
+      .forEach(el => {
 
+        el.classList.add("hidden");
 
-        let roleBadge;
+      });
 
+  }
 
-        switch(user.role){
 
+  /*
+   * PASTORAL
+   */
 
-            case "Admin":
+  if (!["Admin", "Support", "Pastor"].includes(role)) {
 
-                roleBadge = `
-                <span class="badge bg-danger">
-                    Admin
-                </span>`;
+    document
+      .querySelectorAll(".pastoral-only")
+      .forEach(el => {
 
-                break;
+        el.classList.add("hidden");
 
+      });
 
-            case "Head of Missions":
+  }
 
-                roleBadge = `
-                <span class="badge bg-primary">
-                    Head of Missions
-                </span>`;
 
-                break;
+  /*
+   * INTERN / OPERATIONS
+   */
 
+  if (!["Admin", "Pastor", "Support", "Intern"].includes(role)) {
 
-            case "Intern":
+    document
+      .querySelectorAll(".intern-only")
+      .forEach(el => {
 
-                roleBadge = `
-                <span class="badge bg-secondary">
-                    Intern
-                </span>`;
+        el.classList.add("hidden");
 
-                break;
+      });
 
+  }
 
-            default:
+}
 
-                roleBadge = `
-                <span class="badge bg-info">
-                    ${user.role || "-"}
-                </span>`;
 
-        }
 
+/* =========================================================
+   SECTION NAVIGATION
+========================================================= */
 
+function showSection(id) {
 
-        let statusBadge;
+  document
+    .querySelectorAll(".content-section")
+    .forEach(section => {
 
-
-        if(user.status === "Active"){
-
-            statusBadge = `
-            <span class="badge bg-success">
-                Active
-            </span>`;
-
-        }
-        else {
-
-            statusBadge = `
-            <span class="badge bg-secondary">
-                ${user.status || "-"}
-            </span>`;
-
-        }
-
-
-
-        tbody.innerHTML += `
-
-
-        <tr>
-
-
-            <td>
-
-                <strong>
-                    ${user.name || "-"}
-                </strong>
-
-            </td>
-
-
-            <td>
-
-                ${user.email || "-"}
-
-            </td>
-
-
-            <td>
-
-                ${roleBadge}
-
-            </td>
-
-
-            <td>
-
-                ${statusBadge}
-
-            </td>
-
-
-            <td>
-
-                ${
-                    user.lastLogin
-                    ?
-                    new Date(user.lastLogin)
-                    .toLocaleDateString()
-                    :
-                    "-"
-                }
-
-            </td>
-
-
-            <td>
-
-    <div class="action-buttons">
-
-        <button
-        class="action-btn edit-btn"
-        onclick="editUser('${user.email}')">
-
-            ✏️ Update Authorization
-
-        </button>
-
-
-        <button
-        class="action-btn archive-btn"
-        onclick="archiveUser('${user.email}')">
-
-            🗄 Update User Status
-
-        </button>
-
-    </div>
-
-</td>
-
-
-        </tr>
-
-
-        `;
-
+      section.classList.add("hidden");
 
     });
 
 
+  const section =
+    document.getElementById(id);
+
+
+  if (!section) {
+
+    return;
+
+  }
+
+
+  section.classList.remove("hidden");
+
+
+  /*
+   * Update page title
+   */
+
+  const titles = {
+
+    home:
+      "Dashboard",
+
+    admin:
+      "User Access Control",
+
+    events:
+      "Event Management",
+
+    migrations:
+      "Data Migrations",
+
+    intelligence:
+      "Missions Intelligence Center"
+
+  };
+
+
+  const pageTitle =
+    document.getElementById("pageTitle");
+
+
+  if (pageTitle) {
+
+    pageTitle.textContent =
+      titles[id] || "Dashboard";
+
+  }
+
+
+  /*
+   * Load users when opening
+   * User Access Control
+   */
+
+  if (id === "admin") {
+
+    loadUsers();
+
+  }
+
 }
 
-  async function editUser(email){
-
-    const role = prompt(
-`Update Authorization
-
-Choose Role:
-
-1 - Administrator
-2 - Support
-3 - Pastor
-4 - Intern`
-    );
 
 
-    let newRole;
+/* =========================================================
+   USER DATA
+========================================================= */
+
+window.loadedUsers = [];
 
 
-    switch(role){
 
-        case "1":
-            newRole = "Admin";
-            break;
+/* =========================================================
+   LOAD USERS
+========================================================= */
 
-        case "2":
-            newRole = "Support";
-            break;
+async function loadUsers() {
 
-        case "3":
-            newRole = "Pastor";
-            break;
+  const tbody =
+    document.getElementById("usersTable");
 
-        case "4":
-            newRole = "Intern";
-            break;
 
-        default:
-            alert("Invalid role");
-            return;
+  if (!tbody) {
+
+    return;
+
+  }
+
+
+  tbody.innerHTML = `
+
+    <tr>
+
+      <td
+        colspan="6"
+        class="text-center text-muted py-4"
+      >
+
+        <div class="spinner-border spinner-border-sm me-2"></div>
+
+        Loading users...
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  try {
+
+    const result =
+      await API.post(
+        "getUsers",
+        {}
+      );
+
+
+    if (
+      !result ||
+      result.success !== true ||
+      !result.data
+    ) {
+
+      throw new Error(
+        result?.message ||
+        "Unable to load users."
+      );
 
     }
 
 
-    const result = await API.post(
-        "updateUserRole",
-        {
-            email: email,
-            role: newRole
-        }
+    window.loadedUsers =
+      Array.isArray(result.data.users)
+        ? result.data.users
+        : [];
+
+
+    /*
+     * Archived users remain hidden from
+     * the main user table.
+     *
+     * They can still be found automatically
+     * through New User.
+     */
+
+    const activeUsers =
+      window.loadedUsers.filter(
+        user =>
+          String(user.status || "")
+            .trim()
+            .toLowerCase() !== "archived"
+      );
+
+
+    renderUsers(activeUsers);
+
+  } catch (error) {
+
+    console.error(
+      "loadUsers error:",
+      error
     );
 
 
-    alert(result.message);
+    tbody.innerHTML = `
 
+      <tr>
 
-    loadUsers();
+        <td
+          colspan="6"
+          class="text-center text-danger py-4"
+        >
+
+          <i class="bi bi-exclamation-circle me-1"></i>
+
+          ${
+            error.message ||
+            "Unable to load users."
+          }
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
 
 }
 
-  async function archiveUser(email){
 
 
-    const status = prompt(
-`Update User Status
+/* =========================================================
+   FILTER USERS
+========================================================= */
 
-Choose Status:
+function filterUsers() {
 
-1 - Scheduled
-2 - Active
-3 - Archived`
+  const search =
+    (
+      document.getElementById(
+        "userSearch"
+      )?.value || ""
+    )
+      .toLowerCase()
+      .trim();
+
+
+  const activeUsers =
+    window.loadedUsers.filter(
+      user =>
+        String(user.status || "")
+          .trim()
+          .toLowerCase() !== "archived"
     );
 
 
-    let newStatus;
+  if (!search) {
+
+    renderUsers(activeUsers);
+
+    return;
+
+  }
 
 
-    switch(status){
+  const filtered =
+    activeUsers.filter(
+      user => {
 
-        case "1":
-            newStatus = "Scheduled";
-            break;
+        const name =
+          String(user.name || "")
+            .toLowerCase();
 
-        case "2":
-            newStatus = "Active";
-            break;
+        const email =
+          String(user.email || "")
+            .toLowerCase();
 
-        case "3":
-            newStatus = "Archived";
-            break;
+        const role =
+          String(user.role || "")
+            .toLowerCase();
 
-        default:
-            alert("Invalid status");
-            return;
-
-    }
-
-
-
-    const result = await API.post(
-        "updateUserStatus",
-        {
-            email: email,
-            status: newStatus
-        }
-    );
-
-
-
-    alert(result.message);
-
-
-    loadUsers();
-
-}
-
-  function filterUsers(){
-
-
-    const keyword =
-    document
-    .getElementById("userSearch")
-    .value
-    .toLowerCase();
-
-
-
-    const filteredUsers =
-    window.loadedUsers.filter(user => {
-
-
-        // Always hide archived
-        if(user.status === "Archived"){
-            return false;
-        }
+        const status =
+          String(user.status || "")
+            .toLowerCase();
 
 
         return (
-
-            (user.name || "")
-            .toLowerCase()
-            .includes(keyword)
-
-
-            ||
-
-            (user.email || "")
-            .toLowerCase()
-            .includes(keyword)
-
-
-            ||
-
-            (user.role || "")
-            .toLowerCase()
-            .includes(keyword)
-
+          name.includes(search) ||
+          email.includes(search) ||
+          role.includes(search) ||
+          status.includes(search)
         );
 
-
-    });
-
-
-
-    renderUsers(filteredUsers);
-
-
-}
-
-  function showNewUserModal() {
-
-    document.getElementById("newUserEmail").value = "";
-
-    const modal = new bootstrap.Modal(
-        document.getElementById("newUserModal")
+      }
     );
 
-    modal.show();
+
+  renderUsers(filtered);
+
 }
 
+
+
+/* =========================================================
+   RENDER USERS
+========================================================= */
+
+function renderUsers(users) {
+
+  const tbody =
+    document.getElementById("usersTable");
+
+
+  if (!tbody) {
+
+    return;
+
+  }
+
+
+  if (!users.length) {
+
+    tbody.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="6"
+          class="text-center text-muted py-4"
+        >
+
+          No users found.
+
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+    users.map(
+      user => {
+
+
+        const name =
+          escapeHtml(
+            user.name ||
+            "—"
+          );
+
+
+        const email =
+          escapeHtml(
+            user.email ||
+            ""
+          );
+
+
+        const role =
+          escapeHtml(
+            user.role ||
+            "Not Assigned"
+          );
+
+
+        const status =
+          String(
+            user.status ||
+            ""
+          );
+
+
+        const lastLogin =
+          user.lastLogin
+            ? escapeHtml(
+                formatDate(
+                  user.lastLogin
+                )
+              )
+            : "Never";
+
+
+        let statusClass =
+          "bg-secondary";
+
+
+        if (status === "Active") {
+
+          statusClass =
+            "bg-success";
+
+        } else if (status === "Scheduled") {
+
+          statusClass =
+            "bg-warning text-dark";
+
+        }
+
+
+        return `
+
+          <tr>
+
+            <td>
+              <strong>
+                ${name}
+              </strong>
+            </td>
+
+            <td>
+              ${email}
+            </td>
+
+            <td>
+
+              <span class="badge bg-primary">
+
+                ${role}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <span class="badge status-badge ${statusClass}">
+
+                ${escapeHtml(status)}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <small class="text-muted">
+
+                ${lastLogin}
+
+              </small>
+
+            </td>
+
+            <td class="text-end user-actions">
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                onclick="editUser('${escapeJs(user.email)}')"
+                title="Change authorization"
+              >
+
+                <i class="bi bi-pencil"></i>
+
+              </button>
+
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                onclick="archiveUser('${escapeJs(user.email)}')"
+                title="Change status"
+              >
+
+                <i class="bi bi-person-x"></i>
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+
+/* =========================================================
+   NEW USER MODAL
+========================================================= */
+
+function showNewUserModal() {
+
+  const emailInput =
+    document.getElementById(
+      "newUserEmail"
+    );
+
+
+  const warning =
+    document.getElementById(
+      "existingUserWarning"
+    );
+
+
+  const restorePanel =
+    document.getElementById(
+      "restoreUserPanel"
+    );
+
+
+  const error =
+    document.getElementById(
+      "newUserError"
+    );
+
+
+  const success =
+    document.getElementById(
+      "newUserSuccess"
+    );
+
+
+  const addButton =
+    document.getElementById(
+      "addUserButton"
+    );
+
+
+  const restoreButton =
+    document.getElementById(
+      "restoreUserButton"
+    );
+
+
+  const title =
+    document.getElementById(
+      "newUserModalLabel"
+    );
+
+
+  /*
+   * Reset everything
+   */
+
+  emailInput.value = "";
+
+  warning.classList.add("hidden");
+
+  restorePanel.classList.add("hidden");
+
+  error.classList.add("hidden");
+
+  success.classList.add("hidden");
+
+  error.textContent = "";
+
+  success.textContent = "";
+
+
+  addButton.classList.remove("hidden");
+
+  restoreButton.classList.add("hidden");
+
+  emailInput.disabled = false;
+
+
+  title.innerHTML = `
+
+    <i class="bi bi-person-plus"></i>
+
+    New User
+
+  `;
+
+
+  document.getElementById(
+    "restoreUserRole"
+  ).value = "";
+
+
+  document.getElementById(
+    "restoreUserRole"
+  ).dataset.email = "";
+
+
+  const modalElement =
+    document.getElementById(
+      "newUserModal"
+    );
+
+
+  const modal =
+    bootstrap.Modal.getOrCreateInstance(
+      modalElement
+    );
+
+
+  modal.show();
+
+
+  setTimeout(
+    () => emailInput.focus(),
+    300
+  );
+
+}
+
+
+
+/* =========================================================
+   CLOSE NEW USER MODAL
+========================================================= */
+
+function closeNewUserModal() {
+
+  const modalElement =
+    document.getElementById(
+      "newUserModal"
+    );
+
+
+  const modal =
+    bootstrap.Modal.getInstance(
+      modalElement
+    );
+
+
+  if (modal) {
+
+    modal.hide();
+
+  }
+
+}
+
+
+
+/* =========================================================
+   ADD NEW USER
+========================================================= */
 
 async function addNewUser() {
 
-    const emailInput =
-        document.getElementById("newUserEmail");
-
-    const email =
-        emailInput.value.trim();
-
-    if (!email) {
-        emailInput.focus();
-        return;
-    }
-
-    if (!emailInput.checkValidity()) {
-        emailInput.reportValidity();
-        return;
-    }
-
-    try {
-
-        const result = await API.post(
-            "addUser",
-            {
-                email: email
-            }
-        );
-
-        console.log(
-            "ADD USER RESULT:",
-            result
-        );
+  const emailInput =
+    document.getElementById(
+      "newUserEmail"
+    );
 
 
-        if (!result.success) {
+  const email =
+    emailInput.value
+      .trim()
+      .toLowerCase();
 
-            alert(
-                result.message ||
-                "Unable to add user."
-            );
 
-            return;
+  const errorBox =
+    document.getElementById(
+      "newUserError"
+    );
+
+
+  const successBox =
+    document.getElementById(
+      "newUserSuccess"
+    );
+
+
+  errorBox.classList.add("hidden");
+
+  successBox.classList.add("hidden");
+
+
+  /*
+   * Validate email
+   */
+
+  if (!email) {
+
+    errorBox.textContent =
+      "Please enter a Google account email.";
+
+    errorBox.classList.remove("hidden");
+
+    emailInput.focus();
+
+    return;
+
+  }
+
+
+  /*
+   * Basic email validation
+   */
+
+  const emailPattern =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+  if (!emailPattern.test(email)) {
+
+    errorBox.textContent =
+      "Please enter a valid email address.";
+
+    errorBox.classList.remove("hidden");
+
+    emailInput.focus();
+
+    return;
+
+  }
+
+
+  /*
+   * First check the users already loaded
+   * into the browser.
+   */
+
+  const existingUser =
+    window.loadedUsers.find(
+      user =>
+        String(user.email || "")
+          .trim()
+          .toLowerCase() === email
+    );
+
+
+  /*
+   * ARCHIVED USER
+   */
+
+  if (
+    existingUser &&
+    String(existingUser.status || "")
+      .trim()
+      .toLowerCase() === "archived"
+  ) {
+
+    showArchivedUserForRestore(
+      existingUser
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * EXISTING ACTIVE / SCHEDULED USER
+   */
+
+  if (existingUser) {
+
+    showExistingUser(
+      existingUser
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Disable button while processing
+   */
+
+  const button =
+    document.getElementById(
+      "addUserButton"
+    );
+
+
+  const originalHtml =
+    button.innerHTML;
+
+
+  button.disabled = true;
+
+  button.innerHTML = `
+
+    <span
+      class="spinner-border spinner-border-sm me-1"
+    ></span>
+
+    Checking...
+
+  `;
+
+
+  try {
+
+    const result =
+      await API.post(
+        "addUser",
+        {
+          email: email
         }
+      );
 
 
-        alert(
-            result.message ||
-            "User added successfully."
-        );
+    /*
+     * Backend may discover that the user
+     * already exists if frontend data is stale.
+     */
 
+    if (
+      result &&
+      result.code === "ARCHIVED_USER" &&
+      result.data &&
+      result.data.user
+    ) {
 
-        // Close modal
-        const modalElement =
-            document.getElementById(
-                "newUserModal"
-            );
+      showArchivedUserForRestore(
+        result.data.user
+      );
 
-        const modal =
-            bootstrap.Modal.getInstance(
-                modalElement
-            );
-
-        if (modal) {
-            modal.hide();
-        }
-
-
-        // Clear input
-        emailInput.value = "";
-
-
-        // Refresh table
-        loadUsers();
+      return;
 
     }
-    catch (err) {
 
-        console.error(
-            "ADD USER ERROR:",
-            err
-        );
 
-        alert(
-            err.message ||
-            "Unable to add user."
-        );
+    /*
+     * Existing user
+     */
+
+    if (
+      result &&
+      result.code === "USER_EXISTS" &&
+      result.data &&
+      result.data.user
+    ) {
+
+      showExistingUser(
+        result.data.user
+      );
+
+      return;
 
     }
+
+
+    if (
+      !result ||
+      result.success !== true
+    ) {
+
+      throw new Error(
+        result?.message ||
+        "Unable to add user."
+      );
+
+    }
+
+
+    /*
+     * Success
+     */
+
+    successBox.textContent =
+      "User added successfully with status Scheduled.";
+
+    successBox.classList.remove(
+      "hidden"
+    );
+
+
+    emailInput.disabled = true;
+
+
+    /*
+     * Refresh after a short delay
+     */
+
+    await loadUsers();
+
+
+    setTimeout(
+      () => {
+
+        closeNewUserModal();
+
+      },
+      800
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "addNewUser error:",
+      error
+    );
+
+
+    errorBox.textContent =
+      error.message ||
+      "Unable to add user.";
+
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+
+  } finally {
+
+    button.disabled = false;
+
+    button.innerHTML =
+      originalHtml;
+
+  }
 
 }
 
+
+
+/* =========================================================
+   SHOW EXISTING USER
+========================================================= */
+
+function showExistingUser(user) {
+
+  const warning =
+    document.getElementById(
+      "existingUserWarning"
+    );
+
+
+  const title =
+    document.getElementById(
+      "existingUserTitle"
+    );
+
+
+  const message =
+    document.getElementById(
+      "existingUserMessage"
+    );
+
+
+  const restorePanel =
+    document.getElementById(
+      "restoreUserPanel"
+    );
+
+
+  const addButton =
+    document.getElementById(
+      "addUserButton"
+    );
+
+
+  const restoreButton =
+    document.getElementById(
+      "restoreUserButton"
+    );
+
+
+  const emailInput =
+    document.getElementById(
+      "newUserEmail"
+    );
+
+
+  const status =
+    user.status ||
+    "Unknown";
+
+
+  const role =
+    user.role ||
+    "Not Assigned";
+
+
+  title.textContent =
+    "User already exists";
+
+
+  message.innerHTML = `
+
+    <strong>
+      ${escapeHtml(
+        user.email || ""
+      )}
+    </strong>
+
+    is already registered.
+
+    <br>
+
+    Current status:
+    <strong>
+      ${escapeHtml(status)}
+    </strong>
+
+    <br>
+
+    Current authorization:
+    <strong>
+      ${escapeHtml(role)}
+    </strong>
+
+  `;
+
+
+  warning.classList.remove(
+    "hidden"
+  );
+
+
+  restorePanel.classList.add(
+    "hidden"
+  );
+
+
+  addButton.classList.remove(
+    "hidden"
+  );
+
+
+  restoreButton.classList.add(
+    "hidden"
+  );
+
+
+  emailInput.disabled = false;
+
+}
+
+
+
+/* =========================================================
+   SHOW ARCHIVED USER FOR RESTORE
+========================================================= */
+
+function showArchivedUserForRestore(user) {
+
+  const title =
+    document.getElementById(
+      "newUserModalLabel"
+    );
+
+
+  const warning =
+    document.getElementById(
+      "existingUserWarning"
+    );
+
+
+  const titleText =
+    document.getElementById(
+      "existingUserTitle"
+    );
+
+
+  const message =
+    document.getElementById(
+      "existingUserMessage"
+    );
+
+
+  const restorePanel =
+    document.getElementById(
+      "restoreUserPanel"
+    );
+
+
+  const restoreName =
+    document.getElementById(
+      "restoreUserName"
+    );
+
+
+  const restoreEmail =
+    document.getElementById(
+      "restoreUserEmail"
+    );
+
+
+  const previousRole =
+    document.getElementById(
+      "restoreUserPreviousRole"
+    );
+
+
+  const roleSelect =
+    document.getElementById(
+      "restoreUserRole"
+    );
+
+
+  const addButton =
+    document.getElementById(
+      "addUserButton"
+    );
+
+
+  const restoreButton =
+    document.getElementById(
+      "restoreUserButton"
+    );
+
+
+  const emailInput =
+    document.getElementById(
+      "newUserEmail"
+    );
+
+
+  /*
+   * Modal title
+   */
+
+  title.innerHTML = `
+
+    <i class="bi bi-person-check"></i>
+
+    Restore Archived User
+
+  `;
+
+
+  /*
+   * Warning
+   */
+
+  titleText.textContent =
+    "Archived user found";
+
+
+  message.textContent =
+    "This Google account belongs to an archived user. " +
+    "You may restore the account with a new authorization.";
+
+
+  warning.classList.remove(
+    "hidden"
+  );
+
+
+  /*
+   * User information
+   */
+
+  restoreName.textContent =
+    user.name ||
+    "Not available";
+
+
+  restoreEmail.textContent =
+    user.email ||
+    "";
+
+
+  previousRole.textContent =
+    user.role ||
+    "Not Assigned";
+
+
+  /*
+   * Store email for restore
+   */
+
+  roleSelect.dataset.email =
+    user.email || "";
+
+
+  /*
+   * Reset role selection
+   */
+
+  roleSelect.value = "";
+
+
+  /*
+   * UI state
+   */
+
+  restorePanel.classList.remove(
+    "hidden"
+  );
+
+
+  addButton.classList.add(
+    "hidden"
+  );
+
+
+  restoreButton.classList.remove(
+    "hidden"
+  );
+
+
+  /*
+   * Do not allow email to be changed
+   * once archived user is identified.
+   */
+
+  emailInput.value =
+    user.email || "";
+
+
+  emailInput.disabled = true;
+
+}
+
+
+
+/* =========================================================
+   RESTORE ARCHIVED USER
+========================================================= */
+
+async function restoreArchivedUser() {
+
+  const roleSelect =
+    document.getElementById(
+      "restoreUserRole"
+    );
+
+
+  const email =
+    String(
+      roleSelect.dataset.email || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const role =
+    String(
+      roleSelect.value || ""
+    )
+      .trim();
+
+
+  const errorBox =
+    document.getElementById(
+      "newUserError"
+    );
+
+
+  const restoreButton =
+    document.getElementById(
+      "restoreUserButton"
+    );
+
+
+  errorBox.classList.add(
+    "hidden"
+  );
+
+
+  /*
+   * Validate
+   */
+
+  if (!email) {
+
+    errorBox.textContent =
+      "Unable to determine the archived user's email.";
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+    return;
+
+  }
+
+
+  if (!role) {
+
+    errorBox.textContent =
+      "Please select the new authorization for this user.";
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+    roleSelect.focus();
+
+    return;
+
+  }
+
+
+  /*
+   * Confirmation
+   */
+
+  const confirmed =
+    window.confirm(
+      "Restore this archived user as " +
+      role +
+      "?\n\n" +
+      "The user will be changed to Active."
+    );
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+  const originalHtml =
+    restoreButton.innerHTML;
+
+
+  restoreButton.disabled = true;
+
+  restoreButton.innerHTML = `
+
+    <span
+      class="spinner-border spinner-border-sm me-1"
+    ></span>
+
+    Restoring...
+
+  `;
+
+
+  try {
+
+    const result =
+      await API.post(
+        "restoreUser",
+        {
+          email: email,
+          role: role,
+          restoredBy: user?.email || ""
+        }
+      );
+
+
+    if (
+      !result ||
+      result.success !== true
+    ) {
+
+      throw new Error(
+        result?.message ||
+        "Unable to restore user."
+      );
+
+    }
+
+
+    /*
+     * Refresh user list
+     */
+
+    await loadUsers();
+
+
+    /*
+     * Close modal
+     */
+
+    closeNewUserModal();
+
+
+    /*
+     * Tell admin
+     */
+
+    setTimeout(
+      () => {
+
+        alert(
+          "User restored successfully.\n\n" +
+          email +
+          "\nAuthorization: " +
+          role +
+          "\nStatus: Active"
+        );
+
+      },
+      300
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "restoreArchivedUser error:",
+      error
+    );
+
+
+    errorBox.textContent =
+      error.message ||
+      "Unable to restore user.";
+
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+
+  } finally {
+
+    restoreButton.disabled = false;
+
+    restoreButton.innerHTML =
+      originalHtml;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   EDIT USER AUTHORIZATION
+========================================================= */
+
+async function editUser(email) {
+
+  const userRecord =
+    window.loadedUsers.find(
+      user =>
+        String(user.email || "")
+          .trim()
+          .toLowerCase() ===
+        String(email || "")
+          .trim()
+          .toLowerCase()
+    );
+
+
+  if (!userRecord) {
+
+    alert(
+      "User record could not be found."
+    );
+
+    return;
+
+  }
+
+
+  const currentRole =
+    userRecord.role ||
+    "";
+
+
+  const role =
+    window.prompt(
+      "Select authorization:\n\n" +
+      "1. Administrator\n" +
+      "2. Support\n" +
+      "3. Pastor\n" +
+      "4. Intern\n\n" +
+      "Enter the number:",
+      getRoleNumber(currentRole)
+    );
+
+
+  if (role === null) {
+
+    return;
+
+  }
+
+
+  const roleMap = {
+
+    "1": "Admin",
+    "2": "Support",
+    "3": "Pastor",
+    "4": "Intern"
+
+  };
+
+
+  const newRole =
+    roleMap[
+      String(role).trim()
+    ];
+
+
+  if (!newRole) {
+
+    alert(
+      "Invalid authorization selection."
+    );
+
+    return;
+
+  }
+
+
+  if (newRole === currentRole) {
+
+    return;
+
+  }
+
+
+  const confirmed =
+    window.confirm(
+      "Change authorization for " +
+      email +
+      " from " +
+      (currentRole || "Not Assigned") +
+      " to " +
+      newRole +
+      "?"
+    );
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const result =
+      await API.post(
+        "updateUserRole",
+        {
+          email: email,
+          role: newRole
+        }
+      );
+
+
+    if (
+      !result ||
+      result.success !== true
+    ) {
+
+      throw new Error(
+        result?.message ||
+        "Unable to update authorization."
+      );
+
+    }
+
+
+    await loadUsers();
+
+
+    alert(
+      "Authorization updated successfully."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "editUser error:",
+      error
+    );
+
+
+    alert(
+      error.message ||
+      "Unable to update authorization."
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   ROLE NUMBER
+========================================================= */
+
+function getRoleNumber(role) {
+
+  const map = {
+
+    Admin: "1",
+    Support: "2",
+    Pastor: "3",
+    Intern: "4"
+
+  };
+
+
+  return map[role] || "";
+
+}
+
+
+
+/* =========================================================
+   UPDATE USER STATUS
+========================================================= */
+
+async function archiveUser(email) {
+
+  const userRecord =
+    window.loadedUsers.find(
+      user =>
+        String(user.email || "")
+          .trim()
+          .toLowerCase() ===
+        String(email || "")
+          .trim()
+          .toLowerCase()
+    );
+
+
+  if (!userRecord) {
+
+    alert(
+      "User record could not be found."
+    );
+
+    return;
+
+  }
+
+
+  const currentStatus =
+    userRecord.status ||
+    "";
+
+
+  const status =
+    window.prompt(
+      "Select status:\n\n" +
+      "1. Scheduled\n" +
+      "2. Active\n" +
+      "3. Archived\n\n" +
+      "Enter the number:",
+      getStatusNumber(currentStatus)
+    );
+
+
+  if (status === null) {
+
+    return;
+
+  }
+
+
+  const statusMap = {
+
+    "1": "Scheduled",
+    "2": "Active",
+    "3": "Archived"
+
+  };
+
+
+  const newStatus =
+    statusMap[
+      String(status).trim()
+    ];
+
+
+  if (!newStatus) {
+
+    alert(
+      "Invalid status selection."
+    );
+
+    return;
+
+  }
+
+
+  if (newStatus === currentStatus) {
+
+    return;
+
+  }
+
+
+  const confirmed =
+    window.confirm(
+      "Change status for " +
+      email +
+      " from " +
+      currentStatus +
+      " to " +
+      newStatus +
+      "?"
+    );
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const result =
+      await API.post(
+        "updateUserStatus",
+        {
+          email: email,
+          status: newStatus
+        }
+      );
+
+
+    if (
+      !result ||
+      result.success !== true
+    ) {
+
+      throw new Error(
+        result?.message ||
+        "Unable to update user status."
+      );
+
+    }
+
+
+    await loadUsers();
+
+
+    alert(
+      "User status updated successfully."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "archiveUser error:",
+      error
+    );
+
+
+    alert(
+      error.message ||
+      "Unable to update user status."
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   STATUS NUMBER
+========================================================= */
+
+function getStatusNumber(status) {
+
+  const map = {
+
+    Scheduled: "1",
+    Active: "2",
+    Archived: "3"
+
+  };
+
+
+  return map[status] || "";
+
+}
+
+
+
+/* =========================================================
+   REMINDER CENTRE
+========================================================= */
+
+function openReminderCentre() {
+
+  /*
+   * Keep your existing Reminder Centre function here
+   * if it is implemented elsewhere.
+   */
+
+  console.log(
+    "Reminder Centre"
+  );
+
+}
+
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logout() {
+
+  localStorage.removeItem(
+    "mp_user"
+  );
+
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+
+/* =========================================================
+   DATE FORMAT
+========================================================= */
+
+function formatDate(value) {
+
+  if (!value) {
+
+    return "";
+
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if (isNaN(date.getTime())) {
+
+    return String(value);
+
+  }
+
+
+  return date.toLocaleString(
+    "en-SG",
+    {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+
+/* =========================================================
+   JAVASCRIPT STRING ESCAPE
+========================================================= */
+
+function escapeJs(value) {
+
+  return String(value ?? "")
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+    .replace(
+      /'/g,
+      "\\'"
+    )
+    .replace(
+      /\r/g,
+      "\\r"
+    )
+    .replace(
+      /\n/g,
+      "\\n"
+    );
+
+}
+
+
 </script>
+
+
+
+<!-- =======================================================
+     BOOTSTRAP JS
+======================================================== -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
 
 </body>
 </html>
